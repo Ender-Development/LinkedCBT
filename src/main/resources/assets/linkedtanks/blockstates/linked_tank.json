@@ -1,0 +1,10 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"model": "linkedtanks:linked_tank"
+	},
+	"variants": {
+		"normal": [{}],
+		"inventory": [{}]
+	}
+}
