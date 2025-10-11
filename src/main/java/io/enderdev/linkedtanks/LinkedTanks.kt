@@ -1,10 +1,14 @@
 package io.enderdev.linkedtanks
 
 import io.enderdev.linkedtanks.blocks.ModBlocks
+import io.enderdev.linkedtanks.data.LTPersistentData
 import net.minecraft.creativetab.CreativeTabs
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.logging.log4j.Logger
 import org.ender_development.catalyx.client.gui.CatalyxGuiHandler
 import org.ender_development.catalyx.core.CatalyxSettings
@@ -44,6 +48,28 @@ object LinkedTanks : ICatalyxMod {
 	//	ModBlocks.registerItems(event)
 	//	ModItems.registerItems(event)
 	//}
+
+	@EventHandler
+	fun serverStopping(event: FMLServerStoppingEvent) {
+		LTPersistentData.write()
+	}
+
+	var lastWriteCausedBySave = 0L
+
+	@SubscribeEvent
+	fun worldSave(event: WorldEvent.Save) {
+		val currentTime = System.currentTimeMillis()
+		// write to disk at most every 250ms (5t) when caused by worlds saving to hopefully avoid writing the same data n times when all n dimensions save at the same time
+		if(currentTime - lastWriteCausedBySave > 250) {
+			lastWriteCausedBySave = currentTime
+			LTPersistentData.write()
+		}
+	}
+
+	// because of the way Java loads classes, need to do this lol
+	init {
+		ModBlocks.hi()
+	}
 
 	// TODO linkedtanks command for ops to manage stuff
 	// TODO recipes
