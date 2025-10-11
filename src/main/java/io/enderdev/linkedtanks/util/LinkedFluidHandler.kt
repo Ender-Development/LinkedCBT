@@ -1,6 +1,5 @@
 package io.enderdev.linkedtanks.util
 
-import io.enderdev.linkedtanks.ConfigHandler
 import io.enderdev.linkedtanks.data.LTPersistentData
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.FluidTankInfo
@@ -14,9 +13,8 @@ class LinkedFluidHandler(var channelData: LTPersistentData.ChannelData?) : IFlui
 		get() = channelData?.fluid?.let { FluidStack(it, channelData!!.fluidAmount) }
 
 	val capacity
-		get() = channelData?.let {
-			ConfigHandler.tankCapacity * if(ConfigHandler.liquidStorageChangesWithTankCount)it.linkedPositions.size else 1
-		} ?: 0
+		@JvmName("getChannelCapacity")
+		get() = channelData?.fluidCapacity ?: 0
 
 	// IFluidHandler
 	override fun getTankProperties(): Array<out IFluidTankProperties?>? =

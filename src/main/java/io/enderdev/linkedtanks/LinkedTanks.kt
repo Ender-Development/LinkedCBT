@@ -1,14 +1,19 @@
 package io.enderdev.linkedtanks
 
 import io.enderdev.linkedtanks.blocks.ModBlocks
+import io.enderdev.linkedtanks.command.LinkedTanksCommand
 import io.enderdev.linkedtanks.data.LTPersistentData
+import io.enderdev.linkedtanks.network.PacketHandler
 import net.minecraft.creativetab.CreativeTabs
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.network.NetworkRegistry
 import org.apache.logging.log4j.Logger
 import org.ender_development.catalyx.client.gui.CatalyxGuiHandler
 import org.ender_development.catalyx.core.CatalyxSettings
@@ -36,6 +41,14 @@ object LinkedTanks : ICatalyxMod {
 	@EventHandler
 	fun preInit(e: FMLPreInitializationEvent) {
 		logger = e.modLog
+		PacketHandler.init()
+		NetworkRegistry.INSTANCE.registerGuiHandler(LinkedTanks, guiHandler)
+		MinecraftForge.EVENT_BUS.register(this)
+	}
+
+	@EventHandler
+	fun serverStarting(e: FMLServerStartingEvent) {
+		e.registerServerCommand(LinkedTanksCommand)
 	}
 
 	//@SubscribeEvent
@@ -58,9 +71,10 @@ object LinkedTanks : ICatalyxMod {
 
 	@SubscribeEvent
 	fun worldSave(event: WorldEvent.Save) {
+		println("--- WORLDEVENT.SAVE CALLED ---")
 		val currentTime = System.currentTimeMillis()
 		// write to disk at most every 250ms (5t) when caused by worlds saving to hopefully avoid writing the same data n times when all n dimensions save at the same time
-		if(currentTime - lastWriteCausedBySave > 250) {
+		if(currentTime - lastWriteCausedBySave > 250L) {
 			lastWriteCausedBySave = currentTime
 			LTPersistentData.write()
 		}

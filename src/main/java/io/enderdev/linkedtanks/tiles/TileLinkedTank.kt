@@ -35,7 +35,7 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 
 	var channelId = NO_CHANNEL
 
-	var channelData: LTPersistentData.ChannelData? = null
+	var channelData: LTPersistentData.ChannelData? = LTPersistentData.data.get(channelId)
 		set(value) {
 			field = value
 			fluidHandler.channelData = value
@@ -49,6 +49,11 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 		markDirtyGUIEvery(7)
 	}
 
+	init {
+		if(channelId != NO_CHANNEL && !LTPersistentData.data.contains(channelId))
+			unlink()
+	}
+
 	fun notifyBreak() {
 		unlink()
 	}
@@ -57,10 +62,7 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 		if(channelId == NO_CHANNEL)
 			return
 
-		LTPersistentData.data.get(channelId)?.let {
-			it.loadedLinkedTanks.remove(this)
-			it.linkedPositions.remove(pos dim world.dimId)
-		}
+		LTPersistentData.data.get(channelId)?.linkedPositions?.remove(pos dim world.dimId)
 
 		channelId = NO_CHANNEL
 		channelData = null
@@ -90,10 +92,11 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 
 		unlink()
 
-		newChannelData.loadedLinkedTanks.add(this)
 		newChannelData.linkedPositions.add(pos dim world.dimId)
 		channelId = newChannelId
 		channelData = newChannelData
+
+		markDirtyGUI()
 	}
 
 	override fun handleButtonPress(button: AbstractButtonWrapper) {
@@ -101,8 +104,14 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 			is PauseButtonWrapper -> isPaused = !isPaused
 			is RedstoneButtonWrapper -> needsRedstonePower = !needsRedstonePower
 			is LinkButtonWrapper -> {
-				if(button.channelId != NO_CHANNEL)
-					link(button.channelId, button.ctx!!)
+				if(button.channelId != NO_CHANNEL) {
+					val newChannelId = if(button.channelId == CREATE_NEW_CHANNEL)
+						LTPersistentData.createNewChannel(button.ctx!!.serverHandler.player, this)
+					else
+						button.channelId
+
+					link(newChannelId, button.ctx!!)
+				}
 			}
 		}
 	}
@@ -127,34 +136,43 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 	// server-side, sent to client-side [handleUpdateTag]
 	override fun getUpdateTag(): NBTTagCompound {
 		return NBTTagCompound().apply {
+			writeInternal(this) // write stuff like x,y,z + Forge stuff, since we don't call writeToNBT
 			setInteger("ChannelId", channelId)
 			channelData?.let { channelData ->
+				setString("Name", channelData.name)
 				setString("OwnerUsername", channelData.ownerUsername)
-				setString("FluidName", FluidRegistry.getFluidName(channelData.fluid))
+				if(channelData.fluid != null)
+					setString("FluidName", FluidRegistry.getFluidName(channelData.fluid))
 				setInteger("FluidAmount", channelData.fluidAmount)
+				setInteger("FluidCapacity", channelData.fluidCapacity)
 			}
 		}
 	}
 
 	// client-side, handle from server-side [getUpdateTag]
 	override fun handleUpdateTag(tag: NBTTagCompound) {
+		super.readFromNBT(tag)
+
 		if(!tag.hasKey("OwnerUsername"))
 			return
 
+		val name = tag.getString("Name")
 		val ownerUsername = tag.getString("OwnerUsername")
 		val fluid = FluidRegistry.getFluid(tag.getString("FluidName"))
 		val fluidAmount = tag.getInteger("FluidAmount")
 		channelId = tag.getInteger("ChannelId")
-		channelData = LTPersistentData.ChannelData(NO_UUID, ownerUsername, fluid, fluidAmount, NO_LINKED_POSITIONS, NO_LINKED_INSTANCES)
+		channelData = LTPersistentData.ChannelData(NO_UUID, ownerUsername, name, fluid, fluidAmount, NO_LINKED_POSITIONS).apply {
+			fluidCapacityOverride = tag.getInteger("FluidCapacity")
+		}
 	}
 
 	companion object {
 		const val NO_CHANNEL = -1
+		const val CREATE_NEW_CHANNEL = -101
 
 		// client-side only, used in [handleUpdateTag] to try to avoid creating useless class instances
 		val NO_UUID: UUID = UUID.fromString("0-0-0-0-0")
 		val NO_LINKED_POSITIONS = HashSet<LTPersistentData.DimBlockPos>(0)
-		val NO_LINKED_INSTANCES = HashSet<TileLinkedTank>(0)
 	}
 
 	class LinkButtonWrapper(x: Int, y: Int) : AbstractButtonWrapper(x, y, 32) {

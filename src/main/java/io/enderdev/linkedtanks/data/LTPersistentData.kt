@@ -1,5 +1,6 @@
 package io.enderdev.linkedtanks.data
 
+import io.enderdev.linkedtanks.ConfigHandler
 import io.enderdev.linkedtanks.Tags
 import io.enderdev.linkedtanks.data.LTPersistentData.DimBlockPos.Companion.dim
 import io.enderdev.linkedtanks.tiles.TileLinkedTank
@@ -36,19 +37,20 @@ object LTPersistentData {
 			val linkedPositionCount = tag.getInteger("LinkedPositionCount")
 			val linkedPositions = HashSet<DimBlockPos>(linkedPositionCount)
 			repeat(linkedPositionCount) {
-				DimBlockPos.fromString(tag.getString($$"LinkedPosition$$$it"))
+				DimBlockPos.fromString(tag.getString("LinkedPosition$$it"))
 			}
 			val fluid = FluidRegistry.getFluid(tag.getString("FluidName"))
 			val fluidAmount = tag.getInteger("FluidAmount")
 
-			dataMap.put(it.toInt(), ChannelData(ownerUUID, ownerUsername, name, fluid, fluidAmount, linkedPositions, hashSetOf()))
+			dataMap.put(it.toInt(), ChannelData(ownerUUID, ownerUsername, name, fluid, fluidAmount, linkedPositions))
 		}
 
-		nextChannelId = dataMap.keys.max() + 1
+		nextChannelId = (dataMap.keys.maxOrNull() ?: 0) + 1
 	}
 
 	// I'd have to write() every IFluidHandler operation, instead of saving every modification, try to save on exit/ServerStopping/WorldSave/… and accept the unlikely data loss
 	fun write() {
+		println("----- LTPersistentData#write called, saving all data -----")
 		// lazy option, if performance requires it I might need to optimise this more
 		dataNBT.tag.tagMap.clear()
 
@@ -59,12 +61,14 @@ object LTPersistentData {
 				setString("Name", channelData.name)
 				setInteger("LinkedPositionCount", channelData.linkedPositions.size)
 				channelData.linkedPositions.forEachIndexed { idx, pos ->
-					setString($$"LinkedPosition$$$idx", pos.toString())
+					setString("LinkedPosition$$idx", pos.toString())
 				}
-				setString("FluidName", FluidRegistry.getFluidName(channelData.fluid))
+				if(channelData.fluid != null)
+					setString("FluidName", FluidRegistry.getFluidName(channelData.fluid))
 				setInteger("FluidAmount", channelData.fluidAmount)
 			})
 		}
+		println(dataNBT.tag)
 		dataNBT.save()
 	}
 
@@ -74,15 +78,26 @@ object LTPersistentData {
 			return dataMap
 		}
 
-	fun createNewChannel(player: EntityPlayer, te: TileLinkedTank): ChannelData {
-		val channelData = ChannelData(player.uniqueID, player.gameProfile.name, "${player.gameProfile.name}'s Group #${nextChannelId}", null, 0, hashSetOf(te.pos dim te.world.dimId), hashSetOf(te))
-		dataMap.put(nextChannelId++, channelData)
-		return channelData
+	fun createNewChannel(player: EntityPlayer, te: TileLinkedTank): Int {
+		val channelData = ChannelData(player.uniqueID, player.gameProfile.name, "New Channel $nextChannelId", null, 0, hashSetOf(te.pos dim te.world.dimId))
+		dataMap.put(nextChannelId, channelData)
+		return nextChannelId++
 	}
 
 	// TODO cap `name` to a max length of like 32-48 chars
 	/** **Do NOT** use [ownerUsername] nor [name] for any checking */
-	data class ChannelData(val ownerUUID: UUID, var ownerUsername: String, var name: String, var fluid: Fluid?, var fluidAmount: Int, val linkedPositions: HashSet<DimBlockPos>, val loadedLinkedTanks: HashSet<TileLinkedTank>)
+	data class ChannelData(val ownerUUID: UUID, var ownerUsername: String, var name: String, var fluid: Fluid?, var fluidAmount: Int, val linkedPositions: HashSet<DimBlockPos>) {
+		/**
+		 * Used clientside to make stuff display properly
+		 */
+		var fluidCapacityOverride = 0
+
+		val fluidCapacity: Int
+			get() = if(fluidCapacityOverride != 0)
+				fluidCapacityOverride
+			else
+				ConfigHandler.tankCapacity * if(ConfigHandler.liquidStorageChangesWithTankCount) linkedPositions.size else 1
+	}
 
 	data class DimBlockPos(val dimId: Int, val pos: BlockPos) {
 		constructor(dimId: Int, x: Int, y: Int, z: Int) : this(dimId, BlockPos(x, y, z))
