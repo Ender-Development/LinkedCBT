@@ -1,12 +1,10 @@
 package io.enderdev.linkedtanks.tiles
 
-import com.azul.crs.client.Utils.uuid
 import io.enderdev.linkedtanks.LinkedTanks
 import io.enderdev.linkedtanks.Tags
 import io.enderdev.linkedtanks.data.LTPersistentData
 import io.enderdev.linkedtanks.data.LTPersistentData.DimBlockPos.Companion.dim
 import io.enderdev.linkedtanks.data.LTPersistentData.dimId
-import io.enderdev.linkedtanks.tiles.TileLinkedTank.Companion.NO_CHANNEL
 import io.enderdev.linkedtanks.util.LinkedFluidHandler
 import io.netty.buffer.ByteBuf
 import net.minecraft.client.Minecraft
@@ -28,7 +26,6 @@ import org.ender_development.catalyx.tiles.helper.IFluidTile
 import org.ender_development.catalyx.tiles.helper.IGuiTile
 import org.ender_development.catalyx.utils.extensions.readString
 import org.ender_development.catalyx.utils.extensions.writeString
-import sun.audio.AudioPlayer.player
 
 class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable, IGuiTile, IButtonTile, BaseGuiTyped.IDefaultButtonVariables {
 	override var isPaused = false

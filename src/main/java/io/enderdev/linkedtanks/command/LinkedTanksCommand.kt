@@ -95,7 +95,7 @@ object LinkedTanksCommand : CommandTreeBase() {
 				LTPersistentData.data.toList().sortedBy { it.first }.forEach { (id, data) ->
 					sender.reply("- #$id ${data.name}${if(data.deleted) " (deleted)" else ""}")
 					sender.reply("owner: ${data.ownerUsername} (uuid: ${data.ownerUUID})")
-					sender.sendMessage((+"${data.fluidAmount.formatNumber()} / ${data.fluidCapacity.formatNumber()} mB of ").appendSibling(data.fluid.nameComponent))
+					sender.sendMessage(+"${data.fluidAmount.formatNumber()} / ${data.fluidCapacity.formatNumber()} mB of " + data.fluid.nameComponent)
 					sender.reply("")
 				}
 				sender.reply("Total: ${LTPersistentData.data.size} (${LTPersistentData.data.count { !it.value.deleted }} not deleted) channels with ${LTPersistentData.data.map { it.value.linkedPositions.size }.sum()} total endpoints")
@@ -218,7 +218,7 @@ object LinkedTanksCommand : CommandTreeBase() {
 				val fluidAmount = if(args.size == 3) args[2].toIntOrNull() else null
 
 				if(fluidName == "empty" || fluidAmount == 0) {
-					sender.reply((+"Channel $channelId emptied (previous contents: ${channel.fluidAmount.formatNumber()} ").appendSibling(channel.fluid.nameComponent).appendSibling(+")"))
+					sender.reply(+"Channel $channelId emptied (previous contents: ${channel.fluidAmount.formatNumber()} " + channel.fluid.nameComponent + +")")
 					channel.fluidAmount = 0
 					channel.fluid = null
 					return
@@ -238,7 +238,7 @@ object LinkedTanksCommand : CommandTreeBase() {
 				if(fluidAmount > channel.fluidCapacity)
 					sender.replyWarn("Setting fluid amount to more than the expected capacity, things might not work as intended")
 
-				sender.reply((+"Set contents of channel $channelId to ${fluidAmount.formatNumber()} mB ").appendSibling(fluid.nameComponent).appendSibling(+" (previous contents: ${channel.fluidAmount.formatNumber()} mB ").appendSibling(channel.fluid.nameComponent).appendSibling(+")"))
+				sender.reply(+"Set contents of channel $channelId to ${fluidAmount.formatNumber()} mB " + fluid.nameComponent + +" (previous contents: ${channel.fluidAmount.formatNumber()} mB " + channel.fluid.nameComponent + +")")
 				channel.fluid = fluid
 				channel.fluidAmount = fluidAmount
 			}
@@ -300,4 +300,8 @@ object LinkedTanksCommand : CommandTreeBase() {
 	@Suppress("NOTHING_TO_INLINE")
 	private inline operator fun String.unaryPlus() =
 		TextComponentString(this)
+
+	@Suppress("NOTHING_TO_INLINE")
+	private inline operator fun ITextComponent.plus(other: ITextComponent) =
+		appendSibling(other)
 }

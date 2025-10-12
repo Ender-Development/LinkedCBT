@@ -3,7 +3,6 @@ package io.enderdev.linkedtanks.client
 import io.enderdev.linkedtanks.network.ChannelListPacket
 import io.enderdev.linkedtanks.network.PacketHandler
 import io.enderdev.linkedtanks.tiles.TileLinkedTank
-import net.minecraftforge.fluids.FluidRegistry
 
 object ClientChannelListManager {
 	var lastGot = 0L
