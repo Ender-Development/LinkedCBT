@@ -1,6 +1,7 @@
 package io.enderdev.linkedtanks.data
 
 import io.enderdev.linkedtanks.ConfigHandler
+import io.enderdev.linkedtanks.LinkedTanks
 import io.enderdev.linkedtanks.Tags
 import io.enderdev.linkedtanks.data.LTPersistentData.DimBlockPos.Companion.dim
 import io.enderdev.linkedtanks.tiles.TileLinkedTank
@@ -31,18 +32,17 @@ object LTPersistentData {
 
 		dataNBT.tag.keySet.forEach {
 			val tag = dataNBT.tag.getCompoundTag(it)
+			val deleted = tag.getBoolean("Deleted")
 			val ownerUUID = tag.getUniqueId("OwnerUUID") ?: return@forEach
 			val ownerUsername = tag.getString("OwnerUsername")
 			val name = tag.getString("Name")
 			val linkedPositionCount = tag.getInteger("LinkedPositionCount")
 			val linkedPositions = HashSet<DimBlockPos>(linkedPositionCount)
-			repeat(linkedPositionCount) {
-				DimBlockPos.fromString(tag.getString("LinkedPosition$$it"))
-			}
+			(0..<linkedPositionCount).mapTo(linkedPositions) { DimBlockPos.fromString(tag.getString("LinkedPosition$$it")) }
 			val fluid = FluidRegistry.getFluid(tag.getString("FluidName"))
 			val fluidAmount = tag.getInteger("FluidAmount")
 
-			dataMap.put(it.toInt(), ChannelData(ownerUUID, ownerUsername, name, fluid, fluidAmount, linkedPositions))
+			dataMap.put(it.toInt(), ChannelData(deleted, ownerUUID, ownerUsername, name, fluid, fluidAmount, linkedPositions))
 		}
 
 		nextChannelId = (dataMap.keys.maxOrNull() ?: 0) + 1
@@ -50,12 +50,12 @@ object LTPersistentData {
 
 	// I'd have to write() every IFluidHandler operation, instead of saving every modification, try to save on exit/ServerStopping/WorldSave/… and accept the unlikely data loss
 	fun write() {
-		println("----- LTPersistentData#write called, saving all data -----")
 		// lazy option, if performance requires it I might need to optimise this more
 		dataNBT.tag.tagMap.clear()
 
 		dataMap.entries.forEach { (channelId, channelData) ->
 			dataNBT.tag.setTag(channelId.toString(), NBTTagCompound().apply {
+				setBoolean("Deleted", channelData.deleted)
 				setUniqueId("OwnerUUID", channelData.ownerUUID)
 				setString("OwnerUsername", channelData.ownerUsername)
 				setString("Name", channelData.name)
@@ -68,7 +68,7 @@ object LTPersistentData {
 				setInteger("FluidAmount", channelData.fluidAmount)
 			})
 		}
-		println(dataNBT.tag)
+		LinkedTanks.logger.debug("Saving data to disk: {}", dataNBT.tag)
 		dataNBT.save()
 	}
 
@@ -79,14 +79,22 @@ object LTPersistentData {
 		}
 
 	fun createNewChannel(player: EntityPlayer, te: TileLinkedTank): Int {
-		val channelData = ChannelData(player.uniqueID, player.gameProfile.name, "New Channel $nextChannelId", null, 0, hashSetOf(te.pos dim te.world.dimId))
+		val channelData = ChannelData(false, player.uniqueID, player.gameProfile.name, "New Channel $nextChannelId", null, 0, hashSetOf(te.pos dim te.world.dimId))
 		dataMap.put(nextChannelId, channelData)
 		return nextChannelId++
 	}
 
-	// TODO cap `name` to a max length of like 32-48 chars
+	/*
+	 * We have to keep [deleted] channels in the channelData because otherwise there could be a situation where:
+	 * - someone places a linked tank somewhere and links it to channel id X
+	 * - they go somewhere else and that linked tank unloads
+	 * - then they delete the channel with id X
+	 * - someone *different* creates a channel and gets channel id X
+	 * - the first linked tank gets loaded and is magically linked to the new channel
+	 * This is the most resilient way of ensuring this doesn't happen, sadly it also wastes a little bit of space, but I think that's a sacrifice worth paying
+	 */
 	/** **Do NOT** use [ownerUsername] nor [name] for any checking */
-	data class ChannelData(val ownerUUID: UUID, var ownerUsername: String, var name: String, var fluid: Fluid?, var fluidAmount: Int, val linkedPositions: HashSet<DimBlockPos>) {
+	data class ChannelData(var deleted: Boolean, var ownerUUID: UUID, var ownerUsername: String, var name: String, var fluid: Fluid?, var fluidAmount: Int, val linkedPositions: HashSet<DimBlockPos>) {
 		/**
 		 * Used clientside to make stuff display properly
 		 */
@@ -129,7 +137,12 @@ object LTPersistentData {
 		}
 	}
 
+	fun canEdit(channelData: ChannelData, uuid: UUID) =
+		channelData.ownerUUID == uuid
+
 	// TODO verify if this is correct; alternatively can always do `DimensionManager.getWorldIDs().find { DimensionManager.getWorld(it) === this }`
 	val World.dimId: Int
 		inline get() = provider.dimensionType.id
+
+	const val CHANNEL_NAME_LENGTH_LIMIT = 20
 }

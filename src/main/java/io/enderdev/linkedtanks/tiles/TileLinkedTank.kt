@@ -1,10 +1,12 @@
 package io.enderdev.linkedtanks.tiles
 
+import com.azul.crs.client.Utils.uuid
 import io.enderdev.linkedtanks.LinkedTanks
 import io.enderdev.linkedtanks.Tags
 import io.enderdev.linkedtanks.data.LTPersistentData
 import io.enderdev.linkedtanks.data.LTPersistentData.DimBlockPos.Companion.dim
 import io.enderdev.linkedtanks.data.LTPersistentData.dimId
+import io.enderdev.linkedtanks.tiles.TileLinkedTank.Companion.NO_CHANNEL
 import io.enderdev.linkedtanks.util.LinkedFluidHandler
 import io.netty.buffer.ByteBuf
 import net.minecraft.client.Minecraft
@@ -24,7 +26,9 @@ import org.ender_development.catalyx.tiles.BaseTile
 import org.ender_development.catalyx.tiles.helper.IButtonTile
 import org.ender_development.catalyx.tiles.helper.IFluidTile
 import org.ender_development.catalyx.tiles.helper.IGuiTile
-import java.util.*
+import org.ender_development.catalyx.utils.extensions.readString
+import org.ender_development.catalyx.utils.extensions.writeString
+import sun.audio.AudioPlayer.player
 
 class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable, IGuiTile, IButtonTile, BaseGuiTyped.IDefaultButtonVariables {
 	override var isPaused = false
@@ -45,18 +49,19 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 
 	override val fluidTanks = FluidHandlerConcatenate(fluidHandler)
 
+	var updateTicks = 2
+
 	override fun update() {
 		markDirtyGUIEvery(7)
+		if(++updateTicks == 3) {
+			updateTicks = 0
+			if((channelId != NO_CHANNEL && channelData == null) || channelData?.deleted == true)
+				unlink()
+		}
 	}
 
-	init {
-		if(channelId != NO_CHANNEL && !LTPersistentData.data.contains(channelId))
-			unlink()
-	}
-
-	fun notifyBreak() {
+	fun notifyBreak() =
 		unlink()
-	}
 
 	fun unlink() {
 		if(channelId == NO_CHANNEL)
@@ -69,22 +74,23 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 	}
 
 	fun link(newChannelId: Int, ctx: MessageContext) {
-		// unlink
-		if(newChannelId == NO_CHANNEL) {
-			unlink()
-			return
-		}
-
 		if(channelId == newChannelId)
 			return
 
+		val player = ctx.serverHandler.player
+
+		// unlink
+		if(newChannelId == NO_CHANNEL) {
+			if(LTPersistentData.canEdit(channelData!!, player.uniqueID))
+				unlink()
+			return
+		}
+
 		val newChannelData = LTPersistentData.data.get(newChannelId)
-		if(newChannelData == null) // sanity check
+		if(newChannelData == null || newChannelData.deleted) // sanity check + never allow connecting to deleted channels
 			return
 
-		// permission check, maybe in the future this will be more elaborate ;p
-		val player = ctx.serverHandler.player
-		if(newChannelData.ownerUUID != player.uniqueID)
+		if(!LTPersistentData.canEdit(newChannelData, player.uniqueID))
 			return
 
 		// update in case someone's changed their username
@@ -104,13 +110,37 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 			is PauseButtonWrapper -> isPaused = !isPaused
 			is RedstoneButtonWrapper -> needsRedstonePower = !needsRedstonePower
 			is LinkButtonWrapper -> {
-				if(button.channelId != NO_CHANNEL) {
-					val newChannelId = if(button.channelId == CREATE_NEW_CHANNEL)
-						LTPersistentData.createNewChannel(button.ctx!!.serverHandler.player, this)
-					else
-						button.channelId
+				val newChannelId = if(button.channelId == CREATE_NEW_CHANNEL)
+					LTPersistentData.createNewChannel(button.ctx.serverHandler.player, this)
+				else
+					button.channelId
 
-					link(newChannelId, button.ctx!!)
+				link(newChannelId, button.ctx)
+			}
+			is RenameButtonWrapper -> {
+				channelData?.let { channelData ->
+					if(button.ctx.serverHandler.player.uniqueID != channelData.ownerUUID)
+						return
+
+					var newName = button.newName.trim()
+					if(newName.length > LTPersistentData.CHANNEL_NAME_LENGTH_LIMIT)
+						newName = newName.substring(0, LTPersistentData.CHANNEL_NAME_LENGTH_LIMIT)
+					newName = newName.trim()
+					if(newName.isEmpty())
+						return
+
+					channelData.name = newName
+					markDirtyGUI()
+				}
+			}
+			is DeleteButtonWrapper -> {
+				channelData?.let { channelData ->
+					if(button.ctx.serverHandler.player.uniqueID != channelData.ownerUUID)
+						return
+
+					channelData.deleted = true
+					unlink()
+					markDirtyGUI()
 				}
 			}
 		}
@@ -141,6 +171,7 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 			channelData?.let { channelData ->
 				setString("Name", channelData.name)
 				setString("OwnerUsername", channelData.ownerUsername)
+				setUniqueId("OwnerUUID", channelData.ownerUUID)
 				if(channelData.fluid != null)
 					setString("FluidName", FluidRegistry.getFluidName(channelData.fluid))
 				setInteger("FluidAmount", channelData.fluidAmount)
@@ -158,10 +189,11 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 
 		val name = tag.getString("Name")
 		val ownerUsername = tag.getString("OwnerUsername")
+		val ownerUUID = tag.getUniqueId("OwnerUUID")!!
 		val fluid = FluidRegistry.getFluid(tag.getString("FluidName"))
 		val fluidAmount = tag.getInteger("FluidAmount")
 		channelId = tag.getInteger("ChannelId")
-		channelData = LTPersistentData.ChannelData(NO_UUID, ownerUsername, name, fluid, fluidAmount, NO_LINKED_POSITIONS).apply {
+		channelData = LTPersistentData.ChannelData(false, ownerUUID, ownerUsername, name, fluid, fluidAmount, NO_LINKED_POSITIONS).apply {
 			fluidCapacityOverride = tag.getInteger("FluidCapacity")
 		}
 	}
@@ -171,21 +203,23 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 		const val CREATE_NEW_CHANNEL = -101
 
 		// client-side only, used in [handleUpdateTag] to try to avoid creating useless class instances
-		val NO_UUID: UUID = UUID.fromString("0-0-0-0-0")
 		val NO_LINKED_POSITIONS = HashSet<LTPersistentData.DimBlockPos>(0)
 	}
 
-	class LinkButtonWrapper(x: Int, y: Int) : AbstractButtonWrapper(x, y, 32) {
-		override val textureLocation = ResourceLocation(Tags.MOD_ID, "textures/gui/container/buttons.png")
+	class LinkButtonWrapper(x: Int, y: Int) : AbstractButtonWrapper(x, y, 33, 13) {
+		override val textureLocation = ResourceLocation(Tags.MOD_ID, "textures/gui/container/linked_tank_gui.png")
+
+		override val drawDefaultHoverOverlay = false
 
 		override val drawButton: () -> GuiButton.(Minecraft, Int, Int, Float) -> Unit = { { mc, mouseX, mouseY, partialTicks ->
 			mc.textureManager.bindTexture(textureLocation)
 			GlStateManager.color(1f, 1f, 1f)
-			drawTexturedModalRect(this.x, this.y, 0, 0, 32, 16)
+			hovered = mouseX >= this.x && mouseX < this.x + width && mouseY >= this.y && mouseY < this.y + height
+			drawTexturedModalRect(this.x, this.y, 193, if(hovered) 13 else 0, this.width, this.height)
 		} }
 
 		var channelId = NO_CHANNEL
-		var ctx: MessageContext? = null
+		lateinit var ctx: MessageContext
 
 		override fun readExtraData(buf: ByteBuf, ctx: MessageContext) {
 			channelId = buf.readInt()
@@ -195,5 +229,47 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 		override fun writeExtraData(buf: ByteBuf) {
 			buf.writeInt(channelId)
 		}
+	}
+
+	class RenameButtonWrapper(x: Int, y: Int) : AbstractButtonWrapper(x, y) {
+		override val drawButton: () -> GuiButton.(Minecraft, Int, Int, Float) -> Unit = { { mc, mouseX, mouseY, partialTicks ->
+		} }
+
+		var newName = ""
+		lateinit var ctx: MessageContext
+
+		override fun readExtraData(buf: ByteBuf, ctx: MessageContext) {
+			newName = buf.readString()
+			this.ctx = ctx
+		}
+
+		override fun writeExtraData(buf: ByteBuf) {
+			buf.writeString(newName)
+		}
+	}
+
+	class DeleteButtonWrapper(x: Int, y: Int) : AbstractButtonWrapper(x, y, 36, 13) {
+		override val textureLocation = ResourceLocation(Tags.MOD_ID, "textures/gui/container/linked_tank_gui.png")
+
+		override val drawDefaultHoverOverlay = false
+
+		override val drawButton: () -> GuiButton.(Minecraft, Int, Int, Float) -> Unit = { { mc, mouseX, mouseY, partialTicks ->
+			mc.textureManager.bindTexture(textureLocation)
+			GlStateManager.color(1f, 1f, 1f)
+			hovered = mouseX >= this.x && mouseX < this.x + width && mouseY >= this.y && mouseY < this.y + height
+			drawTexturedModalRect(this.x, this.y, 193, if(hovered) 39 else 26, this.width, this.height)
+		} }
+
+		lateinit var ctx: MessageContext
+
+		override fun readExtraData(buf: ByteBuf, ctx: MessageContext) {
+			this.ctx = ctx
+		}
+	}
+
+	init {
+		AbstractButtonWrapper.registerWrapper(LinkButtonWrapper::class.java)
+		AbstractButtonWrapper.registerWrapper(RenameButtonWrapper::class.java)
+		AbstractButtonWrapper.registerWrapper(DeleteButtonWrapper::class.java)
 	}
 }

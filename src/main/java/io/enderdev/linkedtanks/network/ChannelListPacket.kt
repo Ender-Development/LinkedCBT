@@ -1,14 +1,18 @@
 package io.enderdev.linkedtanks.network
 
 import io.enderdev.linkedtanks.data.LTPersistentData
+import io.enderdev.linkedtanks.tiles.TileLinkedTank
 import io.netty.buffer.ByteBuf
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
+import net.minecraft.client.Minecraft
 import net.minecraftforge.fluids.Fluid
 import net.minecraftforge.fluids.FluidRegistry
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 import org.ender_development.catalyx.utils.extensions.readString
 import org.ender_development.catalyx.utils.extensions.writeString
 import kotlin.random.Random
@@ -47,7 +51,7 @@ class ChannelListPacket : IMessage {
 			val uuid = ctx.serverHandler.player.uniqueID
 
 			LTPersistentData.data.mapNotNullTo(message.channelData) { (id, channel) ->
-				if(channel.ownerUUID != uuid)
+				if(channel.deleted || channel.ownerUUID != uuid)
 					return@mapNotNullTo null
 
 				return@mapNotNullTo ClientChannelData(id, channel.name, channel.fluid, channel.fluidAmount, channel.fluidCapacity)
@@ -71,5 +75,10 @@ class ChannelListPacket : IMessage {
 		val handlers: Int2ObjectMap<(response: ChannelListPacket) -> Unit> = Int2ObjectArrayMap(2)
 	}
 
-	data class ClientChannelData(val id: Int, val name: String, val fluid: Fluid?, val fluidAmount: Int, val fluidCapacity: Int)
+	data class ClientChannelData(val id: Int, val name: String, val fluid: Fluid?, val fluidAmount: Int, val fluidCapacity: Int) {
+		fun toFakeChannelData() =
+			LTPersistentData.ChannelData(false, Minecraft.getMinecraft().player.uniqueID, Minecraft.getMinecraft().player.gameProfile.name, name, fluid, fluidAmount, TileLinkedTank.NO_LINKED_POSITIONS).apply {
+				fluidCapacityOverride = fluidCapacity
+			}
+	}
 }

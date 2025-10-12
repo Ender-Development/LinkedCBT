@@ -3,12 +3,19 @@ package io.enderdev.linkedtanks.client.gui
 import io.enderdev.linkedtanks.Tags
 import io.enderdev.linkedtanks.client.ClientChannelListManager
 import io.enderdev.linkedtanks.client.container.ContainerLinkedTank
+import io.enderdev.linkedtanks.data.LTPersistentData
 import io.enderdev.linkedtanks.network.ChannelListPacket
 import io.enderdev.linkedtanks.tiles.TileLinkedTank
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiButton
+import net.minecraft.client.gui.GuiTextField
 import net.minecraft.inventory.IInventory
 import net.minecraft.util.ResourceLocation
+import org.ender_development.catalyx.client.button.AbstractButtonWrapper
 import org.ender_development.catalyx.client.gui.BaseGuiTyped
 import org.ender_development.catalyx.client.gui.wrappers.CapabilityFluidDisplayWrapper
+import org.ender_development.catalyx.utils.DevUtils
+import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
 class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTyped<TileLinkedTank>(ContainerLinkedTank(playerInv, tile), tile) {
@@ -16,17 +23,35 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 	override val displayName = ""
 
 	val fluidDisplayWrapper = CapabilityFluidDisplayWrapper(8, 8, 16, 70, tile::fluidHandler)
-	lateinit var linkButton: TileLinkedTank.LinkButtonWrapper
-	var currentDisplay = CurrentDisplay.MAIN_OVERVIEW
+
+	var currentDisplay = CurrentDisplay.NONE
+	val linkButton = TileLinkedTank.LinkButtonWrapper(0, 0) // MAIN_OVERVIEW
+	val deleteButton = TileLinkedTank.DeleteButtonWrapper(0, 0) // MAIN_OVERVIEW
+	val renameButton = TileLinkedTank.RenameButtonWrapper(0, 0) // not rendered
+
 	var mouseClick: MouseClickData? = null
 
 	var channelListDrawnChannels: List<ChannelListPacket.ClientChannelData> = emptyList()
-	var channelListSkipChannels = 0 // TODO scrolling
+	var channelListSkipChannels = 0
+
+	var mainOverviewDeleteClicked = false
+
+	val canEditChannelData: Boolean
+		get() = tile.channelData?.let { LTPersistentData.canEdit(it, Minecraft.getMinecraft().player.uniqueID) } ?: false
+
+	// yes, Minecraft.getMinecraft() is needed cause this runs before `fontRenderer`/`mc` get initialised
+	val channelRenameTypedString = GuiTextField(0, Minecraft.getMinecraft().fontRenderer, 28, 8, Minecraft.getMinecraft().fontRenderer.getCharWidth('W') * LTPersistentData.CHANNEL_NAME_LENGTH_LIMIT, Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT).apply {
+		maxStringLength = LTPersistentData.CHANNEL_NAME_LENGTH_LIMIT
+		enableBackgroundDrawing = false
+		setTextColor(HIGHLIGHTED_TEXT_COLOUR)
+	}
 
 	init {
 		displayData.add(fluidDisplayWrapper)
 		if(tile.channelId == TileLinkedTank.NO_CHANNEL)
 			switchDisplay(CurrentDisplay.CHANNEL_LINK)
+		else
+			switchDisplay(CurrentDisplay.MAIN_OVERVIEW)
 	}
 
 	override fun initGui() {
@@ -35,9 +60,18 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 		buttonList.remove(redstoneButton.button)
 		buttonList.remove(pauseButton.button)
 
-		linkButton = TileLinkedTank.LinkButtonWrapper(guiLeft + 10, guiTop + 10)
-		linkButton.button!!.visible = false
-		buttonList.add(linkButton.button)
+		linkButton.x = guiLeft + 136
+		linkButton.y = guiTop + 79
+		deleteButton.x = guiLeft + 98
+		deleteButton.y = linkButton.y
+
+		if(currentDisplay == CurrentDisplay.MAIN_OVERVIEW) {
+			if(linkButton.button!!.visible)
+				buttonList.add(linkButton.button)
+
+			if(deleteButton.button!!.visible)
+				buttonList.add(deleteButton.button)
+		}
 	}
 
 	override fun drawGuiContainerBackgroundLayer(partialTicks: Float, mouseX: Int, mouseY: Int) {
@@ -46,24 +80,26 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 		if(currentDisplay == CurrentDisplay.MAIN_OVERVIEW)
 			displayData.add(fluidDisplayWrapper)
 
-		val leftX = (width - xSize) shr 1
-		val topY = (height - ySize) shr 1
-
 		when(currentDisplay) {
 			CurrentDisplay.MAIN_OVERVIEW -> {
-				drawTexturedModalRect(leftX + 7, topY + 7, 175, 0, 18, 72)
-				drawFluidTank(fluidDisplayWrapper, leftX + fluidDisplayWrapper.x, topY + fluidDisplayWrapper.y)
+				drawTexturedModalRect(guiLeft + 7, guiTop + 7, 175, 0, 18, 72)
+				drawFluidTank(fluidDisplayWrapper, guiLeft + fluidDisplayWrapper.x, guiTop + fluidDisplayWrapper.y)
 			}
 			CurrentDisplay.CHANNEL_LINK -> {
 				channelListDrawnChannels = ClientChannelListManager.channels.subList(channelListSkipChannels, (channelListSkipChannels + CHANNEL_LINK_MAX_DRAWN_CHANNELS).coerceAtMost(ClientChannelListManager.channels.size))
 				for(idx in channelListDrawnChannels.indices) {
-					val x = leftX + 7
-					val y = topY + 20 + 16 * idx
+					val x = guiLeft + 7
+					val y = guiTop + 20 + 16 * idx
 					var v = 179
-					if(isHovered(leftX + 7, topY + 20 + 16 * idx, 150, 13, mouseX, mouseY)) {
+					if(isHovered(guiLeft + 7, guiTop + 20 + 16 * idx, 150, 13, mouseX, mouseY)) {
 						v += 13
 						if(mouseClick?.btn == 0) { // should be fine to not even check the x,y here
-							linkButton.channelId = channelListDrawnChannels[idx].id
+							val channel = channelListDrawnChannels[idx]
+							// update client-side tile to hopefully display the correct data faster (also needed for (un)linkButton visiblity)
+							tile.channelId = channel.id
+							tile.channelData = channel.toFakeChannelData()
+
+							linkButton.channelId = channel.id
 							actionPerformed(linkButton.button!!)
 							switchDisplay(CurrentDisplay.MAIN_OVERVIEW)
 						}
@@ -71,6 +107,7 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 					drawTexturedModalRect(x, y, 0, v, 150, 13)
 				}
 			}
+			CurrentDisplay.CHANNEL_RENAME -> {}
 			else -> TODO(currentDisplay.debugName)
 		}
 	}
@@ -78,21 +115,33 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 	override fun drawGuiContainerForegroundLayer(mouseX: Int, mouseY: Int) {
 		super.drawGuiContainerForegroundLayer(mouseX, mouseY)
 
-		val leftX = (width - xSize) shr 1
-		val topY = (height - ySize) shr 1
-
 		when(currentDisplay) {
 			CurrentDisplay.MAIN_OVERVIEW -> {
 				val nameText = "#${tile.channelId} ${tile.channelData?.name}"
 				var nameColour = TEXT_COLOUR
-				if(isHovered(leftX + 28, topY + 8, fontRenderer.getStringWidth(nameText), fontRenderer.FONT_HEIGHT, mouseX, mouseY)) {
+				if(canEditChannelData && isHovered(guiLeft + 28, guiTop + 8, fontRenderer.getStringWidth(nameText), fontRenderer.FONT_HEIGHT, mouseX, mouseY)) {
 					nameColour = HIGHLIGHTED_TEXT_COLOUR
 					if(mouseClick?.btn == 0)
 						switchDisplay(CurrentDisplay.CHANNEL_RENAME)
 				}
+
 				fontRenderer.drawString(nameText, 28, 8, nameColour)
 				fontRenderer.drawString("Owner: ${tile.channelData?.ownerUsername}", 28, 18, TEXT_COLOUR)
-				fontRenderer.drawString("debug: ${tile.channelData?.fluid} ${tile.channelData?.fluidAmount}/${tile.channelData?.fluidCapacity} [${tile.channelData?.fluidCapacityOverride}]", 28, 28, TEXT_COLOUR)
+				fontRenderer.drawString(fluidDisplayWrapper.textLines[0], 28, 28, TEXT_COLOUR)
+
+				if(linkButton.button!!.visible)
+					fontRenderer.drawString("Unlink", linkButton.x + 3 - guiLeft, linkButton.y + 3 - guiTop, TEXT_COLOUR)
+
+				if(deleteButton.button!!.visible) {
+					val textX = deleteButton.x + 3 - guiLeft
+					val textY = deleteButton.y + 3 - guiTop
+					fontRenderer.drawString("Delete", textX, textY, RED_TEXT_COLOUR)
+
+					if(mainOverviewDeleteClicked) {
+						drawCenteredString(fontRenderer, "Are you sure?", textX + (deleteButton.width shr 1), textY - fontRenderer.FONT_HEIGHT - 4, RED_TEXT_COLOUR)
+						mainOverviewDeleteClicked = deleteButton.button!!.hovered
+					}
+				}
 			}
 			CurrentDisplay.CHANNEL_LINK -> {
 				fontRenderer.drawString("Channels:", 8, 8, TEXT_COLOUR)
@@ -101,15 +150,45 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 					val channel = channelListDrawnChannels[idx]
 					fontRenderer.drawString("${if(channel.id == TileLinkedTank.CREATE_NEW_CHANNEL) "+" else "#${channel.id}"} ${channel.name}", 10, 23 + 16 * idx, TEXT_COLOUR)
 				}
+
+				if(channelListSkipChannels > 0)
+					fontRenderer.drawString("^", 161, 23, HIGHLIGHTED_TEXT_COLOUR)
+
+				if(channelListSkipChannels + CHANNEL_LINK_MAX_DRAWN_CHANNELS < ClientChannelListManager.channels.size)
+					fontRenderer.drawString("v", 161, 23 + 16 * (CHANNEL_LINK_MAX_DRAWN_CHANNELS - 1), HIGHLIGHTED_TEXT_COLOUR)
+			}
+			CurrentDisplay.CHANNEL_RENAME -> {
+				channelRenameTypedString.drawTextBox()
 			}
 			else -> TODO(currentDisplay.debugName)
 		}
-		fontRenderer.drawString(currentDisplay.debugName, xSize shr 1, ySize - 20, 0xff0000 or TEXT_COLOUR)
+		if(DevUtils.isDeobfuscated)
+			fontRenderer.drawString(currentDisplay.debugName, 50, -10, RED_TEXT_COLOUR)
 
 		mouseClick = null
 	}
 
+	override fun renderTooltips(mouseX: Int, mouseY: Int) {} // no-op
+
+	override fun actionPerformed(button: GuiButton) {
+		AbstractButtonWrapper.getWrapper<TileLinkedTank.DeleteButtonWrapper>(button)?.let {
+			if(!mainOverviewDeleteClicked) {
+				mainOverviewDeleteClicked = true
+				return
+			}
+			switchDisplay(CurrentDisplay.CHANNEL_LINK)
+		}
+
+		super.actionPerformed(button)
+
+		AbstractButtonWrapper.getWrapper<TileLinkedTank.LinkButtonWrapper>(button)?.let {
+			if(it.channelId == TileLinkedTank.NO_CHANNEL)
+				switchDisplay(CurrentDisplay.CHANNEL_LINK)
+		}
+	}
+
 	override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
+		super.mouseClicked(mouseX, mouseY, mouseButton)
 		mouseClick = MouseClickData(mouseX, mouseY, mouseButton)
 	}
 
@@ -130,20 +209,69 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 		}
 	}
 
+	override fun keyTyped(typedChar: Char, keyCode: Int) {
+		if(currentDisplay == CurrentDisplay.CHANNEL_RENAME) {
+			if(keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_NUMPADENTER) {
+				val text = channelRenameTypedString.text.trim()
+				if(text.isEmpty())
+					return
+
+				tile.channelData?.let { it.name = text } // not needed but whatever
+				renameButton.newName = text
+				actionPerformed(renameButton.button!!)
+				switchDisplay(CurrentDisplay.MAIN_OVERVIEW)
+			} else
+				channelRenameTypedString.textboxKeyTyped(typedChar, keyCode)
+		} else
+			super.keyTyped(typedChar, keyCode)
+	}
+
 	fun switchDisplay(new: CurrentDisplay) {
-		if(currentDisplay == CurrentDisplay.MAIN_OVERVIEW)
+		if(currentDisplay == CurrentDisplay.MAIN_OVERVIEW) {
 			displayData.remove(fluidDisplayWrapper)
+			buttonList.remove(linkButton.button)
+			buttonList.remove(deleteButton.button)
+		}
 
-		if(new == CurrentDisplay.MAIN_OVERVIEW)
+		if(new == CurrentDisplay.MAIN_OVERVIEW) {
 			displayData.add(fluidDisplayWrapper)
+			buttonList.add(linkButton.button)
+			buttonList.add(deleteButton.button)
+		}
 
-		if(currentDisplay == CurrentDisplay.CHANNEL_LINK)
+		linkButton.button!!.visible = new == CurrentDisplay.MAIN_OVERVIEW && canEditChannelData
+		deleteButton.button!!.visible = new == CurrentDisplay.MAIN_OVERVIEW && canEditChannelData
+
+		if(currentDisplay == CurrentDisplay.CHANNEL_LINK) {
 			channelListSkipChannels = 0
+			linkButton.channelId = TileLinkedTank.NO_CHANNEL
+		}
+
+		if(new == CurrentDisplay.CHANNEL_RENAME) {
+			channelRenameTypedString.isFocused = true
+			channelRenameTypedString.visible = true
+			channelRenameTypedString.text = tile.channelData?.name ?: "???"
+			Keyboard.enableRepeatEvents(true)
+		}
+
+		if(currentDisplay == CurrentDisplay.CHANNEL_RENAME) {
+			channelRenameTypedString.isFocused = false
+			channelRenameTypedString.visible = false
+			Keyboard.enableRepeatEvents(false)
+		}
 
 		currentDisplay = new
 	}
 
+	override fun onGuiClosed() {
+		super.onGuiClosed()
+		Keyboard.enableRepeatEvents(false)
+	}
+
 	enum class CurrentDisplay(val debugName: String) {
+		// no screen
+		NONE("none"),
+
 		// main screen you go to when you open the GUI
 		MAIN_OVERVIEW("main_overview"),
 
@@ -159,11 +287,13 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 	companion object {
 		const val TEXT_COLOUR = 0x505090
 		const val HIGHLIGHTED_TEXT_COLOUR = 0x7080BA
+		const val RED_TEXT_COLOUR = 0xFF0000 or TEXT_COLOUR
 		const val CHANNEL_LINK_MAX_DRAWN_CHANNELS = 4
 	}
 
-	// TODO: link GUI ;p
-	// - current link state (fluid, amount, id, ownername)
-	// - menu to link to a new group
-	// - renaming current group
+	// TODO
+	// - current link state (fluid, amount)
+	// - translation
+	// - fluid whitelist selector?
+	// - channel selector search?
 }

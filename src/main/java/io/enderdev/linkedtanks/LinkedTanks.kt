@@ -19,6 +19,7 @@ import org.ender_development.catalyx.client.gui.CatalyxGuiHandler
 import org.ender_development.catalyx.core.CatalyxSettings
 import org.ender_development.catalyx.core.ICatalyxMod
 import org.ender_development.catalyx.utils.extensions.toStack
+import java.text.NumberFormat
 
 @Mod(
 	modid = Tags.MOD_ID,
@@ -35,6 +36,7 @@ object LinkedTanks : ICatalyxMod {
 
 	override val modSettings = CatalyxSettings(Tags.MOD_ID, creativeTab, LinkedTanks, true)
 	val guiHandler = CatalyxGuiHandler()
+	val numberFormat: NumberFormat = NumberFormat.getNumberInstance()
 
 	lateinit var logger: Logger
 
@@ -71,7 +73,6 @@ object LinkedTanks : ICatalyxMod {
 
 	@SubscribeEvent
 	fun worldSave(event: WorldEvent.Save) {
-		println("--- WORLDEVENT.SAVE CALLED ---")
 		val currentTime = System.currentTimeMillis()
 		// write to disk at most every 250ms (5t) when caused by worlds saving to hopefully avoid writing the same data n times when all n dimensions save at the same time
 		if(currentTime - lastWriteCausedBySave > 250L) {
@@ -87,4 +88,8 @@ object LinkedTanks : ICatalyxMod {
 
 	// TODO linkedtanks command for ops to manage stuff
 	// TODO recipes
+	
+	@Suppress("NOTHING_TO_INLINE")
+	inline fun Int.formatNumber() =
+		numberFormat.format(this)
 }

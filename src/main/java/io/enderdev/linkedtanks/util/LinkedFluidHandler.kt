@@ -32,12 +32,14 @@ class LinkedFluidHandler(var channelData: LTPersistentData.ChannelData?) : IFlui
 			return 0
 
 		channelData?.let { channelData ->
-			if(channelData.fluid != resource.fluid)
+			if(channelData.fluid != null && channelData.fluid != resource.fluid)
 				return 0
 
 			val filled = (channelData.fluidAmount + resource.amount).coerceAtMost(capacity)
-			if(doFill)
+			if(doFill) {
+				channelData.fluid = resource.fluid
 				channelData.fluidAmount += filled
+			}
 
 			return filled
 		}
@@ -51,8 +53,11 @@ class LinkedFluidHandler(var channelData: LTPersistentData.ChannelData?) : IFlui
 
 			val drained = (channelData.fluidAmount - maxDrain).coerceAtLeast(0)
 
-			if(doDrain)
+			if(doDrain) {
 				channelData.fluidAmount -= drained
+				if(channelData.fluidAmount == 0)
+					channelData.fluid = null
+			}
 
 			return FluidStack(channelData.fluid, drained)
 		}
