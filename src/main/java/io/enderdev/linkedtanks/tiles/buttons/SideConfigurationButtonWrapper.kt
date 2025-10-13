@@ -12,10 +12,8 @@ import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
 import org.ender_development.catalyx.client.button.AbstractButtonWrapper
 
-class SideConfigurationButtonWrapper(x: Int, y: Int) : AbstractButtonWrapper(x, y, GuiLinkedTank.SIDE_CONFIGURATION_BTN_W, GuiLinkedTank.SIDE_CONFIGURATION_BTN_H) {
+class SideConfigurationButtonWrapper(x: Int, y: Int) : AbstractButtonWrapper(x, y, GuiLinkedTank.SIDE_CONFIG_BTN_W, GuiLinkedTank.SIDE_CONFIG_BTN_H) {
 	override val textureLocation = ResourceLocation(Tags.MOD_ID, "textures/gui/container/linked_tank_gui.png")
-
-	//override val drawDefaultHoverOverlay = false
 
 	override val drawButton: () -> GuiButton.(Minecraft, Int, Int, Float) -> Unit = { { mc, mouseX, mouseY, partialTicks ->
 		mc.textureManager.bindTexture(textureLocation)

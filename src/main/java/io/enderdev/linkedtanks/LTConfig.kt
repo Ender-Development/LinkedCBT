@@ -20,9 +20,8 @@ object LTConfig {
 		@SubscribeEvent
 		@JvmStatic
 		fun onConfigChangedEvent(event: ConfigChangedEvent.OnConfigChangedEvent) {
-			if(event.modID == Tags.MOD_ID) {
+			if(event.modID == Tags.MOD_ID)
 				ConfigManager.sync(Tags.MOD_ID, Config.Type.INSTANCE)
-			}
 		}
 	}
 }
