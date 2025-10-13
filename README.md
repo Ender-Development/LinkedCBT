@@ -14,6 +14,10 @@ Our Team currently includes:
 
 You can contact us on our [Discord](https://discord.gg/JF7x2vG).
 
+## Licensing
+All code is licensed under the LGPL-3 license, which can be found in the LICENSE file
+All textures and assets are All Rights Reserved, exact terms can be found in the LICENSE-assets file
+
 ## Contributing
 
 Feel free to contribute to the project. We are always happy about pull requests.

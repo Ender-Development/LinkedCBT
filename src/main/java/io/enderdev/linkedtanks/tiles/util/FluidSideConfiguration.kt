@@ -1,13 +1,16 @@
 package io.enderdev.linkedtanks.tiles.util
 
+import io.enderdev.linkedtanks.LTConfig
 import io.enderdev.linkedtanks.tiles.TileLinkedTank
 import io.enderdev.linkedtanks.util.FluidUtils
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.text.TextFormatting
+import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
 import org.ender_development.catalyx.tiles.BaseTile.Companion.FLUID_CAP
+import org.ender_development.catalyx.utils.Delegates
 
 // this could be generalized and thrown into Catalyx ;p
 class FluidSideConfiguration(val tile: TileLinkedTank) {
@@ -17,8 +20,12 @@ class FluidSideConfiguration(val tile: TileLinkedTank) {
 		}
 	}
 
-	val fillOnlyWrapper = FluidUtils.FillOnlyWrapper(tile.fluidHandler)
-	val drainOnlyWrapper = FluidUtils.DrainOnlyWrapper(tile.fluidHandler)
+	val fillOnlyWrapper by Delegates.lazyProperty {
+		FluidUtils.FillOnlyWrapper(tile.fluidHandler)
+	}
+	val drainOnlyWrapper by Delegates.lazyProperty {
+		FluidUtils.DrainOnlyWrapper(tile.fluidHandler)
+	}
 
 	@Suppress("NOTHING_TO_INLINE")
 	inline operator fun get(side: EnumFacing) =
@@ -34,15 +41,41 @@ class FluidSideConfiguration(val tile: TileLinkedTank) {
 			if(side != Side.PUSH && side != Side.PULL)
 				continue
 
-			if(tile.fluidHandler.fluidAmount <= 0)
+			if((side == Side.PUSH && tile.fluidHandler.fluidAmount <= 0) || (side == Side.PULL && tile.fluidHandler.fluidAmount >= tile.fluidHandler.capacity))
 				break
 
 			val te = tile.world.getTileEntity(tile.pos.offset(facing)) ?: continue
 			val cap = te.getCapability(FLUID_CAP, facing.opposite) ?: continue
 			if(side == Side.PUSH)
-				tile.fluidHandler.drain(cap.fill(tile.fluidHandler.fluid, true), true)
-			else // Side.PULL
-				tile.fluidHandler.fill(cap.drain(tile.fluidHandler.capacity - tile.fluidHandler.fluidAmount, true), true)
+				tile.fluidHandler.drain(cap.fill(tile.fluidHandler.fluid?.let {
+					if(LTConfig.maxPushPullThroughput != 0)
+						FluidStack(it.fluid, it.amount.coerceAtMost(LTConfig.maxPushPullThroughput))
+					else
+						it
+				}, true), true)
+			else { // Side.PULL
+				val maxDrain = (tile.fluidHandler.capacity - tile.fluidHandler.fluidAmount).let {
+					if(LTConfig.maxPushPullThroughput != 0)
+						it.coerceIn(0, LTConfig.maxPushPullThroughput)
+					else
+						it
+				}
+
+				val currentFluid = tile.fluidHandler.fluid
+				val wouldDrain = if(currentFluid == null)
+					cap.drain(maxDrain, false)
+				else
+					cap.drain(FluidStack(currentFluid, maxDrain), false)
+
+				if(wouldDrain == null || wouldDrain.amount <= 0 || (currentFluid != null && wouldDrain.fluid != currentFluid.fluid))
+					continue
+
+				val filled = tile.fluidHandler.fill(wouldDrain, true)
+				if(filled <= 0) // shouldn't happen
+					continue
+
+				cap.drain(FluidStack(wouldDrain.fluid, filled), true)
+			}
 		}
 	}
 
@@ -61,11 +94,11 @@ class FluidSideConfiguration(val tile: TileLinkedTank) {
 		}
 	}
 
-	fun writeToNBT(): NBTTagCompound {
+	fun writeToNBT(writeDefault: Boolean): NBTTagCompound {
 		val tag = NBTTagCompound()
 
 		sides.forEach { (facing, side) ->
-			if(side == Side.NONE)
+			if(side == Side.DEFAULT && !writeDefault)
 				return@forEach
 
 			tag.setString(facing.name, side.name)
@@ -85,11 +118,11 @@ class FluidSideConfiguration(val tile: TileLinkedTank) {
 		/**
 		 * The default state of a side, i.e. can input and output
 		 */
-		DEFAULT("default", TextFormatting.LIGHT_PURPLE),
+		DEFAULT("default", TextFormatting.WHITE),
 		/**
 		 * No inputting or outputting may occur
 		 */
-		NONE("none", TextFormatting.GRAY),
+		NONE("none", TextFormatting.DARK_GRAY),
 		/**
 		 * Can only input
 		 */
@@ -107,6 +140,16 @@ class FluidSideConfiguration(val tile: TileLinkedTank) {
 		 */
 		PUSH("push", TextFormatting.GOLD);
 
+		fun previous() =
+			when(this) {
+				DEFAULT -> PUSH
+				NONE -> DEFAULT
+				INPUT -> NONE
+				PULL -> INPUT
+				OUTPUT -> PULL
+				PUSH -> OUTPUT
+			}
+
 		fun next() =
 			when(this) {
 				DEFAULT -> NONE
@@ -116,5 +159,21 @@ class FluidSideConfiguration(val tile: TileLinkedTank) {
 				OUTPUT -> PUSH
 				PUSH -> DEFAULT
 			}
+
+		val u: Int
+			get() = when(this) {
+				DEFAULT, PULL -> 193
+				NONE, OUTPUT -> 203
+				INPUT, PUSH -> 213
+			}
+
+		val v: Int
+			get() = when(this) {
+				DEFAULT, NONE, INPUT -> 52
+				PULL, OUTPUT, PUSH -> 62
+			}
+
+		fun describe(facing: EnumFacing) =
+			"${facing.name.lowercase().replaceFirstChar(Char::uppercaseChar)} - $named"
 	}
 }

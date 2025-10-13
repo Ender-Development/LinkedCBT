@@ -1,3 +1,5 @@
 tile.linkedtanks:linked_tank.name=Linked Tank
 
+item.linkedtanks:tank_configurator.name=Tank Configurator
+
 itemGroup.linkedtanks=Linked Tanks

@@ -5,12 +5,15 @@ import io.enderdev.linkedtanks.Tags
 import io.enderdev.linkedtanks.blocks.ModBlocks
 import io.enderdev.linkedtanks.data.ChannelData
 import io.enderdev.linkedtanks.data.LTPersistentData
+import io.enderdev.linkedtanks.util.extensions.*
 import it.unimi.dsi.fastutil.ints.Int2LongArrayMap
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.server.MinecraftServer
-import net.minecraft.util.text.*
+import net.minecraft.util.text.TextComponentString
+import net.minecraft.util.text.TextComponentTranslation
+import net.minecraft.util.text.TextFormatting
 import net.minecraftforge.common.UsernameCache
 import net.minecraftforge.fluids.Fluid
 import net.minecraftforge.fluids.FluidRegistry
@@ -100,7 +103,7 @@ object LinkedTanksCommand : CommandTreeBase() {
 					val colour = if(data.deleted) TextFormatting.GRAY else TextFormatting.WHITE
 					sender.reply("- #$id ${data.name}${if(data.deleted) " (deleted)" else ""}", colour)
 					sender.reply("owner: ${data.ownerUsername} (uuid: ${data.ownerUUID})", colour)
-					sender.sendMessage((+"${data.fluidAmount.formatNumber()} / ${data.fluidCapacity.formatNumber()} mB of " + data.fluid.nameComponent + +"; ${data.linkedPositions.size} endpoint${if(data.linkedPositions.size == 1) "" else "s"}").withColour(colour))
+					sender.reply((+"${data.fluidAmount.formatNumber()} / ${data.fluidCapacity.formatNumber()} mB of " + data.fluid.nameComponent + +"; ${data.linkedPositions.size} endpoint${if(data.linkedPositions.size == 1) "" else "s"}").withColour(colour))
 					sender.reply("")
 				}
 				val endpoints = LTPersistentData.data.map { it.value.linkedPositions.size }.sum()
@@ -306,30 +309,6 @@ object LinkedTanksCommand : CommandTreeBase() {
 	}
 
 	@Suppress("NOTHING_TO_INLINE")
-	private inline fun ICommandSender.reply(component: ITextComponent) =
-		sendMessage(component)
-
-	@Suppress("NOTHING_TO_INLINE")
-	private inline fun ICommandSender.reply(text: String) =
-		reply(+text)
-
-	@Suppress("NOTHING_TO_INLINE")
-	private inline fun ICommandSender.reply(text: String, colour: TextFormatting) =
-		sendMessage((+text).withColour(colour))
-
-	@Suppress("NOTHING_TO_INLINE")
-	private inline fun ICommandSender.replyFail(text: String) =
-		reply(text, TextFormatting.RED)
-
-	@Suppress("NOTHING_TO_INLINE")
-	private inline fun ICommandSender.replyWarn(text: String) =
-		reply(text, TextFormatting.YELLOW)
-
-	@Suppress("NOTHING_TO_INLINE")
-	private inline fun ICommandSender.replyWarn(component: ITextComponent) =
-		reply(component.withColour(TextFormatting.YELLOW))
-
-	@Suppress("NOTHING_TO_INLINE")
 	private inline val Fluid?.nameComponent
 		get() = if(this == null) +"<empty>" else TextComponentTranslation(realUnlocalisedName)
 
@@ -345,12 +324,4 @@ object LinkedTanksCommand : CommandTreeBase() {
 	@Suppress("NOTHING_TO_INLINE")
 	private inline operator fun String.unaryPlus() =
 		TextComponentString(this)
-
-	@Suppress("NOTHING_TO_INLINE")
-	private inline operator fun ITextComponent.plus(other: ITextComponent) =
-		appendSibling(other)
-
-	@Suppress("NOTHING_TO_INLINE")
-	private inline fun ITextComponent.withColour(colour: TextFormatting) =
-		setStyle(Style().setColor(colour))
 }
