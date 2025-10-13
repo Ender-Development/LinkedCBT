@@ -35,7 +35,7 @@ object LinkedTanks : ICatalyxMod {
 		override fun createIcon() = ModBlocks.linkedTank.toStack()
 	}
 
-	override val modSettings = CatalyxSettings(Tags.MOD_ID, creativeTab, LinkedTanks, true)
+	override val modSettings = CatalyxSettings(Tags.MOD_ID, creativeTab, this, true)
 	val guiHandler = CatalyxGuiHandler()
 	val numberFormat: NumberFormat = NumberFormat.getNumberInstance()
 
