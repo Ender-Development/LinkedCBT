@@ -7,6 +7,7 @@ import io.enderdev.linkedtanks.data.LTPersistentData.DimBlockPos.Companion.dim
 import io.enderdev.linkedtanks.tiles.TileLinkedTank
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
+import jdk.nashorn.internal.objects.NativeArray.forEach
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.math.BlockPos
@@ -30,7 +31,10 @@ object LTPersistentData {
 
 		wasRead = true
 
-		dataNBT.tag.keySet.forEach {
+		var nextUnbrokenId = 1
+		dataNBT.tag.keySet.sortedBy(String::toInt).forEach {
+			if(it.toInt() == nextUnbrokenId)
+				++nextUnbrokenId
 			val tag = dataNBT.tag.getCompoundTag(it)
 			val deleted = tag.getBoolean("Deleted")
 			val ownerUUID = tag.getUniqueId("OwnerUUID") ?: return@forEach
@@ -38,14 +42,16 @@ object LTPersistentData {
 			val name = tag.getString("Name")
 			val linkedPositionCount = tag.getInteger("LinkedPositionCount")
 			val linkedPositions = HashSet<DimBlockPos>(linkedPositionCount)
-			(0..<linkedPositionCount).mapTo(linkedPositions) { DimBlockPos.fromString(tag.getString("LinkedPosition$$it")) }
+			(0..<linkedPositionCount).mapTo(linkedPositions) {
+				DimBlockPos.fromString(tag.getString("LinkedPosition$$it"))
+			}
 			val fluid = FluidRegistry.getFluid(tag.getString("FluidName"))
 			val fluidAmount = tag.getInteger("FluidAmount")
 
 			dataMap.put(it.toInt(), ChannelData(deleted, ownerUUID, ownerUsername, name, fluid, fluidAmount, linkedPositions))
 		}
 
-		nextChannelId = (dataMap.keys.maxOrNull() ?: 0) + 1
+		nextChannelId = nextUnbrokenId
 	}
 
 	// I'd have to write() every IFluidHandler operation, instead of saving every modification, try to save on exit/ServerStopping/WorldSave/… and accept the unlikely data loss
@@ -79,9 +85,21 @@ object LTPersistentData {
 		}
 
 	fun createNewChannel(player: EntityPlayer, te: TileLinkedTank): Int {
-		val channelData = ChannelData(false, player.uniqueID, player.gameProfile.name, "New Channel $nextChannelId", null, 0, hashSetOf(te.pos dim te.world.dimId))
+		val channelData = ChannelData(false, player.uniqueID, player.gameProfile.name, "New channel $nextChannelId", null, 0, hashSetOf(te.pos dim te.world.dimId))
 		dataMap.put(nextChannelId, channelData)
-		return nextChannelId++
+		return nextChannelId.also {
+			nextChannelId = findNextFreeChannelId()
+		}
+	}
+
+	private fun findNextFreeChannelId(): Int {
+		var id = 1
+		for(it in data.keys.sorted())
+			if(it == id)
+				++id
+			else
+				break
+		return id
 	}
 
 	/*

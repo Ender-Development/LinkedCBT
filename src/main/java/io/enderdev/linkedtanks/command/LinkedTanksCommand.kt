@@ -2,7 +2,10 @@ package io.enderdev.linkedtanks.command
 
 import io.enderdev.linkedtanks.LinkedTanks.formatNumber
 import io.enderdev.linkedtanks.Tags
+import io.enderdev.linkedtanks.blocks.ModBlocks
 import io.enderdev.linkedtanks.data.LTPersistentData
+import io.enderdev.linkedtanks.network.PacketHandler.channel
+import it.unimi.dsi.fastutil.ints.Int2LongArrayMap
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
 import net.minecraft.entity.player.EntityPlayer
@@ -81,6 +84,7 @@ object LinkedTanksCommand : CommandTreeBase() {
 			addSubcommand(Delete)
 			addSubcommand(Undelete)
 			addSubcommand(SetContents)
+			addSubcommand(Purge)
 		}
 
 		object List : CommandBase() {
@@ -93,12 +97,14 @@ object LinkedTanksCommand : CommandTreeBase() {
 			override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<out String?>) {
 				sender.reply("Channels:")
 				LTPersistentData.data.toList().sortedBy { it.first }.forEach { (id, data) ->
-					sender.reply("- #$id ${data.name}${if(data.deleted) " (deleted)" else ""}")
-					sender.reply("owner: ${data.ownerUsername} (uuid: ${data.ownerUUID})")
-					sender.sendMessage(+"${data.fluidAmount.formatNumber()} / ${data.fluidCapacity.formatNumber()} mB of " + data.fluid.nameComponent)
+					val colour = if(data.deleted) TextFormatting.GRAY else TextFormatting.WHITE
+					sender.reply("- #$id ${data.name}${if(data.deleted) " (deleted)" else ""}", colour)
+					sender.reply("owner: ${data.ownerUsername} (uuid: ${data.ownerUUID})", colour)
+					sender.sendMessage((+"${data.fluidAmount.formatNumber()} / ${data.fluidCapacity.formatNumber()} mB of " + data.fluid.nameComponent + +"; ${data.linkedPositions.size} endpoint${if(data.linkedPositions.size == 1) "" else "s"}").withColour(colour))
 					sender.reply("")
 				}
-				sender.reply("Total: ${LTPersistentData.data.size} (${LTPersistentData.data.count { !it.value.deleted }} not deleted) channels with ${LTPersistentData.data.map { it.value.linkedPositions.size }.sum()} total endpoints")
+				val endpoints = LTPersistentData.data.map { it.value.linkedPositions.size }.sum()
+				sender.reply("Total: ${LTPersistentData.data.size} (${LTPersistentData.data.count { !it.value.deleted }} not deleted) channels with $endpoints total endpoint${if(endpoints == 1) "" else "s"}")
 			}
 		}
 
@@ -130,7 +136,7 @@ object LinkedTanksCommand : CommandTreeBase() {
 					if(playerUUID == null)
 						try {
 							playerUUID = UUID.fromString(playerArg)
-						} catch(e: IllegalArgumentException) {}
+						} catch(_: IllegalArgumentException) {}
 				}
 
 				if(playerUUID == null) {
@@ -243,6 +249,41 @@ object LinkedTanksCommand : CommandTreeBase() {
 				channel.fluidAmount = fluidAmount
 			}
 		}
+
+		object Purge : CommandBase() {
+			// channelId to milliseconds
+			val channelIdConfirmations = Int2LongArrayMap(2).apply {
+				defaultReturnValue(0L)
+			}
+			private const val CONFIRMATION_SECONDS = 5
+
+			override fun getName() =
+				"purge"
+
+			override fun getUsage(sender: ICommandSender) =
+				"channels $name meow"
+
+			override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) {
+				if(args.isEmpty()) {
+					sender.replyFail("Usage: /linkedtanks purge <channel id>")
+					return
+				}
+
+				val (channelId, channel) = getChannelData(sender, args[0], false) ?: return
+
+				if(channel.linkedPositions.isNotEmpty() && System.currentTimeMillis() - channelIdConfirmations[channelId] > CONFIRMATION_SECONDS * 1000L) {
+					sender.replyWarn("Channel $channelId still has ${channel.linkedPositions.size} endpoint${if(channel.linkedPositions.size == 1) "" else "s"}")
+					sender.replyWarn(+"This can happen due to a " + TextComponentTranslation("${ModBlocks.linkedTank.translationKey}.name") + +" being in an unloaded chunk, and it might relink to the next created channel with id $channelId")
+					sender.replyWarn("If you're sure you want to purge this channel, type this command again within $CONFIRMATION_SECONDS seconds")
+					channelIdConfirmations.put(channelId, System.currentTimeMillis())
+					return
+				}
+
+				LTPersistentData.data.remove(channelId)
+
+				sender.reply("Channel $channelId and all of its associated data has been purged, and its channel id free to be reused")
+			}
+		}
 	}
 
 	fun getChannelId(sender: ICommandSender, arg: String) =
@@ -274,7 +315,7 @@ object LinkedTanksCommand : CommandTreeBase() {
 
 	@Suppress("NOTHING_TO_INLINE")
 	private inline fun ICommandSender.reply(text: String, colour: TextFormatting) =
-		sendMessage((+text).setStyle(Style().setColor(colour)))
+		sendMessage((+text).withColour(colour))
 
 	@Suppress("NOTHING_TO_INLINE")
 	private inline fun ICommandSender.replyFail(text: String) =
@@ -283,6 +324,10 @@ object LinkedTanksCommand : CommandTreeBase() {
 	@Suppress("NOTHING_TO_INLINE")
 	private inline fun ICommandSender.replyWarn(text: String) =
 		reply(text, TextFormatting.YELLOW)
+
+	@Suppress("NOTHING_TO_INLINE")
+	private inline fun ICommandSender.replyWarn(component: ITextComponent) =
+		reply(component.withColour(TextFormatting.YELLOW))
 
 	@Suppress("NOTHING_TO_INLINE")
 	private inline val Fluid?.nameComponent
@@ -304,4 +349,8 @@ object LinkedTanksCommand : CommandTreeBase() {
 	@Suppress("NOTHING_TO_INLINE")
 	private inline operator fun ITextComponent.plus(other: ITextComponent) =
 		appendSibling(other)
+
+	@Suppress("NOTHING_TO_INLINE")
+	private inline fun ITextComponent.withColour(colour: TextFormatting) =
+		setStyle(Style().setColor(colour))
 }
