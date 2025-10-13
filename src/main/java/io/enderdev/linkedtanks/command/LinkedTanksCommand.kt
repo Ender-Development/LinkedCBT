@@ -224,7 +224,7 @@ object LinkedTanksCommand : CommandTreeBase() {
 				val fluidAmount = if(args.size == 3) args[2].toIntOrNull() else null
 
 				if(fluidName == "empty" || fluidAmount == 0) {
-					sender.reply(+"Channel $channelId emptied (previous contents: ${channel.fluidAmount.formatNumber()} " + channel.fluid.nameComponent + +")")
+					sender.reply(+"Channel $channelId emptied (previous contents: ${channel.fluidAmount.formatNumber()} mB " + channel.fluid.nameComponent + +")")
 					channel.fluidAmount = 0
 					channel.fluid = null
 					return

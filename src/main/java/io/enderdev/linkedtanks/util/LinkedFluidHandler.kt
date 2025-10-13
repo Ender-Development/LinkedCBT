@@ -35,10 +35,20 @@ class LinkedFluidHandler(var channelData: LTPersistentData.ChannelData?) : IFlui
 			if(channelData.fluid != null && channelData.fluid != resource.fluid)
 				return 0
 
-			val filled = (channelData.fluidAmount + resource.amount).coerceAtMost(capacity)
+			val filled = resource.amount.coerceAtMost(capacity - channelData.fluidAmount)
+
+			if(DEBUG_LOG)
+				println("fill(resource=${resource.fluid?.unlocalizedName} ${resource.amount}, doFill=$doFill) => $filled")
+
 			if(doFill) {
+				if(DEBUG_LOG)
+					println("filling! previous content: ${channelData.fluid?.unlocalizedName} ${channelData.fluidAmount}")
+
 				channelData.fluid = resource.fluid
 				channelData.fluidAmount += filled
+
+				if(DEBUG_LOG)
+					println("new content: ${channelData.fluid?.unlocalizedName} ${channelData.fluidAmount}")
 			}
 
 			return filled
@@ -48,18 +58,28 @@ class LinkedFluidHandler(var channelData: LTPersistentData.ChannelData?) : IFlui
 
 	override fun drain(maxDrain: Int, doDrain: Boolean): FluidStack? {
 		channelData?.let { channelData ->
-			if(channelData.fluid == null || channelData.fluidAmount == 0 || maxDrain == 0)
+			if(channelData.fluid == null || channelData.fluidAmount == 0 || maxDrain <= 0)
 				return null
 
-			val drained = (channelData.fluidAmount - maxDrain).coerceAtLeast(0)
+			val drained = channelData.fluidAmount.coerceIn(0, maxDrain)
 
+			if(DEBUG_LOG)
+				println("drain(maxDrain=$maxDrain, doDrain=$doDrain) => $drained")
+
+			val currentFluid = channelData.fluid // needed, otherwise if we drain to 0 and `channelData.fluid` gets set to null, FluidStack() will crash with "Cannot create a fluidstack from a null fluid"
 			if(doDrain) {
+				if(DEBUG_LOG)
+					println("draining! previous content: ${channelData.fluid?.unlocalizedName} ${channelData.fluidAmount}")
+
 				channelData.fluidAmount -= drained
 				if(channelData.fluidAmount == 0)
 					channelData.fluid = null
+
+				if(DEBUG_LOG)
+					println("new content: ${channelData.fluid?.unlocalizedName} ${channelData.fluidAmount}")
 			}
 
-			return FluidStack(channelData.fluid, drained)
+			return FluidStack(currentFluid, drained)
 		}
 		return null
 	}
@@ -76,4 +96,8 @@ class LinkedFluidHandler(var channelData: LTPersistentData.ChannelData?) : IFlui
 
 	override fun getInfo() =
 		FluidTankInfo(this)
+
+	private companion object {
+		const val DEBUG_LOG = false
+	}
 }

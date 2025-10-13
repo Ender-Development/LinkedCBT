@@ -124,4 +124,13 @@ dependencies {
 	// JADE (+ Hwyla)
 //	implementation rfg.deobf("curse.maven:hwyla-253449:2568751")
 //	implementation rfg.deobf("curse.maven:jade-324717:2735905")
+
+	// Thermal
+	runtimeOnly "curse.maven:codechicken-lib-1-8-242818:2779848"
+	runtimeOnly "curse.maven:redstone-flux-270789:2920436"
+	runtimeOnly "curse.maven:cofh-core-69162:2920433"
+	runtimeOnly "curse.maven:cofh-world-271384:2920434"
+	runtimeOnly "curse.maven:thermal-foundation-222880:2926428"
+	runtimeOnly "curse.maven:thermal-expansion-69163:2926431"
+	runtimeOnly "curse.maven:thermal-dynamics-227443:2920505"
 }

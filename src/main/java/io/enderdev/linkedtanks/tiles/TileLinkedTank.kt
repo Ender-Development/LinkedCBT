@@ -102,6 +102,27 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 		markDirtyGUI()
 	}
 
+	fun link(newChannelId: Int) {
+		if(channelId == newChannelId)
+			return
+
+		val newChannelData = LTPersistentData.data.get(newChannelId)
+		if(newChannelData == null || newChannelData.deleted) // sanity check + never allow connecting to deleted channels
+			return
+
+		unlink()
+
+		// unlink
+		if(newChannelId == NO_CHANNEL)
+			return
+
+		newChannelData.linkedPositions.add(pos dim world.dimId)
+		channelId = newChannelId
+		channelData = newChannelData
+
+		markDirtyGUI()
+	}
+
 	override fun handleButtonPress(button: AbstractButtonWrapper) {
 		when(button) {
 			is PauseButtonWrapper -> isPaused = !isPaused
@@ -145,10 +166,8 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 
 	// server-side
 	override fun readFromNBT(compound: NBTTagCompound) {
-		if(compound.hasKey("ChannelId")) {
-			channelId = compound.getInteger("ChannelId")
-			channelData = LTPersistentData.data.get(channelId)
-		}
+		if(compound.hasKey("ChannelId"))
+			link(compound.getInteger("ChannelId"))
 		super.readFromNBT(compound)
 	}
 

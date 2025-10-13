@@ -56,6 +56,7 @@ object LinkedTanks : ICatalyxMod {
 	@EventHandler
 	fun serverStopping(event: FMLServerStoppingEvent) {
 		LTPersistentData.write()
+		LTPersistentData.unload()
 	}
 
 	var lastWriteCausedBySave = 0L

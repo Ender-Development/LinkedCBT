@@ -31,6 +31,8 @@ object LTPersistentData {
 
 		wasRead = true
 
+		dataMap.clear()
+
 		var nextUnbrokenId = 1
 		dataNBT.tag.keySet.sortedBy(String::toInt).forEach {
 			if(it.toInt() == nextUnbrokenId)
@@ -56,6 +58,9 @@ object LTPersistentData {
 
 	// I'd have to write() every IFluidHandler operation, instead of saving every modification, try to save on exit/ServerStopping/WorldSave/… and accept the unlikely data loss
 	fun write() {
+		if(!wasRead)
+			return
+
 		// lazy option, if performance requires it I might need to optimise this more
 		dataNBT.tag.tagMap.clear()
 
@@ -76,6 +81,11 @@ object LTPersistentData {
 		}
 		LinkedTanks.logger.debug("Saving data to disk: {}", dataNBT.tag)
 		dataNBT.save()
+	}
+
+	fun unload() {
+		dataMap.clear()
+		wasRead = false
 	}
 
 	val data: Int2ObjectMap<ChannelData>
