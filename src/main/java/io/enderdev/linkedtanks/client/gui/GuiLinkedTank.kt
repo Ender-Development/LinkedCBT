@@ -429,11 +429,6 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 		const val CHANNELS_TEXT_X = BASE_TEXT_X
 		const val CHANNELS_TEXT_Y = BASE_TEXT_Y
 
-		const val CHANNELS_SCROLL_HINT_UP_X = 161
-		const val CHANNELS_SCROLL_HINT_UP_Y = 23
-		const val CHANNELS_SCROLL_HINT_DOWN_X = CHANNELS_SCROLL_HINT_UP_X
-		const val CHANNELS_SCROLL_HINT_DOWN_Y = CHANNELS_SCROLL_HINT_UP_Y + 16 * (CHANNEL_LINK_MAX_DRAWN_CHANNELS - 1) // TODO REMOVE THIS 16 AS SOON AS POSSIBLE OR ELSE
-
 		const val LINK_BTN_X = 7
 		const val LINK_BTN_Y = 20
 		const val LINK_BTN_W = 150
@@ -444,6 +439,11 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 		const val LINK_BTN_TEXT_OFF_Y = 3
 		const val LINK_BTN_OFF_Y = LINK_BTN_H + LINK_BTN_TEXT_OFF_Y
 		const val LINK_BTN_V_HOVERED = LINK_BTN_V + LINK_BTN_H
+
+		const val CHANNELS_SCROLL_HINT_UP_X = 161
+		const val CHANNELS_SCROLL_HINT_UP_Y = 23
+		const val CHANNELS_SCROLL_HINT_DOWN_X = CHANNELS_SCROLL_HINT_UP_X
+		const val CHANNELS_SCROLL_HINT_DOWN_Y = CHANNELS_SCROLL_HINT_UP_Y + LINK_BTN_OFF_Y * (CHANNEL_LINK_MAX_DRAWN_CHANNELS - 1)
 	}
 
 	// TODO
