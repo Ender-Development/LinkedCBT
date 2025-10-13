@@ -118,7 +118,7 @@ dependencies {
 //	runtimeOnly "maven.modrinth:json-paintings:QBprvpeM"
 
 	// The One Probe
-//	implementation rfg.deobf("curse.maven:the-one-probe-community-edition-885670:6280353")
+	implementation rfg.deobf("curse.maven:the-one-probe-community-edition-885670:6280353")
 //	implementation rfg.deobf("curse.maven:topalldependents-1120632:6310644")
 
 	// JADE (+ Hwyla)

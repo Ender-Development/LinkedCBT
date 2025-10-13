@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.NetworkRegistry
+import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.ender_development.catalyx.client.gui.CatalyxGuiHandler
 import org.ender_development.catalyx.core.CatalyxSettings
@@ -38,11 +39,10 @@ object LinkedTanks : ICatalyxMod {
 	val guiHandler = CatalyxGuiHandler()
 	val numberFormat: NumberFormat = NumberFormat.getNumberInstance()
 
-	lateinit var logger: Logger
+	val logger: Logger = LogManager.getLogger(Tags.MOD_ID)
 
 	@EventHandler
 	fun preInit(e: FMLPreInitializationEvent) {
-		logger = e.modLog
 		PacketHandler.init()
 		NetworkRegistry.INSTANCE.registerGuiHandler(LinkedTanks, guiHandler)
 		MinecraftForge.EVENT_BUS.register(this)
@@ -52,17 +52,6 @@ object LinkedTanks : ICatalyxMod {
 	fun serverStarting(e: FMLServerStartingEvent) {
 		e.registerServerCommand(LinkedTanksCommand)
 	}
-
-	//@SubscribeEvent
-	//fun registerBlocks(event: RegistryEvent.Register<Block>) {
-	//	ModBlocks.registerBlocks(event)
-	//}
-	//
-	//@SubscribeEvent
-	//fun registerItems(event: RegistryEvent.Register<Item>) {
-	//	ModBlocks.registerItems(event)
-	//	ModItems.registerItems(event)
-	//}
 
 	@EventHandler
 	fun serverStopping(event: FMLServerStoppingEvent) {
@@ -86,10 +75,9 @@ object LinkedTanks : ICatalyxMod {
 		ModBlocks.hi()
 	}
 
-	// TODO linkedtanks command for ops to manage stuff
 	// TODO recipes
-	
+
 	@Suppress("NOTHING_TO_INLINE")
-	inline fun Int.formatNumber() =
+	inline fun Int.formatNumber(): String =
 		numberFormat.format(this)
 }
