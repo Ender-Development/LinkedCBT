@@ -1,11 +1,14 @@
 package io.enderdev.linkedtanks.client.gui
 
 import io.enderdev.linkedtanks.Tags
+import io.enderdev.linkedtanks.client.ClientChannelData
 import io.enderdev.linkedtanks.client.ClientChannelListManager
 import io.enderdev.linkedtanks.client.container.ContainerLinkedTank
-import io.enderdev.linkedtanks.data.LTPersistentData
-import io.enderdev.linkedtanks.network.ChannelListPacket
+import io.enderdev.linkedtanks.data.Constants
 import io.enderdev.linkedtanks.tiles.TileLinkedTank
+import io.enderdev.linkedtanks.tiles.buttons.DeleteButtonWrapper
+import io.enderdev.linkedtanks.tiles.buttons.LinkButtonWrapper
+import io.enderdev.linkedtanks.tiles.buttons.RenameButtonWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiTextField
@@ -25,30 +28,30 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 	val fluidDisplayWrapper = CapabilityFluidDisplayWrapper(8, 8, 16, 70, tile::fluidHandler)
 
 	var currentDisplay = CurrentDisplay.NONE
-	val linkButton = TileLinkedTank.LinkButtonWrapper(0, 0) // MAIN_OVERVIEW
-	val deleteButton = TileLinkedTank.DeleteButtonWrapper(0, 0) // MAIN_OVERVIEW
-	val renameButton = TileLinkedTank.RenameButtonWrapper(0, 0) // not rendered
+	val linkButton = LinkButtonWrapper(0, 0) // MAIN_OVERVIEW
+	val deleteButton = DeleteButtonWrapper(0, 0) // MAIN_OVERVIEW
+	val renameButton = RenameButtonWrapper(0, 0) // not rendered
 
 	var mouseClick: MouseClickData? = null
 
-	var channelListDrawnChannels: List<ChannelListPacket.ClientChannelData> = emptyList()
+	var channelListDrawnChannels = emptyList<ClientChannelData>()
 	var channelListSkipChannels = 0
 
 	var mainOverviewDeleteClicked = false
 
 	val canEditChannelData: Boolean
-		get() = tile.channelData?.let { LTPersistentData.canEdit(it, Minecraft.getMinecraft().player.uniqueID) } ?: false
+		get() = tile.channelData?.canBeEditedBy(Minecraft.getMinecraft().player.uniqueID) == true
 
 	// yes, Minecraft.getMinecraft() is needed cause this runs before `fontRenderer`/`mc` get initialised
-	val channelRenameTypedString = GuiTextField(0, Minecraft.getMinecraft().fontRenderer, 28, 8, Minecraft.getMinecraft().fontRenderer.getCharWidth('W') * LTPersistentData.CHANNEL_NAME_LENGTH_LIMIT, Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT).apply {
-		maxStringLength = LTPersistentData.CHANNEL_NAME_LENGTH_LIMIT
+	val channelRenameTypedString = GuiTextField(0, Minecraft.getMinecraft().fontRenderer, 28, 8, Minecraft.getMinecraft().fontRenderer.getCharWidth('W') * Constants.CHANNEL_NAME_LENGTH_LIMIT, Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT).apply {
+		maxStringLength = Constants.CHANNEL_NAME_LENGTH_LIMIT
 		enableBackgroundDrawing = false
 		setTextColor(HIGHLIGHTED_TEXT_COLOUR)
 	}
 
 	init {
 		displayData.add(fluidDisplayWrapper)
-		if(tile.channelId == TileLinkedTank.NO_CHANNEL)
+		if(tile.channelId == Constants.NO_CHANNEL)
 			switchDisplay(CurrentDisplay.CHANNEL_LINK)
 		else
 			switchDisplay(CurrentDisplay.MAIN_OVERVIEW)
@@ -148,7 +151,7 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 
 				for(idx in channelListDrawnChannels.indices) {
 					val channel = channelListDrawnChannels[idx]
-					fontRenderer.drawString("${if(channel.id == TileLinkedTank.CREATE_NEW_CHANNEL) "+" else "#${channel.id}"} ${channel.name}", 10, 23 + 16 * idx, TEXT_COLOUR)
+					fontRenderer.drawString("${if(channel.id == Constants.CREATE_NEW_CHANNEL) "+" else "#${channel.id}"} ${channel.name}", 10, 23 + 16 * idx, TEXT_COLOUR)
 				}
 
 				if(channelListSkipChannels > 0)
@@ -171,7 +174,7 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 	override fun renderTooltips(mouseX: Int, mouseY: Int) {} // no-op
 
 	override fun actionPerformed(button: GuiButton) {
-		AbstractButtonWrapper.getWrapper<TileLinkedTank.DeleteButtonWrapper>(button)?.let {
+		AbstractButtonWrapper.getWrapper<DeleteButtonWrapper>(button)?.let {
 			if(!mainOverviewDeleteClicked) {
 				mainOverviewDeleteClicked = true
 				return
@@ -181,8 +184,8 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 
 		super.actionPerformed(button)
 
-		AbstractButtonWrapper.getWrapper<TileLinkedTank.LinkButtonWrapper>(button)?.let {
-			if(it.channelId == TileLinkedTank.NO_CHANNEL)
+		AbstractButtonWrapper.getWrapper<LinkButtonWrapper>(button)?.let {
+			if(it.channelId == Constants.NO_CHANNEL)
 				switchDisplay(CurrentDisplay.CHANNEL_LINK)
 		}
 	}
@@ -244,7 +247,7 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 
 		if(currentDisplay == CurrentDisplay.CHANNEL_LINK) {
 			channelListSkipChannels = 0
-			linkButton.channelId = TileLinkedTank.NO_CHANNEL
+			linkButton.channelId = Constants.NO_CHANNEL
 		}
 
 		if(new == CurrentDisplay.CHANNEL_RENAME) {

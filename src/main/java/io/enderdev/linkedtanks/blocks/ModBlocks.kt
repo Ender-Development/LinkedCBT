@@ -1,7 +1,7 @@
 package io.enderdev.linkedtanks.blocks
 
 object ModBlocks {
-	val linkedTank = LinkedTank()
+	val linkedTank = LinkedTankBlock()
 
-	fun hi() {}
+	fun jvmLoadClass() {}
 }

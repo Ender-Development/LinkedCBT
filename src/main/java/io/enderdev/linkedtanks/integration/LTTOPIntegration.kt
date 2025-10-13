@@ -1,6 +1,7 @@
 package io.enderdev.linkedtanks.integration
 
 import io.enderdev.linkedtanks.Tags
+import io.enderdev.linkedtanks.data.Constants
 import io.enderdev.linkedtanks.tiles.TileLinkedTank
 import mcjty.theoneprobe.api.IProbeHitData
 import mcjty.theoneprobe.api.IProbeInfo
@@ -18,7 +19,7 @@ object LTTOPIntegration : IProbeInfoProvider {
 		val tile = world.getTileEntity(data.pos) as? TileLinkedTank ?: return
 
 		info.text(when(tile.channelId) {
-			TileLinkedTank.NO_CHANNEL -> "Unlinked"
+			Constants.NO_CHANNEL -> "Unlinked"
 			else -> "Channel #${tile.channelId} ${tile.channelData?.name}"
 		})
 	}

@@ -3,8 +3,8 @@ package io.enderdev.linkedtanks.command
 import io.enderdev.linkedtanks.LinkedTanks.formatNumber
 import io.enderdev.linkedtanks.Tags
 import io.enderdev.linkedtanks.blocks.ModBlocks
+import io.enderdev.linkedtanks.data.ChannelData
 import io.enderdev.linkedtanks.data.LTPersistentData
-import io.enderdev.linkedtanks.network.PacketHandler.channel
 import it.unimi.dsi.fastutil.ints.Int2LongArrayMap
 import net.minecraft.command.CommandBase
 import net.minecraft.command.ICommandSender
@@ -292,7 +292,7 @@ object LinkedTanksCommand : CommandTreeBase() {
 				sender.replyFail("Couldn't convert '$arg' to a numerical channel id")
 		}
 
-	fun getChannelData(sender: ICommandSender, arg: String, deletedWarn: Boolean = true): Pair<Int, LTPersistentData.ChannelData>? {
+	fun getChannelData(sender: ICommandSender, arg: String, deletedWarn: Boolean = true): Pair<Int, ChannelData>? {
 		val channelId = getChannelId(sender, arg) ?: return null
 		val channel = LTPersistentData.data.get(channelId) ?: run {
 			sender.replyFail("There is no channel with id $channelId")

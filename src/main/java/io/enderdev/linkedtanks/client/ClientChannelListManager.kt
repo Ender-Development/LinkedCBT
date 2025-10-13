@@ -1,33 +1,31 @@
 package io.enderdev.linkedtanks.client
 
+import io.enderdev.linkedtanks.data.Constants
 import io.enderdev.linkedtanks.network.ChannelListPacket
 import io.enderdev.linkedtanks.network.PacketHandler
-import io.enderdev.linkedtanks.tiles.TileLinkedTank
 
 object ClientChannelListManager {
-	var lastGot = 0L
-	private var cachedData: List<ChannelListPacket.ClientChannelData> = emptyList()
+	private var lastQueried = 0L
+	private var cachedData = emptyList<ClientChannelData>()
 
-	val channels: List<ChannelListPacket.ClientChannelData>
+	val channels: List<ClientChannelData>
 		get() {
 			// only check every 1s
-			if(System.currentTimeMillis() - lastGot >= 1000L) {
-				lastGot = System.currentTimeMillis()
-				fetch()
+			if(System.currentTimeMillis() - lastQueried >= 1000L) {
+				lastQueried = System.currentTimeMillis()
+				fetchNewData()
 			}
 
 			return cachedData
 		}
 
-	private fun fetch() {
+	private fun fetchNewData() {
 		PacketHandler.channel.sendToServer(ChannelListPacket().also {
 			ChannelListPacket.handlers.put(it.id) {
 				it.channelData.sortBy { it.id }
-				it.channelData.add(createNewChannel)
+				it.channelData.add(Constants.CLIENT_CHANNEL_CREATE_NEW)
 				cachedData = it.channelData
 			}
 		})
 	}
-
-	val createNewChannel = ChannelListPacket.ClientChannelData(TileLinkedTank.CREATE_NEW_CHANNEL, "Create new", null, 0, 0)
 }

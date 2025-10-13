@@ -3,6 +3,7 @@ package io.enderdev.linkedtanks
 import io.enderdev.linkedtanks.blocks.ModBlocks
 import io.enderdev.linkedtanks.command.LinkedTanksCommand
 import io.enderdev.linkedtanks.data.LTPersistentData
+import io.enderdev.linkedtanks.items.ModItems
 import io.enderdev.linkedtanks.network.PacketHandler
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraftforge.common.MinecraftForge
@@ -42,19 +43,19 @@ object LinkedTanks : ICatalyxMod {
 	val logger: Logger = LogManager.getLogger(Tags.MOD_ID)
 
 	@EventHandler
-	fun preInit(e: FMLPreInitializationEvent) {
+	fun preInit(ev: FMLPreInitializationEvent) {
 		PacketHandler.init()
 		NetworkRegistry.INSTANCE.registerGuiHandler(LinkedTanks, guiHandler)
 		MinecraftForge.EVENT_BUS.register(this)
 	}
 
 	@EventHandler
-	fun serverStarting(e: FMLServerStartingEvent) {
-		e.registerServerCommand(LinkedTanksCommand)
+	fun serverStarting(ev: FMLServerStartingEvent) {
+		ev.registerServerCommand(LinkedTanksCommand)
 	}
 
 	@EventHandler
-	fun serverStopping(event: FMLServerStoppingEvent) {
+	fun serverStopping(ev: FMLServerStoppingEvent) {
 		LTPersistentData.write()
 		LTPersistentData.unload()
 	}
@@ -62,7 +63,7 @@ object LinkedTanks : ICatalyxMod {
 	var lastWriteCausedBySave = 0L
 
 	@SubscribeEvent
-	fun worldSave(event: WorldEvent.Save) {
+	fun worldSave(ev: WorldEvent.Save) {
 		val currentTime = System.currentTimeMillis()
 		// write to disk at most every 250ms (5t) when caused by worlds saving to hopefully avoid writing the same data n times when all n dimensions save at the same time
 		if(currentTime - lastWriteCausedBySave > 250L) {
@@ -73,7 +74,8 @@ object LinkedTanks : ICatalyxMod {
 
 	// because of the way Java loads classes, need to do this lol
 	init {
-		ModBlocks.hi()
+		ModBlocks.jvmLoadClass()
+		ModItems.jvmLoadClass()
 	}
 
 	// TODO recipes

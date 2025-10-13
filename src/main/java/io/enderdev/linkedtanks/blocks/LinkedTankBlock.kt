@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import org.ender_development.catalyx.blocks.BaseMachineBlock
 
-class LinkedTank : BaseMachineBlock(LinkedTanks.modSettings, "linked_tank", TileLinkedTank::class.java, LinkedTanks.guiHandler.registerId(TileLinkedTank::class.java, ContainerLinkedTank::class.java) { GuiLinkedTank::class.java }) {
+class LinkedTankBlock : BaseMachineBlock(LinkedTanks.modSettings, "linked_tank", TileLinkedTank::class.java, LinkedTanks.guiHandler.registerId(TileLinkedTank::class.java, ContainerLinkedTank::class.java) { GuiLinkedTank::class.java }) {
 	override fun breakBlock(world: World, pos: BlockPos, state: IBlockState) {
 		// super destroys the TE
 		(world.getTileEntity(pos) as? TileLinkedTank)?.notifyBreak()
