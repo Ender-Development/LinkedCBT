@@ -27,7 +27,7 @@ data class ChannelData(var deleted: Boolean, var ownerUUID: UUID, var ownerUsern
 		get() = if(fluidCapacityOverride != 0)
 			fluidCapacityOverride
 		else
-			LTConfig.tankCapacity * if(LTConfig.liquidStorageChangesWithTankCount) linkedPositions.size else 1
+			LTConfig.tankCapacity * if(LTConfig.tankCapacityChangesWithTankCount) linkedPositions.size else 1
 
 	fun canBeEditedBy(uuid: UUID) =
 		ownerUUID == uuid

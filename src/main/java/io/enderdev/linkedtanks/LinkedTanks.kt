@@ -7,7 +7,10 @@ import io.enderdev.linkedtanks.items.ModItems
 import io.enderdev.linkedtanks.network.PacketHandler
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.common.config.Config
+import net.minecraftforge.common.config.ConfigManager
 import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.client.event.ConfigChangedEvent
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
@@ -75,8 +78,15 @@ object LinkedTanks : ICatalyxMod {
 		}
 	}
 
+	@SubscribeEvent
+	fun onConfigChangedEvent(event: ConfigChangedEvent.OnConfigChangedEvent) {
+		if(event.modID == Tags.MOD_ID)
+			ConfigManager.sync(Tags.MOD_ID, Config.Type.INSTANCE)
+	}
+
 	// because of the way Java loads classes, need to do this lol
 	init {
+		LTConfig.jvmLoadClass()
 		ModBlocks.jvmLoadClass()
 		ModItems.jvmLoadClass() // items is technically not necesary anymore since we ref it in preInit for client-side, but keep it here for now for server-side
 	}

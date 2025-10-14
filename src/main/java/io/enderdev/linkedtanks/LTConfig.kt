@@ -1,27 +1,31 @@
 package io.enderdev.linkedtanks
 
 import net.minecraftforge.common.config.Config
-import net.minecraftforge.common.config.ConfigManager
-import net.minecraftforge.fml.client.event.ConfigChangedEvent
-import net.minecraftforge.fml.common.Mod
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @Config(modid = Tags.MOD_ID, name = Tags.MOD_ID)
 object LTConfig {
-	// tank capacity
+	@JvmField
+	@Config.Name("Tank capacity")
+	@Config.Comment("Max fluid amount [mB] stored in a channel")
+	@Config.RangeInt(min = 1, max = Int.MAX_VALUE)
 	var tankCapacity = 8000
-	// basically if you add another tank to a link group, does the total link group capacity increase (like from 8B => 16B => 24B, etc.)
-	var liquidStorageChangesWithTankCount = false
-	// max mB/t when a side is set to push/pull, 0 to disable limits
+
+	@JvmField
+	@Config.Name("Tank capacity changes with tank count")
+	@Config.Comment(
+		"Should tank capacity be multiplied by the total amount of tanks in a channel",
+		"ex. if you have a tank capacity of 8,000 mB, and the channel has 3 tanks connected to it, the total channel capacity will be 24,000 mB"
+	)
+	var tankCapacityChangesWithTankCount = false
+
+	@JvmField
+	@Config.Name("Max tank push/pull throughput per side")
+	@Config.Comment(
+		"Max fluid amount [mB] that a tank will try to push/pull per side per tick",
+		"0 to disable any limits"
+	)
+	@Config.RangeInt(min = 0, max = Int.MAX_VALUE)
 	var maxPushPullThroughput = 250
 
-	@Mod.EventBusSubscriber(modid = Tags.MOD_ID)
-	object ConfigEventHandler {
-		@SubscribeEvent
-		@JvmStatic
-		fun onConfigChangedEvent(event: ConfigChangedEvent.OnConfigChangedEvent) {
-			if(event.modID == Tags.MOD_ID)
-				ConfigManager.sync(Tags.MOD_ID, Config.Type.INSTANCE)
-		}
-	}
+	fun jvmLoadClass() {}
 }
