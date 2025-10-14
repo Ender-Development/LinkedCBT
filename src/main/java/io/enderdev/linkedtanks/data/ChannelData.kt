@@ -20,6 +20,9 @@ data class ChannelData(var deleted: Boolean, var ownerUUID: UUID, var ownerUsern
 	 */
 	var fluidCapacityOverride = 0
 
+	fun displayName(channelId: Int) =
+		"#$channelId $name"
+
 	val fluidCapacity: Int
 		get() = if(fluidCapacityOverride != 0)
 			fluidCapacityOverride

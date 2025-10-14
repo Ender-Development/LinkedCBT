@@ -101,7 +101,7 @@ object LinkedTanksCommand : CommandTreeBase() {
 				sender.reply("Channels:")
 				LTPersistentData.data.toList().sortedBy { it.first }.forEach { (id, data) ->
 					val colour = if(data.deleted) TextFormatting.GRAY else TextFormatting.WHITE
-					sender.reply("- #$id ${data.name}${if(data.deleted) " (deleted)" else ""}", colour)
+					sender.reply("- ${data.displayName(id)}${if(data.deleted) " (deleted)" else ""}", colour)
 					sender.reply("owner: ${data.ownerUsername} (uuid: ${data.ownerUUID})", colour)
 					sender.reply((+"${data.fluidAmount.formatNumber()} / ${data.fluidCapacity.formatNumber()} mB of " + data.fluid.nameComponent + +"; ${data.linkedPositions.size} endpoint${if(data.linkedPositions.size == 1) "" else "s"}").withColour(colour))
 					sender.reply("")

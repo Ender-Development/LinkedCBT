@@ -63,17 +63,16 @@ class ItemTankConfigurator : BaseItem(LinkedTanks.modSettings, "tank_configurato
 		val res = ev.resolution
 		val facing = mousedOver.sideHit
 		val side = te.fluidSideConfiguration[facing]
-		val fontRenderer = mc.fontRenderer
 
 		GlStateManager.pushMatrix()
 		GlStateManager.color(1f, 1f, 1f, 1f)
 
 		val text = "§${side.colour.formattingCode}${side.describe(facing)}"
-		val w = fontRenderer.getStringWidth(text)
+		val w = GuiLinkedTank.FONT_RENDERER.getStringWidth(text)
 		val x = (res.scaledWidth - w) shr 1
 		val y = res.scaledHeight - OVERLAY_OFF_Y
 		Gui.drawRect(x - 2, y - 2, x + w + 2, y + GuiLinkedTank.FONT_HEIGHT + 2, OVERLAY_BG)
-		fontRenderer.drawString(text, x, y, 0)
+		GuiLinkedTank.FONT_RENDERER.drawString(text, x, y, 0)
 
 		GlStateManager.popMatrix()
 	}

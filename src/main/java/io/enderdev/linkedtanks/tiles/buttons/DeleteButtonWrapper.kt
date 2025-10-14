@@ -20,7 +20,7 @@ class DeleteButtonWrapper(x: Int, y: Int) : AbstractButtonWrapper(x, y, GuiLinke
 		GlStateManager.color(1f, 1f, 1f)
 		hovered = mouseX >= this.x && mouseX < this.x + width && mouseY >= this.y && mouseY < this.y + height
 		drawTexturedModalRect(this.x, this.y, GuiLinkedTank.DELETE_BTN_U, if(hovered) GuiLinkedTank.DELETE_BTN_V_HOVERED else GuiLinkedTank.DELETE_BTN_V, this.width, this.height)
-		Minecraft.getMinecraft().fontRenderer.drawString("Delete", this.x + GuiLinkedTank.DELETE_BTN_TEXT_OFF_X, this.y + GuiLinkedTank.DELETE_BTN_TEXT_OFF_Y, GuiLinkedTank.RED_TEXT_COLOUR)
+		GuiLinkedTank.FONT_RENDERER.drawString("Delete", this.x + GuiLinkedTank.DELETE_BTN_TEXT_OFF_X, this.y + GuiLinkedTank.DELETE_BTN_TEXT_OFF_Y, GuiLinkedTank.RED_TEXT_COLOUR)
 	} }
 
 	lateinit var ctx: MessageContext

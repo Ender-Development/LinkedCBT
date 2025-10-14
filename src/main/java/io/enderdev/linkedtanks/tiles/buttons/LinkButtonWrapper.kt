@@ -24,12 +24,12 @@ class LinkButtonWrapper(x: Int, y: Int, width: Int, height: Int) : AbstractButto
 
 		if(channelId == Constants.NO_CHANNEL) {
 			drawTexturedModalRect(this.x, this.y, GuiLinkedTank.UNLINK_BTN_U, if(hovered) GuiLinkedTank.UNLINK_BTN_V_HOVERED else GuiLinkedTank.UNLINK_BTN_V, this.width, this.height)
-			Minecraft.getMinecraft().fontRenderer.drawString("Unlink", this.x + GuiLinkedTank.UNLINK_BTN_TEXT_OFF_X, this.y + GuiLinkedTank.UNLINK_BTN_TEXT_OFF_Y, GuiLinkedTank.TEXT_COLOUR)
+			GuiLinkedTank.FONT_RENDERER.drawString("Unlink", this.x + GuiLinkedTank.UNLINK_BTN_TEXT_OFF_X, this.y + GuiLinkedTank.UNLINK_BTN_TEXT_OFF_Y, GuiLinkedTank.TEXT_COLOUR)
 		} else {
 			drawTexturedModalRect(this.x, this.y, GuiLinkedTank.LINK_BTN_U, if(hovered) GuiLinkedTank.LINK_BTN_V_HOVERED else GuiLinkedTank.LINK_BTN_V, this.width, this.height)
 			val channel = if(channelId == Constants.CREATE_NEW_CHANNEL) Constants.CLIENT_CHANNEL_CREATE_NEW else ClientChannelListManager.channels.find { it.id == channelId }!!
-			Minecraft.getMinecraft().fontRenderer.drawString(
-				"${if(channel.id == Constants.CREATE_NEW_CHANNEL) "+" else "#${channel.id}"} ${channel.name}",
+			GuiLinkedTank.FONT_RENDERER.drawString(
+				channel.displayName,
 				this.x + GuiLinkedTank.LINK_BTN_TEXT_OFF_X,
 				this.y + GuiLinkedTank.LINK_BTN_TEXT_OFF_Y,
 				GuiLinkedTank.TEXT_COLOUR

@@ -11,6 +11,7 @@ import io.enderdev.linkedtanks.tiles.buttons.RenameButtonWrapper
 import io.enderdev.linkedtanks.tiles.buttons.SideConfigurationButtonWrapper
 import io.enderdev.linkedtanks.tiles.util.FluidSideConfiguration
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiTextField
 import net.minecraft.inventory.IInventory
@@ -45,14 +46,19 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 	var mouseClick: MouseClickData? = null
 
 	var channelListSkipChannels = 0
+	var channelListMatchingChannels = 0
+	val channelListSearchBar = GuiTextField(1, FONT_RENDERER, CHANNEL_SEARCH_X, CHANNEL_SEARCH_Y, CHANNEL_SEARCH_W, CHANNEL_SEARCH_H).apply {
+		maxStringLength = CHANNEL_SEARCH_MAX_LENGTH
+		enableBackgroundDrawing = false
+		setTextColor(HIGHLIGHTED_TEXT_COLOUR)
+	}
 
 	var mainOverviewDeleteClicked = false
 
 	val canEditChannelData: Boolean
 		get() = tile.channelData?.canBeEditedBy(Minecraft.getMinecraft().player.uniqueID) == true
 
-	// yes, Minecraft.getMinecraft() is needed cause this runs before `fontRenderer`/`mc` get initialised
-	val channelRenameTypedString = GuiTextField(0, Minecraft.getMinecraft().fontRenderer, NAME_TEXT_X, NAME_TEXT_Y, Minecraft.getMinecraft().fontRenderer.getCharWidth('W') * Constants.CHANNEL_NAME_LENGTH_LIMIT, FONT_HEIGHT).apply {
+	val channelRenameTextField = GuiTextField(0, FONT_RENDERER, NAME_TEXT_X, NAME_TEXT_Y, FONT_RENDERER.getCharWidth('W') * Constants.CHANNEL_NAME_LENGTH_LIMIT, FONT_HEIGHT).apply {
 		maxStringLength = Constants.CHANNEL_NAME_LENGTH_LIMIT
 		enableBackgroundDrawing = false
 		setTextColor(HIGHLIGHTED_TEXT_COLOUR)
@@ -138,12 +144,29 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 					it.button!!.visible = false
 				}
 
-				for(idx in (channelListSkipChannels..<(channelListSkipChannels + CHANNEL_LINK_MAX_DRAWN_CHANNELS).coerceAtMost(ClientChannelListManager.channels.size))) {
-					val btnIdx = idx - channelListSkipChannels
-					val btn = linkChannelButtons[btnIdx]
-					btn.button!!.visible = true
-					btn.channelId = ClientChannelListManager.channels[idx].id
+				channelListMatchingChannels = 0
+				var skip = channelListSkipChannels
+				var btnIdx = 0
+				for(channel in ClientChannelListManager.channels) {
+					if(!channel.displayName.contains(channelListSearchBar.text, true))
+						continue
+
+					++channelListMatchingChannels
+
+					if(btnIdx < CHANNEL_LINK_MAX_DRAWN_CHANNELS && skip-- <= 0)
+						linkChannelButtons[btnIdx++].apply {
+							button!!.visible = true
+							channelId = channel.id
+						}
 				}
+
+				channelListSkipChannels = channelListSkipChannels.coerceIn(0, (channelListMatchingChannels - CHANNEL_LINK_MAX_DRAWN_CHANNELS).coerceAtLeast(0))
+
+				if(btnIdx < CHANNEL_LINK_MAX_DRAWN_CHANNELS && (btnIdx == 0 || linkChannelButtons[btnIdx - 1].channelId != Constants.CREATE_NEW_CHANNEL))
+					linkChannelButtons[btnIdx].apply {
+						button!!.visible = true
+						channelId = Constants.CREATE_NEW_CHANNEL
+					}
 			}
 			CurrentDisplay.CHANNEL_RENAME -> {}
 			else -> TODO(currentDisplay.debugName)
@@ -155,48 +178,50 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 
 		when(currentDisplay) {
 			CurrentDisplay.MAIN_OVERVIEW -> {
-				val nameText = "#${tile.channelId} ${tile.channelData?.name}"
+				val nameText = tile.channelData?.displayName(tile.channelId) ?: "???"
 				var nameColour = TEXT_COLOUR
-				if(canEditChannelData && isHovered(guiLeft + NAME_TEXT_X, guiTop + NAME_TEXT_Y, fontRenderer.getStringWidth(nameText), FONT_HEIGHT, mouseX, mouseY)) {
+				if(canEditChannelData && isHovered(guiLeft + NAME_TEXT_X, guiTop + NAME_TEXT_Y, FONT_RENDERER.getStringWidth(nameText), FONT_HEIGHT, mouseX, mouseY)) {
 					nameColour = HIGHLIGHTED_TEXT_COLOUR
 					if(mouseClick?.btn == 0)
 						switchDisplay(CurrentDisplay.CHANNEL_RENAME)
 				}
 
-				fontRenderer.drawString(nameText, NAME_TEXT_X, NAME_TEXT_Y, nameColour)
-				fontRenderer.drawString("Owner: ${tile.channelData?.ownerUsername}", OWNER_TEXT_X, OWNER_TEXT_Y, TEXT_COLOUR)
-				fontRenderer.drawString(fluidDisplayWrapper.textLines[0], CONTENTS_TEXT_X, CONTENTS_TEXT_Y, TEXT_COLOUR)
+				FONT_RENDERER.drawString(nameText, NAME_TEXT_X, NAME_TEXT_Y, nameColour)
+				FONT_RENDERER.drawString("Owner: ${tile.channelData?.ownerUsername}", OWNER_TEXT_X, OWNER_TEXT_Y, TEXT_COLOUR)
+				FONT_RENDERER.drawString(fluidDisplayWrapper.textLines[0], CONTENTS_TEXT_X, CONTENTS_TEXT_Y, TEXT_COLOUR)
 
 				if(mainOverviewDeleteClicked) {
-					drawCenteredString(fontRenderer, "Are you sure?", DELETE_BTN_CONFIRMATION_TEXT_X, DELETE_BTN_CONFIRMATION_TEXT_Y, RED_TEXT_COLOUR)
+					drawCenteredString(FONT_RENDERER, "Are you sure?", DELETE_BTN_CONFIRMATION_TEXT_X, DELETE_BTN_CONFIRMATION_TEXT_Y, RED_TEXT_COLOUR)
 					mainOverviewDeleteClicked = deleteButton.button!!.hovered
 				}
 
 				// this could be theoretically moved to [SideConfigurationButtonWrapper], but then I'd need to pass in the gridOffsetX/Y to it to properly position the text
 				sideConfigurationButtons.forEach { btn ->
 					if(btn.button!!.hovered)
-						drawCenteredString(fontRenderer, "§${btn.side.colour.formattingCode}${btn.side.describe(btn.facing)}", SIDE_CONFIG_BTN_X + SIDE_CONFIG_TOOLTIP_OFF_X, SIDE_CONFIG_BTN_Y + SIDE_CONFIG_TOOLTIP_OFF_Y, 0)
+						drawCenteredString(FONT_RENDERER, "§${btn.side.colour.formattingCode}${btn.side.describe(btn.facing)}", SIDE_CONFIG_BTN_X + SIDE_CONFIG_TOOLTIP_OFF_X, SIDE_CONFIG_BTN_Y + SIDE_CONFIG_TOOLTIP_OFF_Y, 0)
 				}
 			}
 			CurrentDisplay.CHANNEL_LINK -> {
-				fontRenderer.drawString("Channels:", CHANNELS_TEXT_X, CHANNELS_TEXT_Y, TEXT_COLOUR)
+				FONT_RENDERER.drawString("Channels:", CHANNELS_TEXT_X, CHANNELS_TEXT_Y, TEXT_COLOUR)
 
 				if(channelListSkipChannels > 0)
-					fontRenderer.drawString("^", CHANNELS_SCROLL_HINT_UP_X, CHANNELS_SCROLL_HINT_UP_Y, HIGHLIGHTED_TEXT_COLOUR)
+					FONT_RENDERER.drawString("^", CHANNELS_SCROLL_HINT_UP_X, CHANNELS_SCROLL_HINT_UP_Y, HIGHLIGHTED_TEXT_COLOUR)
 
-				if(channelListSkipChannels + CHANNEL_LINK_MAX_DRAWN_CHANNELS < ClientChannelListManager.channels.size)
-					fontRenderer.drawString("v", CHANNELS_SCROLL_HINT_DOWN_X, CHANNELS_SCROLL_HINT_DOWN_Y, HIGHLIGHTED_TEXT_COLOUR)
+				if(channelListSkipChannels + CHANNEL_LINK_MAX_DRAWN_CHANNELS < channelListMatchingChannels)
+					FONT_RENDERER.drawString("v", CHANNELS_SCROLL_HINT_DOWN_X, CHANNELS_SCROLL_HINT_DOWN_Y, HIGHLIGHTED_TEXT_COLOUR)
+
+				channelListSearchBar.drawTextBox()
 			}
 			CurrentDisplay.CHANNEL_RENAME -> {
-				channelRenameTypedString.drawTextBox()
+				channelRenameTextField.drawTextBox()
 			}
 			else -> TODO(currentDisplay.debugName)
 		}
 
 		if(DevUtils.isDeobfuscated) {
-			fontRenderer.drawString(currentDisplay.debugName, 50, -10, RED_TEXT_COLOUR)
-			fontRenderer.drawString(tile.channelId.toString(), -300, (ySize shr 1) - FONT_HEIGHT, RED_TEXT_COLOUR)
-			fontRenderer.drawSplitString(tile.channelData.toString(), -300, ySize shr 1, 300, RED_TEXT_COLOUR)
+			FONT_RENDERER.drawString(currentDisplay.debugName, 50, -10, RED_TEXT_COLOUR)
+			FONT_RENDERER.drawString(tile.channelId.toString(), -300, (ySize shr 1) - FONT_HEIGHT, RED_TEXT_COLOUR)
+			FONT_RENDERER.drawSplitString(tile.channelData.toString(), -300, ySize shr 1, 300, RED_TEXT_COLOUR)
 		}
 
 		mouseClick = null
@@ -270,16 +295,23 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 				if(channelListSkipChannels != 0)
 					--channelListSkipChannels
 			} else {
-				if(ClientChannelListManager.channels.size - CHANNEL_LINK_MAX_DRAWN_CHANNELS > channelListSkipChannels)
+				if(channelListSkipChannels + CHANNEL_LINK_MAX_DRAWN_CHANNELS < channelListMatchingChannels)
 					++channelListSkipChannels
 			}
 		}
 	}
 
 	override fun keyTyped(typedChar: Char, keyCode: Int) {
-		if(currentDisplay == CurrentDisplay.CHANNEL_RENAME) {
-			if(keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_NUMPADENTER) {
-				val text = channelRenameTypedString.text.trim()
+		when(currentDisplay) {
+			CurrentDisplay.CHANNEL_RENAME -> {
+				if(keyCode == 1)
+					return mc.player.closeScreen()
+
+				if(keyCode != Keyboard.KEY_RETURN && keyCode != Keyboard.KEY_NUMPADENTER) {
+					channelRenameTextField.textboxKeyTyped(typedChar, keyCode)
+					return
+				}
+				val text = channelRenameTextField.text.trim()
 				if(text.isEmpty())
 					return
 
@@ -287,13 +319,19 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 				renameButton.newName = text
 				actionPerformed(renameButton.button!!)
 				switchDisplay(CurrentDisplay.MAIN_OVERVIEW)
-			} else
-				channelRenameTypedString.textboxKeyTyped(typedChar, keyCode)
-		} else
-			super.keyTyped(typedChar, keyCode)
+			}
+			CurrentDisplay.CHANNEL_LINK -> {
+				if(keyCode == 1)
+					return mc.player.closeScreen()
+
+				channelListSearchBar.textboxKeyTyped(typedChar, keyCode)
+			}
+			else -> super.keyTyped(typedChar, keyCode)
+		}
 	}
 
 	fun switchDisplay(new: CurrentDisplay) {
+		// MAIN_OVERVIEW
 		if(currentDisplay == CurrentDisplay.MAIN_OVERVIEW) {
 			displayData.remove(fluidDisplayWrapper)
 			buttonList.remove(unlinkButton.button)
@@ -315,26 +353,27 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 			it.button!!.enabled = canEditChannelData
 		}
 
-		if(new == CurrentDisplay.CHANNEL_LINK)
+		// CHANNEL_LINK
+		Keyboard.enableRepeatEvents(new == CurrentDisplay.CHANNEL_LINK || new == CurrentDisplay.CHANNEL_RENAME)
+		channelListSearchBar.isFocused = new == CurrentDisplay.CHANNEL_LINK
+		channelListSearchBar.visible = new == CurrentDisplay.CHANNEL_LINK
+
+		if(new == CurrentDisplay.CHANNEL_LINK) {
 			linkChannelButtons.mapTo(buttonList, LinkButtonWrapper::button)
+			channelListSearchBar.text = ""
+		}
 
 		if(currentDisplay == CurrentDisplay.CHANNEL_LINK) {
 			channelListSkipChannels = 0
 			buttonList.removeAll(linkChannelButtons.map(LinkButtonWrapper::button))
 		}
 
-		if(new == CurrentDisplay.CHANNEL_RENAME) {
-			channelRenameTypedString.isFocused = true
-			channelRenameTypedString.visible = true
-			channelRenameTypedString.text = tile.channelData?.name ?: "???"
-			Keyboard.enableRepeatEvents(true)
-		}
+		// CHANNEL_RENAME
+		channelRenameTextField.isFocused = new == CurrentDisplay.CHANNEL_RENAME
+		channelRenameTextField.visible = new == CurrentDisplay.CHANNEL_RENAME
 
-		if(currentDisplay == CurrentDisplay.CHANNEL_RENAME) {
-			channelRenameTypedString.isFocused = false
-			channelRenameTypedString.visible = false
-			Keyboard.enableRepeatEvents(false)
-		}
+		if(new == CurrentDisplay.CHANNEL_RENAME)
+			channelRenameTextField.text = tile.channelData?.name ?: "???"
 
 		currentDisplay = new
 	}
@@ -368,7 +407,8 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 		const val BASE_TEXT_X = 8
 		const val BASE_TEXT_Y = 8
 
-		val FONT_HEIGHT = Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT
+		val FONT_RENDERER: FontRenderer = Minecraft.getMinecraft().fontRenderer
+		val FONT_HEIGHT = FONT_RENDERER.FONT_HEIGHT
 
 		// --- MAIN_OVERVIEW ---
 		const val NAME_TEXT_X = BASE_TEXT_X + 20
@@ -442,10 +482,15 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 		const val CHANNELS_SCROLL_HINT_UP_Y = 23
 		const val CHANNELS_SCROLL_HINT_DOWN_X = CHANNELS_SCROLL_HINT_UP_X
 		const val CHANNELS_SCROLL_HINT_DOWN_Y = CHANNELS_SCROLL_HINT_UP_Y + LINK_BTN_OFF_Y * (CHANNEL_LINK_MAX_DRAWN_CHANNELS - 1)
+
+		const val CHANNEL_SEARCH_X = CHANNELS_TEXT_X
+		const val CHANNEL_SEARCH_Y = CHANNELS_SCROLL_HINT_DOWN_Y + LINK_BTN_H
+		const val CHANNEL_SEARCH_MAX_LENGTH = 25
+		val CHANNEL_SEARCH_W = FONT_RENDERER.getStringWidth("W".repeat(CHANNEL_SEARCH_MAX_LENGTH))
+		val CHANNEL_SEARCH_H = FONT_HEIGHT
 	}
 
 	// TODO
 	// - translation
 	// - fluid whitelist selector?
-	// - channel selector search?
 }
