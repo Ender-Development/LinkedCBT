@@ -1,10 +1,12 @@
 package io.enderdev.linkedtanks.command
 
+import io.enderdev.linkedtanks.LinkedTanks
 import io.enderdev.linkedtanks.LinkedTanks.formatNumber
 import io.enderdev.linkedtanks.Tags
 import io.enderdev.linkedtanks.blocks.ModBlocks
 import io.enderdev.linkedtanks.data.ChannelData
 import io.enderdev.linkedtanks.data.LTPersistentData
+import io.enderdev.linkedtanks.tiles.TileLinkedTank
 import io.enderdev.linkedtanks.util.extensions.*
 import it.unimi.dsi.fastutil.ints.Int2LongArrayMap
 import net.minecraft.command.CommandBase
@@ -49,7 +51,8 @@ object LinkedTanksCommand : CommandTreeBase() {
 			sender.reply("/linkedtanks channels hijack <channel id> [player] - change a channel's ownership")
 			sender.reply("/linkedtanks channels delete <channel id> - delete a channel")
 			sender.reply("/linkedtanks channels undelete <channel id> - undelete a channel")
-			sender.reply("/linkedtanks setcontents <channel id> <fluid | empty> <amount> - set a channel's contents")
+			sender.reply("/linkedtanks channels setcontents <channel id> <fluid | empty> <amount> - set a channel's contents")
+			sender.reply("/linkedtanks channels revalidate - validate if all channels have saved correct tank positions, this may load chunks")
 		}
 	}
 
@@ -88,6 +91,7 @@ object LinkedTanksCommand : CommandTreeBase() {
 			addSubcommand(Undelete)
 			addSubcommand(SetContents)
 			addSubcommand(Purge)
+			addSubcommand(Revalidate)
 		}
 
 		object List : CommandBase() {
@@ -288,6 +292,33 @@ object LinkedTanksCommand : CommandTreeBase() {
 				LTPersistentData.data.remove(channelId)
 
 				sender.reply("Channel $channelId and all of its associated data has been purged, and its channel id is free to be reused")
+			}
+		}
+
+		object Revalidate : CommandBase() {
+			override fun getName() =
+				"revalidate"
+
+			override fun getUsage(sender: ICommandSender) =
+				"channels $name meow"
+
+			override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) {
+				LTPersistentData.data.forEach { (id, data) ->
+					data.linkedPositions.removeIf { pos ->
+						// idk if this loads dimensions, so if it returns null, just bail
+						val world = pos.world ?: return@removeIf false.also {
+							LinkedTanks.logger.info("Revalidate: couldn't get dimension with id {} (pos: {}, channel id: {})!", pos.dimId, pos, id)
+						}
+						val te = world.getTileEntity(pos.pos) as? TileLinkedTank ?: return@removeIf true.also {
+							LinkedTanks.logger.info("Revalidate: there was no Linked Tank at {}; removing from channel id {}!", pos, id)
+						}
+						return@removeIf (te.channelId != id).also {
+							if(it)
+								LinkedTanks.logger.info("Revalidate: Linked Tank at {} had channelId {} instead of expected {}!", pos, te.channelId, id)
+						}
+					}
+				}
+				sender.reply("Channels revalidated")
 			}
 		}
 	}
