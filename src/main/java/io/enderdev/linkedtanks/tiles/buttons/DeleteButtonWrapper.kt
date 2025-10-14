@@ -1,17 +1,17 @@
 package io.enderdev.linkedtanks.tiles.buttons
 
-import io.enderdev.linkedtanks.Tags
 import io.enderdev.linkedtanks.client.gui.GuiLinkedTank
+import io.enderdev.linkedtanks.data.Constants
+import io.enderdev.linkedtanks.util.extensions.guiTranslate
 import io.netty.buffer.ByteBuf
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
 import org.ender_development.catalyx.client.button.AbstractButtonWrapper
 
 class DeleteButtonWrapper(x: Int, y: Int) : AbstractButtonWrapper(x, y, GuiLinkedTank.DELETE_BTN_W, GuiLinkedTank.DELETE_BTN_H) {
-	override val textureLocation = ResourceLocation(Tags.MOD_ID, "textures/gui/container/linked_tank_gui.png")
+	override val textureLocation = Constants.LINKED_TANK_GUI
 
 	override val drawDefaultHoverOverlay = false
 
@@ -20,7 +20,7 @@ class DeleteButtonWrapper(x: Int, y: Int) : AbstractButtonWrapper(x, y, GuiLinke
 		GlStateManager.color(1f, 1f, 1f)
 		hovered = mouseX >= this.x && mouseX < this.x + width && mouseY >= this.y && mouseY < this.y + height
 		drawTexturedModalRect(this.x, this.y, GuiLinkedTank.DELETE_BTN_U, if(hovered) GuiLinkedTank.DELETE_BTN_V_HOVERED else GuiLinkedTank.DELETE_BTN_V, this.width, this.height)
-		GuiLinkedTank.FONT_RENDERER.drawString("Delete", this.x + GuiLinkedTank.DELETE_BTN_TEXT_OFF_X, this.y + GuiLinkedTank.DELETE_BTN_TEXT_OFF_Y, GuiLinkedTank.RED_TEXT_COLOUR)
+		GuiLinkedTank.FONT_RENDERER.drawString("delete_btn".guiTranslate(), this.x + GuiLinkedTank.DELETE_BTN_TEXT_OFF_X, this.y + GuiLinkedTank.DELETE_BTN_TEXT_OFF_Y, GuiLinkedTank.RED_TEXT_COLOUR)
 	} }
 
 	lateinit var ctx: MessageContext

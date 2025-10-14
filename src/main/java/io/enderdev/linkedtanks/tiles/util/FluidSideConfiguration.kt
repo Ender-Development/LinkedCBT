@@ -176,6 +176,7 @@ class FluidSideConfiguration(val tile: TileLinkedTank) {
 				PULL, OUTPUT, PUSH -> 62
 			}
 
+		// should this be translatable? maybe.
 		fun describe(facing: EnumFacing) =
 			"${facing.name.lowercase().replaceFirstChar(Char::uppercaseChar)} - $named"
 	}

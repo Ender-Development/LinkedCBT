@@ -10,13 +10,14 @@ import io.enderdev.linkedtanks.tiles.buttons.LinkButtonWrapper
 import io.enderdev.linkedtanks.tiles.buttons.RenameButtonWrapper
 import io.enderdev.linkedtanks.tiles.buttons.SideConfigurationButtonWrapper
 import io.enderdev.linkedtanks.tiles.util.FluidSideConfiguration
+import io.enderdev.linkedtanks.util.extensions.guiTranslate
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiTextField
+import net.minecraft.client.resources.I18n
 import net.minecraft.inventory.IInventory
 import net.minecraft.util.EnumFacing
-import net.minecraft.util.ResourceLocation
 import org.ender_development.catalyx.client.button.AbstractButtonWrapper
 import org.ender_development.catalyx.client.gui.BaseGuiTyped
 import org.ender_development.catalyx.client.gui.wrappers.CapabilityFluidDisplayWrapper
@@ -25,7 +26,7 @@ import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
 class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTyped<TileLinkedTank>(ContainerLinkedTank(playerInv, tile), tile) {
-	override val textureLocation = ResourceLocation(Tags.MOD_ID, "textures/gui/container/linked_tank_gui.png")
+	override val textureLocation = Constants.LINKED_TANK_GUI
 	override val displayName = ""
 
 	val fluidDisplayWrapper = CapabilityFluidDisplayWrapper(FLUID_TANK_X, FLUID_TANK_Y, FLUID_TANK_W, FLUID_TANK_H, tile::fluidHandler)
@@ -44,6 +45,8 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 	}
 
 	var mouseClick: MouseClickData? = null
+	val canEditChannelData: Boolean
+		get() = tile.channelData?.canBeEditedBy(Minecraft.getMinecraft().player.uniqueID) == true
 
 	var channelListSkipChannels = 0
 	var channelListMatchingChannels = 0
@@ -54,9 +57,6 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 	}
 
 	var mainOverviewDeleteClicked = false
-
-	val canEditChannelData: Boolean
-		get() = tile.channelData?.canBeEditedBy(Minecraft.getMinecraft().player.uniqueID) == true
 
 	val channelRenameTextField = GuiTextField(0, FONT_RENDERER, NAME_TEXT_X, NAME_TEXT_Y, FONT_RENDERER.getCharWidth('W') * Constants.CHANNEL_NAME_LENGTH_LIMIT, FONT_HEIGHT).apply {
 		maxStringLength = Constants.CHANNEL_NAME_LENGTH_LIMIT
@@ -132,7 +132,9 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 		if(currentDisplay == CurrentDisplay.MAIN_OVERVIEW)
 			displayData.add(fluidDisplayWrapper)
 
+		@Suppress("REDUNDANT_ELSE_IN_WHEN")
 		when(currentDisplay) {
+			CurrentDisplay.NONE -> {} // shouldn't happen, but don't crash if it does
 			CurrentDisplay.MAIN_OVERVIEW -> {
 				// draw fluid tank bg
 				drawTexturedModalRect(guiLeft + FLUID_TANK_BACKGROUND_X, guiTop + FLUID_TANK_BACKGROUND_Y, FLUID_TANK_BACKGROUND_U, FLUID_TANK_BACKGROUND_V, FLUID_TANK_BACKGROUND_W, FLUID_TANK_BACKGROUND_H)
@@ -169,14 +171,16 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 					}
 			}
 			CurrentDisplay.CHANNEL_RENAME -> {}
-			else -> TODO(currentDisplay.debugName)
+			else -> error(currentDisplay.debugName)
 		}
 	}
 
 	override fun drawGuiContainerForegroundLayer(mouseX: Int, mouseY: Int) {
 		super.drawGuiContainerForegroundLayer(mouseX, mouseY)
 
+		@Suppress("REDUNDANT_ELSE_IN_WHEN")
 		when(currentDisplay) {
+			CurrentDisplay.NONE -> {} // shouldn't happen, but don't crash if it does
 			CurrentDisplay.MAIN_OVERVIEW -> {
 				val nameText = tile.channelData?.displayName(tile.channelId) ?: "???"
 				var nameColour = TEXT_COLOUR
@@ -187,11 +191,12 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 				}
 
 				FONT_RENDERER.drawString(nameText, NAME_TEXT_X, NAME_TEXT_Y, nameColour)
-				FONT_RENDERER.drawString("Owner: ${tile.channelData?.ownerUsername}", OWNER_TEXT_X, OWNER_TEXT_Y, TEXT_COLOUR)
+				// for some reason, this cannot use "owner".guiTranslate(...); in the GUI it shows up as "Owner: [Ljava.lang.Object;@address"
+				FONT_RENDERER.drawString(I18n.format("${TRANSLATION_BASE}owner", tile.channelData?.ownerUsername), OWNER_TEXT_X, OWNER_TEXT_Y, TEXT_COLOUR)
 				FONT_RENDERER.drawString(fluidDisplayWrapper.textLines[0], CONTENTS_TEXT_X, CONTENTS_TEXT_Y, TEXT_COLOUR)
 
 				if(mainOverviewDeleteClicked) {
-					drawCenteredString(FONT_RENDERER, "Are you sure?", DELETE_BTN_CONFIRMATION_TEXT_X, DELETE_BTN_CONFIRMATION_TEXT_Y, RED_TEXT_COLOUR)
+					drawCenteredString(FONT_RENDERER, "confirmation".guiTranslate(), DELETE_BTN_CONFIRMATION_TEXT_X, DELETE_BTN_CONFIRMATION_TEXT_Y, RED_TEXT_COLOUR)
 					mainOverviewDeleteClicked = deleteButton.button!!.hovered
 				}
 
@@ -202,7 +207,7 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 				}
 			}
 			CurrentDisplay.CHANNEL_LINK -> {
-				FONT_RENDERER.drawString("Channels:", CHANNELS_TEXT_X, CHANNELS_TEXT_Y, TEXT_COLOUR)
+				FONT_RENDERER.drawString("channels".guiTranslate(), CHANNELS_TEXT_X, CHANNELS_TEXT_Y, TEXT_COLOUR)
 
 				if(channelListSkipChannels > 0)
 					FONT_RENDERER.drawString("^", CHANNELS_SCROLL_HINT_UP_X, CHANNELS_SCROLL_HINT_UP_Y, HIGHLIGHTED_TEXT_COLOUR)
@@ -215,7 +220,7 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 			CurrentDisplay.CHANNEL_RENAME -> {
 				channelRenameTextField.drawTextBox()
 			}
-			else -> TODO(currentDisplay.debugName)
+			else -> error(currentDisplay.debugName)
 		}
 
 		if(DevUtils.isDeobfuscated) {
@@ -417,6 +422,7 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 		const val RED_TEXT_COLOUR = 0xFF0000 or TEXT_COLOUR
 		const val BASE_TEXT_X = 8
 		const val BASE_TEXT_Y = 8
+		const val TRANSLATION_BASE = "tile.${Tags.MOD_ID}:linked_tank.gui."
 
 		val FONT_RENDERER: FontRenderer = Minecraft.getMinecraft().fontRenderer
 		val FONT_HEIGHT = FONT_RENDERER.FONT_HEIGHT
@@ -502,6 +508,5 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 	}
 
 	// TODO
-	// - translation
 	// - fluid whitelist selector?
 }

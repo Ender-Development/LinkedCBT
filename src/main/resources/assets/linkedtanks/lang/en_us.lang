@@ -1,4 +1,10 @@
 tile.linkedtanks:linked_tank.name=Linked Tank
+tile.linkedtanks:linked_tank.gui.owner=Owner: %s
+tile.linkedtanks:linked_tank.gui.confirmation=Are you sure?
+tile.linkedtanks:linked_tank.gui.channels=Channels:
+tile.linkedtanks:linked_tank.gui.unlink_btn=Unlink
+tile.linkedtanks:linked_tank.gui.delete_btn=Delete
+tile.linkedtanks:linked_tank.gui.create_new=Create new
 
 item.linkedtanks:tank_configurator.name=Tank Configurator
 

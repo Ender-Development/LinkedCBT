@@ -1,6 +1,9 @@
 package io.enderdev.linkedtanks.data
 
+import io.enderdev.linkedtanks.Tags
 import io.enderdev.linkedtanks.client.ClientChannelData
+import io.enderdev.linkedtanks.util.extensions.guiTranslate
+import net.minecraft.util.ResourceLocation
 
 internal object Constants {
 	// special channel ids
@@ -9,9 +12,12 @@ internal object Constants {
 
 	const val CHANNEL_NAME_LENGTH_LIMIT = 20
 
+	const val LINKED_TANK_GUI_PATH = "textures/gui/container/linked_tank_gui.png"
+	val LINKED_TANK_GUI = ResourceLocation(Tags.MOD_ID, LINKED_TANK_GUI_PATH)
+
 	// client-side only, used in [handleUpdateTag] to try to avoid creating useless class instances
 	val NO_LINKED_POSITIONS = HashSet<DimBlockPos>(0)
 
 	// special [ClientChannelData] instance that has the id of [CREATE_NEW_CHANNEL]
-	val CLIENT_CHANNEL_CREATE_NEW = ClientChannelData(CREATE_NEW_CHANNEL, "Create new", null, 0, 0)
+	val CLIENT_CHANNEL_CREATE_NEW = ClientChannelData(CREATE_NEW_CHANNEL, "create_new".guiTranslate(), null, 0, 0)
 }

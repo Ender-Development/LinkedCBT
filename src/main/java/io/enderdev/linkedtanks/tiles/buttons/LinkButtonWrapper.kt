@@ -1,21 +1,20 @@
 package io.enderdev.linkedtanks.tiles.buttons
 
-import io.enderdev.linkedtanks.Tags
 import io.enderdev.linkedtanks.client.ClientChannelListManager
 import io.enderdev.linkedtanks.client.gui.GuiLinkedTank
 import io.enderdev.linkedtanks.data.Constants
+import io.enderdev.linkedtanks.util.extensions.guiTranslate
 import io.netty.buffer.ByteBuf
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
 import org.ender_development.catalyx.client.button.AbstractButtonWrapper
 import org.ender_development.catalyx.utils.extensions.readString
 import org.ender_development.catalyx.utils.extensions.writeString
 
 class LinkButtonWrapper(x: Int, y: Int, width: Int, height: Int) : AbstractButtonWrapper(x, y, width, height) {
-	override val textureLocation = ResourceLocation(Tags.MOD_ID, "textures/gui/container/linked_tank_gui.png")
+	override val textureLocation = Constants.LINKED_TANK_GUI
 
 	override val drawDefaultHoverOverlay = false
 
@@ -26,7 +25,7 @@ class LinkButtonWrapper(x: Int, y: Int, width: Int, height: Int) : AbstractButto
 
 		if(channelId == Constants.NO_CHANNEL) {
 			drawTexturedModalRect(this.x, this.y, GuiLinkedTank.UNLINK_BTN_U, if(hovered) GuiLinkedTank.UNLINK_BTN_V_HOVERED else GuiLinkedTank.UNLINK_BTN_V, this.width, this.height)
-			GuiLinkedTank.FONT_RENDERER.drawString("Unlink", this.x + GuiLinkedTank.UNLINK_BTN_TEXT_OFF_X, this.y + GuiLinkedTank.UNLINK_BTN_TEXT_OFF_Y, GuiLinkedTank.TEXT_COLOUR)
+			GuiLinkedTank.FONT_RENDERER.drawString("unlink_btn".guiTranslate(), this.x + GuiLinkedTank.UNLINK_BTN_TEXT_OFF_X, this.y + GuiLinkedTank.UNLINK_BTN_TEXT_OFF_Y, GuiLinkedTank.TEXT_COLOUR)
 		} else {
 			drawTexturedModalRect(this.x, this.y, GuiLinkedTank.LINK_BTN_U, if(hovered) GuiLinkedTank.LINK_BTN_V_HOVERED else GuiLinkedTank.LINK_BTN_V, this.width, this.height)
 			val channel = if(channelId == Constants.CREATE_NEW_CHANNEL) Constants.CLIENT_CHANNEL_CREATE_NEW else ClientChannelListManager.channels.find { it.id == channelId }!!
