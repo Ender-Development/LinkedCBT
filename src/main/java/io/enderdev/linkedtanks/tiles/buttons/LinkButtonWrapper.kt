@@ -11,6 +11,8 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
 import org.ender_development.catalyx.client.button.AbstractButtonWrapper
+import org.ender_development.catalyx.utils.extensions.readString
+import org.ender_development.catalyx.utils.extensions.writeString
 
 class LinkButtonWrapper(x: Int, y: Int, width: Int, height: Int) : AbstractButtonWrapper(x, y, width, height) {
 	override val textureLocation = ResourceLocation(Tags.MOD_ID, "textures/gui/container/linked_tank_gui.png")
@@ -38,14 +40,17 @@ class LinkButtonWrapper(x: Int, y: Int, width: Int, height: Int) : AbstractButto
 	} }
 
 	var channelId = Constants.NO_CHANNEL
+	var newChannelNameOverride = ""
 	lateinit var ctx: MessageContext
 
 	override fun readExtraData(buf: ByteBuf, ctx: MessageContext) {
 		channelId = buf.readInt()
+		newChannelNameOverride = buf.readString()
 		this.ctx = ctx
 	}
 
 	override fun writeExtraData(buf: ByteBuf) {
 		buf.writeInt(channelId)
+		buf.writeString(newChannelNameOverride)
 	}
 }

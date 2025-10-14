@@ -254,9 +254,20 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 				}
 		}
 
+		AbstractButtonWrapper.getWrapper<LinkButtonWrapper>(button)?.let {
+			if(currentDisplay == CurrentDisplay.CHANNEL_LINK) {
+				val text = channelListSearchBar.text.trim()
+				// this will be processed properly on server-side anyways
+				if(!text.isEmpty())
+					it.newChannelNameOverride = text
+			}
+		}
+
+		// send packet to server-side
 		super.actionPerformed(button)
 
 		AbstractButtonWrapper.getWrapper<LinkButtonWrapper>(button)?.let {
+			it.newChannelNameOverride = ""
 			if(it.channelId == Constants.NO_CHANNEL)
 				switchDisplay(CurrentDisplay.CHANNEL_LINK)
 			else {

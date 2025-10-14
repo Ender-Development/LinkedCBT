@@ -142,7 +142,7 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 			is LinkButtonWrapper -> {
 				val player = button.ctx.serverHandler.player
 				val newChannelId = if(button.channelId == Constants.CREATE_NEW_CHANNEL)
-					LTPersistentData.createNewChannel(player, this)
+					LTPersistentData.createNewChannel(player, this, transformChannelName(button.newChannelNameOverride))
 				else
 					button.channelId
 
@@ -153,12 +153,7 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 					if(!channelData.canBeEditedBy(button.ctx.serverHandler.player.uniqueID))
 						return
 
-					var newName = button.newName.trim()
-					if(newName.length > Constants.CHANNEL_NAME_LENGTH_LIMIT)
-						newName = newName.substring(0, Constants.CHANNEL_NAME_LENGTH_LIMIT)
-					newName = newName.trim()
-					if(newName.isEmpty())
-						return
+					val newName = transformChannelName(button.newName) ?: return
 
 					channelData.name = newName
 					markDirtyGUI()
@@ -186,6 +181,14 @@ class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable,
 				markDirtyGUI()
 			}
 		}
+	}
+
+	fun transformChannelName(name: String): String? {
+		var name = name.trim()
+		if(name.length > Constants.CHANNEL_NAME_LENGTH_LIMIT)
+			name = name.substring(0, Constants.CHANNEL_NAME_LENGTH_LIMIT).trim()
+
+		return name.ifEmpty { null }
 	}
 
 	// server-side

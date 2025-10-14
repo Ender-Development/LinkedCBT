@@ -187,6 +187,9 @@ object LinkedTanksCommand : CommandTreeBase() {
 			override fun getUsage(sender: ICommandSender) =
 				"channels $name meow"
 
+			override fun getAliases() =
+				listOf("restore")
+
 			override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) {
 				if(args.isEmpty()) {
 					sender.replyFail("Usage: /linkedtanks undelete <channel id>")

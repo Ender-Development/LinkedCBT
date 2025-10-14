@@ -87,8 +87,8 @@ object LTPersistentData {
 			return dataMap
 		}
 
-	fun createNewChannel(player: EntityPlayer, te: TileLinkedTank): Int {
-		val channelData = ChannelData(false, player.uniqueID, player.gameProfile.name, "New channel $nextChannelId", null, 0, hashSetOf(te.pos dim te.world.dimId))
+	fun createNewChannel(player: EntityPlayer, te: TileLinkedTank, channelName: String? = null): Int {
+		val channelData = ChannelData(false, player.uniqueID, player.gameProfile.name, channelName ?: "New channel $nextChannelId", null, 0, hashSetOf(te.pos dim te.world.dimId))
 		dataMap.put(nextChannelId, channelData)
 		return nextChannelId.also {
 			nextChannelId = findNextFreeChannelId()
