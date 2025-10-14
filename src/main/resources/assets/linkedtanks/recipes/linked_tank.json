@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"GOG",
+		"ELE",
+		"GRG"
+	],
+	"key": {
+		"L": { "item": "minecraft:lapis_block" },
+		"G": { "type": "forge:ore_dict", "ore": "blockGlass"},
+		"E": { "item": "minecraft:ender_pearl" },
+		"R": { "item": "minecraft:redstone_torch" },
+		"O": { "item": "minecraft:gold_ingot" }
+	},
+	"result": { "item": "linked_tank" }
+}

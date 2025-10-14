@@ -284,7 +284,7 @@ object LinkedTanksCommand : CommandTreeBase() {
 
 				LTPersistentData.data.remove(channelId)
 
-				sender.reply("Channel $channelId and all of its associated data has been purged, and its channel id free to be reused")
+				sender.reply("Channel $channelId and all of its associated data has been purged, and its channel id is free to be reused")
 			}
 		}
 	}

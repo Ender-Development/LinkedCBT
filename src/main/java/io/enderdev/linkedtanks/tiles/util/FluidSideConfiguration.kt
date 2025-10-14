@@ -42,9 +42,12 @@ class FluidSideConfiguration(val tile: TileLinkedTank) {
 				continue
 
 			if((side == Side.PUSH && tile.fluidHandler.fluidAmount <= 0) || (side == Side.PULL && tile.fluidHandler.fluidAmount >= tile.fluidHandler.capacity))
-				break
+				continue
 
 			val te = tile.world.getTileEntity(tile.pos.offset(facing)) ?: continue
+			if(te is TileLinkedTank && te.channelId == tile.channelId) // pointless looping
+				continue
+
 			val cap = te.getCapability(FLUID_CAP, facing.opposite) ?: continue
 			if(side == Side.PUSH)
 				tile.fluidHandler.drain(cap.fill(tile.fluidHandler.fluid?.let {

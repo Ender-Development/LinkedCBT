@@ -1,7 +1,6 @@
 package io.enderdev.linkedtanks.client.gui
 
 import io.enderdev.linkedtanks.Tags
-import io.enderdev.linkedtanks.client.ClientChannelData
 import io.enderdev.linkedtanks.client.ClientChannelListManager
 import io.enderdev.linkedtanks.client.container.ContainerLinkedTank
 import io.enderdev.linkedtanks.data.Constants
@@ -45,7 +44,6 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 
 	var mouseClick: MouseClickData? = null
 
-	var channelListDrawnChannels = emptyList<ClientChannelData>()
 	var channelListSkipChannels = 0
 
 	var mainOverviewDeleteClicked = false
@@ -447,7 +445,6 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 	}
 
 	// TODO
-	// - current link state (fluid, amount)
 	// - translation
 	// - fluid whitelist selector?
 	// - channel selector search?

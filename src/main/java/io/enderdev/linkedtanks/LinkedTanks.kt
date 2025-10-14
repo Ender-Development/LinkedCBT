@@ -20,6 +20,7 @@ import org.apache.logging.log4j.Logger
 import org.ender_development.catalyx.client.gui.CatalyxGuiHandler
 import org.ender_development.catalyx.core.CatalyxSettings
 import org.ender_development.catalyx.core.ICatalyxMod
+import org.ender_development.catalyx.utils.SideUtils
 import org.ender_development.catalyx.utils.extensions.toStack
 import java.text.NumberFormat
 
@@ -47,6 +48,8 @@ object LinkedTanks : ICatalyxMod {
 		PacketHandler.init()
 		NetworkRegistry.INSTANCE.registerGuiHandler(LinkedTanks, guiHandler)
 		MinecraftForge.EVENT_BUS.register(this)
+		if(SideUtils.isClient)
+			MinecraftForge.EVENT_BUS.register(ModItems.tankConfigurator)
 	}
 
 	@EventHandler
@@ -75,10 +78,8 @@ object LinkedTanks : ICatalyxMod {
 	// because of the way Java loads classes, need to do this lol
 	init {
 		ModBlocks.jvmLoadClass()
-		ModItems.jvmLoadClass()
+		ModItems.jvmLoadClass() // items is technically not necesary anymore since we ref it in preInit for client-side, but keep it here for now for server-side
 	}
-
-	// TODO recipes
 
 	@Suppress("NOTHING_TO_INLINE")
 	inline fun Int.formatNumber(): String =

@@ -1,0 +1,14 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		" IR",
+		" LI",
+		"L  "
+	],
+	"key": {
+		"L": { "item": "minecraft:dye", "data": 4 },
+		"R": { "item": "minecraft:redstone" },
+		"I": { "item": "minecraft:iron_ingot" }
+	},
+	"result": { "item": "tank_configurator" }
+}
