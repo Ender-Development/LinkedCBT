@@ -4,7 +4,7 @@ import io.enderdev.linkedtanks.Tags
 import org.ender_development.catalyx.modules.CatalyxModuleContainer
 import org.ender_development.catalyx.modules.ICatalyxModuleContainer
 
-@CatalyxModuleContainer
+@CatalyxModuleContainer(Tags.MOD_ID)
 object LTModuleContainer : ICatalyxModuleContainer {
 	override val id = Tags.MOD_ID
 
