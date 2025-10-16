@@ -30,7 +30,7 @@ import org.ender_development.catalyx.tiles.helper.ICopyPasteExtraTile
 import org.ender_development.catalyx.tiles.helper.IFluidTile
 import org.ender_development.catalyx.tiles.helper.IGuiTile
 
-class TileLinkedTank : BaseTile(LinkedTanks.modSettings), IFluidTile, ITickable, IGuiTile, IButtonTile, BaseGuiTyped.IDefaultButtonVariables, ICopyPasteExtraTile {
+class TileLinkedTank : BaseTile(LinkedTanks), IFluidTile, ITickable, IGuiTile, IButtonTile, BaseGuiTyped.IDefaultButtonVariables, ICopyPasteExtraTile {
 	override var isPaused = false
 	override var needsRedstonePower = false
 

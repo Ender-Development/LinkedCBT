@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.ender_development.catalyx.items.BaseItem
 
-class ItemTankConfigurator : BaseItem(LinkedTanks.modSettings, "tank_configurator") {
+class ItemTankConfigurator : BaseItem(LinkedTanks, "tank_configurator") {
 	init {
 		maxStackSize = 1
 	}

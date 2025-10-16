@@ -21,7 +21,6 @@ import net.minecraftforge.fml.common.network.NetworkRegistry
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.ender_development.catalyx.client.gui.CatalyxGuiHandler
-import org.ender_development.catalyx.core.CatalyxSettings
 import org.ender_development.catalyx.core.ICatalyxMod
 import org.ender_development.catalyx.utils.SideUtils
 import org.ender_development.catalyx.utils.extensions.toStack
@@ -36,11 +35,10 @@ import java.text.NumberFormat
 )
 @Mod.EventBusSubscriber
 object LinkedTanks : ICatalyxMod {
-	val creativeTab = object : CreativeTabs(Tags.MOD_ID) {
+	override val creativeTab = object : CreativeTabs(Tags.MOD_ID) {
 		override fun createIcon() = ModBlocks.linkedTank.toStack()
 	}
 
-	override val modSettings = CatalyxSettings(Tags.MOD_ID, creativeTab, this, true)
 	val guiHandler = CatalyxGuiHandler()
 	val numberFormat: NumberFormat = NumberFormat.getNumberInstance()
 
