@@ -8,4 +8,6 @@ tile.linkedtanks:linked_tank.gui.create_new=Create new
 
 item.linkedtanks:tank_configurator.name=Tank Configurator
 
+info.linkedtanks:no_permission=You don't have sufficient permissions to edit this tank
+
 itemGroup.linkedtanks=Linked Tanks

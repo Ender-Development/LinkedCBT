@@ -1,9 +1,11 @@
 package io.enderdev.linkedtanks.items
 
 import io.enderdev.linkedtanks.LinkedTanks
+import io.enderdev.linkedtanks.Tags
 import io.enderdev.linkedtanks.client.gui.GuiLinkedTank
 import io.enderdev.linkedtanks.tiles.TileLinkedTank
 import io.enderdev.linkedtanks.util.extensions.reply
+import io.enderdev.linkedtanks.util.extensions.replyFail
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
@@ -13,6 +15,7 @@ import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumHand
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.RayTraceResult
+import net.minecraft.util.text.TextComponentTranslation
 import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -29,8 +32,10 @@ class ItemTankConfigurator : BaseItem(LinkedTanks, "tank_configurator") {
 			return EnumActionResult.PASS
 
 		val te = world.getTileEntity(pos) as? TileLinkedTank ?: return EnumActionResult.PASS
-		if(te.channelData?.canBeEditedBy(player.uniqueID) == false)
-			return EnumActionResult.PASS
+		if(te.channelData?.canBeEditedBy(player.uniqueID) == false) {
+			player.replyFail(TextComponentTranslation("info.${Tags.MOD_ID}:no_permission"))
+			return EnumActionResult.FAIL
+		}
 
 		val newSideConfiguration = te.fluidSideConfiguration[facing].let {
 			if(player.isSneaking)

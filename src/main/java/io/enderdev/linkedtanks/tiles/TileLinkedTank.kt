@@ -1,6 +1,7 @@
 package io.enderdev.linkedtanks.tiles
 
 import io.enderdev.linkedtanks.LinkedTanks
+import io.enderdev.linkedtanks.Tags
 import io.enderdev.linkedtanks.data.ChannelData
 import io.enderdev.linkedtanks.data.Constants
 import io.enderdev.linkedtanks.data.LTPersistentData
@@ -12,14 +13,22 @@ import io.enderdev.linkedtanks.tiles.util.FluidSideConfiguration
 import io.enderdev.linkedtanks.util.LinkedFluidHandler
 import io.enderdev.linkedtanks.util.extensions.dim
 import io.enderdev.linkedtanks.util.extensions.dimId
+import io.enderdev.linkedtanks.util.extensions.replyFail
+import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
+import net.minecraft.util.EnumActionResult
 import net.minecraft.util.EnumFacing
+import net.minecraft.util.EnumHand
 import net.minecraft.util.ITickable
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.text.TextComponentTranslation
+import net.minecraft.world.World
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.fluids.FluidRegistry
+import net.minecraftforge.fluids.FluidUtil
 import org.ender_development.catalyx.client.button.AbstractButtonWrapper
 import org.ender_development.catalyx.client.button.PauseButtonWrapper
 import org.ender_development.catalyx.client.button.RedstoneButtonWrapper
@@ -47,8 +56,8 @@ class TileLinkedTank : BaseTile(LinkedTanks), IFluidTile, ITickable, IGuiTile, I
 	var channelUpdateTicks = 2
 	var channelUnfuckTicks = 10
 	override fun update() {
-		// don't tick on client-side
-		if(world.isRemote)
+		// don't tick on client-side or when we don't have any channel
+		if(world.isRemote || channelId == Constants.NO_CHANNEL)
 			return
 
 		markDirtyGUIEvery(5)
@@ -270,6 +279,17 @@ class TileLinkedTank : BaseTile(LinkedTanks), IFluidTile, ITickable, IGuiTile, I
 			FLUID_CAP.cast(fluidSideConfiguration.getCapability(facing) ?: return null)
 		else
 			null
+	}
+
+	override fun onBlockActivated(world: World, pos: BlockPos, state: IBlockState, player: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean {
+		if(channelId == Constants.NO_CHANNEL || !channelData!!.canBeEditedBy(player.uniqueID))
+			return false
+
+		val heldItem = player.getHeldItem(hand)
+		if(heldItem.hasCapability(ITEM_FLUID_CAP, facing) || heldItem.hasCapability(FLUID_CAP, facing))
+			FluidUtil.interactWithFluidHandler(player, hand, world, pos, facing).also { markDirtyGUI() }
+
+		return false
 	}
 
 	// ICopyPasteExtraTile

@@ -9,17 +9,23 @@ import net.minecraft.util.text.TextFormatting
 inline fun ICommandSender.reply(component: ITextComponent) =
 	sendMessage(component)
 
+inline fun ICommandSender.reply(component: ITextComponent, colour: TextFormatting) =
+	reply(component.withColour(colour))
+
 inline fun ICommandSender.reply(text: String) =
 	reply(text.component())
 
 inline fun ICommandSender.reply(text: String, colour: TextFormatting) =
-	sendMessage(text.component().withColour(colour))
+	reply(text.component(), colour)
 
 inline fun ICommandSender.replyFail(text: String) =
 	reply(text, TextFormatting.RED)
+
+inline fun ICommandSender.replyFail(component: ITextComponent) =
+	reply(component, TextFormatting.RED)
 
 inline fun ICommandSender.replyWarn(text: String) =
 	reply(text, TextFormatting.YELLOW)
 
 inline fun ICommandSender.replyWarn(component: ITextComponent) =
-	reply(component.withColour(TextFormatting.YELLOW))
+	reply(component, TextFormatting.YELLOW)
