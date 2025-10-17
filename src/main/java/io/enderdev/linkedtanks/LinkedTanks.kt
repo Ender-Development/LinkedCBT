@@ -36,10 +36,11 @@ import java.text.NumberFormat
 @Mod.EventBusSubscriber
 object LinkedTanks : ICatalyxMod {
 	override val creativeTab = object : CreativeTabs(Tags.MOD_ID) {
-		override fun createIcon() = ModBlocks.linkedTank.toStack()
+		override fun createIcon() =
+			ModBlocks.linkedTank.toStack()
 	}
 
-	val guiHandler = CatalyxGuiHandler()
+	val guiHandler = CatalyxGuiHandler(this)
 	val numberFormat: NumberFormat = NumberFormat.getNumberInstance()
 
 	val logger: Logger = LogManager.getLogger(Tags.MOD_ID)
@@ -86,7 +87,7 @@ object LinkedTanks : ICatalyxMod {
 	init {
 		LTConfig.jvmLoadClass()
 		ModBlocks.jvmLoadClass()
-		ModItems.jvmLoadClass() // items is technically not necesary anymore since we ref it in preInit for client-side, but keep it here for now for server-side
+		ModItems.jvmLoadClass()
 	}
 
 	@Suppress("NOTHING_TO_INLINE")
