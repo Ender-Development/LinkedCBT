@@ -1,6 +1,7 @@
-# Linked Tanks
+# Linked CBT
+(Linked Chests, Batteries & Tanks)
 
-Provides a way of instantly transporting liquids cross-dimension and across large distances.
+Provides a way of instantly transporting liquids, energy and items cross-dimension and across large distances.
 
 <a href="https://www.akliz.net/enderman"><img src="https://github.com/Ender-Development/PatchouliBooks/raw/master/banner.png" align="center"/></a>
 
@@ -20,14 +21,14 @@ Our Team currently includes:
 You can contact us on our [Discord](https://discord.gg/JF7x2vG).
 
 ## Licensing
-All code is licensed under the **LGPL-3** license, which can be found in the LICENSE file  
+All code is licensed under the **LGPL-3** license, which can be found in the LICENSE-code file  
 All textures and assets are **All Rights Reserved**, exact terms can be found in the LICENSE-assets file
 
 ## Contributing
 
 Feel free to contribute to the project. We are always happy about pull requests.
 If you want to help us, you can find potential tasks in
-the [issue tracker](https://github.com/Ender-Development/LinkedTanks/issues).
+the [issue tracker](https://github.com/Ender-Development/LinkedCBT/issues).
 Of course, you can also create new issues if you find a bug or have a suggestion for a new feature.
 Should you have any questions, feel free to ask us on [Discord](https://discord.gg/JF7x2vG).
 
