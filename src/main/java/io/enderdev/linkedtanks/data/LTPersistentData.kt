@@ -9,14 +9,15 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fluids.FluidRegistry
-import org.ender_development.catalyx.utils.PersistentData
+import org.ender_development.catalyx.utils.persistence.WorldPersistentData
 
 object LTPersistentData {
-	private val dataNBT = PersistentData(Tags.MOD_ID)
+	private val dataNBT = WorldPersistentData(ResourceLocation(Tags.MOD_ID, "tanks"), true, { read() }, { unload() })
 	private var wasRead = false
-	private var nextChannelId = 0
-	private val dataMap: Int2ObjectMap<ChannelData> = Int2ObjectOpenHashMap()
+	private var nextChannelId = 1
+	val data: Int2ObjectMap<ChannelData> = Int2ObjectOpenHashMap()
 
 	fun read() {
 		if(wasRead)
@@ -24,13 +25,13 @@ object LTPersistentData {
 
 		wasRead = true
 
-		dataMap.clear()
+		data.clear()
 
 		var nextUnbrokenId = 1
-		dataNBT.tag.keySet.sortedBy(String::toInt).forEach {
+		dataNBT.data.keySet.sortedBy(String::toInt).forEach {
 			if(it.toInt() == nextUnbrokenId)
 				++nextUnbrokenId
-			val tag = dataNBT.tag.getCompoundTag(it)
+			val tag = dataNBT.data.getCompoundTag(it)
 			val deleted = tag.getBoolean("Deleted")
 			val ownerUUID = tag.getUniqueId("OwnerUUID") ?: return@forEach
 			val ownerUsername = tag.getString("OwnerUsername")
@@ -43,7 +44,7 @@ object LTPersistentData {
 			val fluid = FluidRegistry.getFluid(tag.getString("FluidName"))
 			val fluidAmount = tag.getInteger("FluidAmount")
 
-			dataMap.put(it.toInt(), ChannelData(deleted, ownerUUID, ownerUsername, name, fluid, fluidAmount, linkedPositions))
+			data.put(it.toInt(), ChannelData(deleted, ownerUUID, ownerUsername, name, fluid, fluidAmount, linkedPositions))
 		}
 
 		nextChannelId = nextUnbrokenId
@@ -55,10 +56,10 @@ object LTPersistentData {
 			return
 
 		// lazy option, if performance requires it I might need to optimise this more
-		dataNBT.tag.tagMap.clear()
+		dataNBT.data.tagMap.clear()
 
-		dataMap.entries.forEach { (channelId, channelData) ->
-			dataNBT.tag.setTag(channelId.toString(), NBTTagCompound().apply {
+		data.entries.forEach { (channelId, channelData) ->
+			dataNBT.data.setTag(channelId.toString(), NBTTagCompound().apply {
 				setBoolean("Deleted", channelData.deleted)
 				setUniqueId("OwnerUUID", channelData.ownerUUID)
 				setString("OwnerUsername", channelData.ownerUsername)
@@ -72,24 +73,19 @@ object LTPersistentData {
 				setInteger("FluidAmount", channelData.fluidAmount)
 			})
 		}
-		LinkedTanks.logger.debug("Saving data to disk: {}", dataNBT.tag)
+		LinkedTanks.logger.debug("Saving data to disk: {}", dataNBT.data)
 		dataNBT.save()
 	}
 
 	fun unload() {
-		dataMap.clear()
+		write()
 		wasRead = false
+		data.clear()
 	}
-
-	val data: Int2ObjectMap<ChannelData>
-		get() {
-			read()
-			return dataMap
-		}
 
 	fun createNewChannel(player: EntityPlayer, te: TileLinkedTank, channelName: String? = null): Int {
 		val channelData = ChannelData(false, player.uniqueID, player.gameProfile.name, channelName ?: "New channel $nextChannelId", null, 0, hashSetOf(te.pos dim te.world.dimId))
-		dataMap.put(nextChannelId, channelData)
+		data.put(nextChannelId, channelData)
 		return nextChannelId.also {
 			nextChannelId = findNextFreeChannelId()
 		}
@@ -103,5 +99,10 @@ object LTPersistentData {
 			else
 				break
 		return id
+	}
+
+	init {
+		// try to load the data
+		dataNBT.data
 	}
 }

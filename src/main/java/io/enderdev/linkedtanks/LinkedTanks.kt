@@ -15,7 +15,6 @@ import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent
-import net.minecraftforge.fml.common.event.FMLServerStoppingEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.NetworkRegistry
 import org.apache.logging.log4j.LogManager
@@ -57,12 +56,6 @@ object LinkedTanks : ICatalyxMod {
 	@EventHandler
 	fun serverStarting(ev: FMLServerStartingEvent) {
 		ev.registerServerCommand(LinkedTanksCommand)
-	}
-
-	@EventHandler
-	fun serverStopping(ev: FMLServerStoppingEvent) {
-		LTPersistentData.write()
-		LTPersistentData.unload()
 	}
 
 	var lastWriteCausedBySave = 0L
