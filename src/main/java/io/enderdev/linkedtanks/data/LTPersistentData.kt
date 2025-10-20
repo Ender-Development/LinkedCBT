@@ -14,7 +14,7 @@ import net.minecraftforge.fluids.FluidRegistry
 import org.ender_development.catalyx.utils.persistence.WorldPersistentData
 
 object LTPersistentData {
-	private val dataNBT = WorldPersistentData(ResourceLocation(Tags.MOD_ID, "tanks"), true, { read() }, { unload() })
+	private val dataNBT = WorldPersistentData(ResourceLocation(Tags.MOD_ID, "tanks"), true, ::read, ::unload)
 	private var wasRead = false
 	private var nextChannelId = 1
 	val data: Int2ObjectMap<ChannelData> = Int2ObjectOpenHashMap()
