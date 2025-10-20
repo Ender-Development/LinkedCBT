@@ -4,8 +4,8 @@ import io.enderdev.linkedcbt.LinkedCBT
 import io.enderdev.linkedcbt.LinkedCBT.formatNumber
 import io.enderdev.linkedcbt.Tags
 import io.enderdev.linkedcbt.blocks.ModBlocks
-import io.enderdev.linkedcbt.data.ChannelData
-import io.enderdev.linkedcbt.data.LTPersistentData
+import io.enderdev.linkedcbt.data.tanks.TankChannelData
+import io.enderdev.linkedcbt.data.tanks.LTPersistentData
 import io.enderdev.linkedcbt.tiles.TileLinkedTank
 import io.enderdev.linkedcbt.util.extensions.*
 import it.unimi.dsi.fastutil.ints.Int2LongArrayMap
@@ -35,7 +35,7 @@ object LinkedCBTCommand : CommandTreeBase() {
 	init {
 		addSubcommand(Help)
 		addSubcommand(Version)
-		addSubcommand(Channels)
+		addSubcommand(Tanks)
 	}
 
 	object Help : CommandBase() {
@@ -47,12 +47,12 @@ object LinkedCBTCommand : CommandTreeBase() {
 
 		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<out String?>) {
 			sender.reply("/linkedcbt version - show the ${Tags.MOD_NAME} version")
-			sender.reply("/linkedcbt channels list - show channel list")
-			sender.reply("/linkedcbt channels hijack <channel id> [player] - change a channel's ownership")
-			sender.reply("/linkedcbt channels delete <channel id> - delete a channel")
-			sender.reply("/linkedcbt channels undelete <channel id> - undelete a channel")
-			sender.reply("/linkedcbt channels setcontents <channel id> <fluid | empty> <amount> - set a channel's contents")
-			sender.reply("/linkedcbt channels revalidate - validate if all channels have saved correct tank positions, this may load chunks")
+			sender.reply("/linkedcbt tanks list - show tank channel list")
+			sender.reply("/linkedcbt tanks hijack <channel id> [player] - change a tank channel's ownership")
+			sender.reply("/linkedcbt tanks delete <channel id> - delete a tank channel")
+			sender.reply("/linkedcbt tanks undelete <channel id> - undelete a tank channel")
+			sender.reply("/linkedcbt tanks setcontents <channel id> <fluid | empty> <amount> - set a tank channel's contents")
+			sender.reply("/linkedcbt tanks revalidate - validate if all tank channels have saved correct tank positions, this may load chunks")
 		}
 	}
 
@@ -67,9 +67,9 @@ object LinkedCBTCommand : CommandTreeBase() {
 			sender.reply("${Tags.MOD_NAME} version ${Tags.VERSION}", TextFormatting.BLUE)
 	}
 
-	object Channels : CommandTreeBase() {
+	object Tanks : CommandTreeBase() {
 		override fun getName() =
-			"channels"
+			"tanks"
 
 		override fun getUsage(sender: ICommandSender) =
 			"$name meow"
@@ -99,7 +99,7 @@ object LinkedCBTCommand : CommandTreeBase() {
 				"list"
 
 			override fun getUsage(sender: ICommandSender) =
-				"channels $name meow"
+				"tanks $name meow"
 
 			override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<out String?>) {
 				sender.reply("Channels:")
@@ -111,7 +111,7 @@ object LinkedCBTCommand : CommandTreeBase() {
 					sender.reply("")
 				}
 				val endpoints = LTPersistentData.data.map { it.value.linkedPositions.size }.sum()
-				sender.reply("Total: ${LTPersistentData.data.size} (${LTPersistentData.data.count { !it.value.deleted }} not deleted) channels with $endpoints total endpoint${if(endpoints == 1) "" else "s"}")
+				sender.reply("Total: ${LTPersistentData.data.size} (${LTPersistentData.data.count { !it.value.deleted }} not deleted) tank channels with $endpoints total endpoint${if(endpoints == 1) "" else "s"}")
 			}
 		}
 
@@ -120,11 +120,11 @@ object LinkedCBTCommand : CommandTreeBase() {
 				"hijack"
 
 			override fun getUsage(sender: ICommandSender) =
-				"channels $name meow"
+				"tanks $name meow"
 
 			override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) {
 				if(args.isEmpty()) {
-					sender.replyFail("Usage: /linkedcbt hijack <channel id> [player]")
+					sender.replyFail("Usage: /linkedcbt tanks hijack <channel id> [player]")
 					return
 				}
 
@@ -164,11 +164,11 @@ object LinkedCBTCommand : CommandTreeBase() {
 				"delete"
 
 			override fun getUsage(sender: ICommandSender) =
-				"channels $name meow"
+				"tanks $name meow"
 
 			override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) {
 				if(args.isEmpty()) {
-					sender.replyFail("Usage: /linkedcbt delete <channel id>")
+					sender.replyFail("Usage: /linkedcbt tanks delete <channel id>")
 					return
 				}
 
@@ -189,14 +189,14 @@ object LinkedCBTCommand : CommandTreeBase() {
 				"undelete"
 
 			override fun getUsage(sender: ICommandSender) =
-				"channels $name meow"
+				"tanks $name meow"
 
 			override fun getAliases() =
 				listOf("restore")
 
 			override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) {
 				if(args.isEmpty()) {
-					sender.replyFail("Usage: /linkedcbt undelete <channel id>")
+					sender.replyFail("Usage: /linkedcbt tanks undelete <channel id>")
 					return
 				}
 
@@ -220,11 +220,11 @@ object LinkedCBTCommand : CommandTreeBase() {
 				listOf("setContents", "set_contents")
 
 			override fun getUsage(sender: ICommandSender) =
-				"channels $name meow"
+				"tanks $name meow"
 
 			override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) {
 				if(args.size < 3 && !(args.size == 2 && args[1] == "empty")) {
-					sender.replyFail("Usage: /linkedcbt setcontents <channel id> <fluid | empty> <amount>")
+					sender.replyFail("Usage: /linkedcbt tanks setcontents <channel id> <fluid | empty> <amount>")
 					return
 				}
 
@@ -271,11 +271,11 @@ object LinkedCBTCommand : CommandTreeBase() {
 				"purge"
 
 			override fun getUsage(sender: ICommandSender) =
-				"channels $name meow"
+				"tanks $name meow"
 
 			override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) {
 				if(args.isEmpty()) {
-					sender.replyFail("Usage: /linkedcbt purge <channel id>")
+					sender.replyFail("Usage: /linkedcbt tanks purge <channel id>")
 					return
 				}
 
@@ -300,7 +300,7 @@ object LinkedCBTCommand : CommandTreeBase() {
 				"revalidate"
 
 			override fun getUsage(sender: ICommandSender) =
-				"channels $name meow"
+				"tanks $name meow"
 
 			override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) {
 				LTPersistentData.data.forEach { (id, data) ->
@@ -329,7 +329,7 @@ object LinkedCBTCommand : CommandTreeBase() {
 				sender.replyFail("Couldn't convert '$arg' to a numerical channel id")
 		}
 
-	fun getChannelData(sender: ICommandSender, arg: String, deletedWarn: Boolean = true): Pair<Int, ChannelData>? {
+	fun getChannelData(sender: ICommandSender, arg: String, deletedWarn: Boolean = true): Pair<Int, TankChannelData>? {
 		val channelId = getChannelId(sender, arg) ?: return null
 		val channel = LTPersistentData.data.get(channelId) ?: run {
 			sender.replyFail("There is no channel with id $channelId")

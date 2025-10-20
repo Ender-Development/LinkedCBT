@@ -1,6 +1,6 @@
 package io.enderdev.linkedcbt.tiles.buttons
 
-import io.enderdev.linkedcbt.client.ClientChannelListManager
+import io.enderdev.linkedcbt.data.tanks.client.ClientTankChannelListManager
 import io.enderdev.linkedcbt.client.gui.GuiLinkedTank
 import io.enderdev.linkedcbt.data.Constants
 import io.enderdev.linkedcbt.util.extensions.guiTranslate
@@ -28,7 +28,7 @@ class LinkButtonWrapper(x: Int, y: Int, width: Int, height: Int) : AbstractButto
 			GuiLinkedTank.FONT_RENDERER.drawString("unlink_btn".guiTranslate(), this.x + GuiLinkedTank.UNLINK_BTN_TEXT_OFF_X, this.y + GuiLinkedTank.UNLINK_BTN_TEXT_OFF_Y, GuiLinkedTank.TEXT_COLOUR)
 		} else {
 			drawTexturedModalRect(this.x, this.y, GuiLinkedTank.LINK_BTN_U, if(hovered) GuiLinkedTank.LINK_BTN_V_HOVERED else GuiLinkedTank.LINK_BTN_V, this.width, this.height)
-			val channel = if(channelId == Constants.CREATE_NEW_CHANNEL) Constants.CLIENT_CHANNEL_CREATE_NEW else ClientChannelListManager.channels.find { it.id == channelId }!!
+			val channel = if(channelId == Constants.CREATE_NEW_CHANNEL) Constants.CLIENT_CHANNEL_CREATE_NEW else ClientTankChannelListManager.channels.find { it.id == channelId }!!
 			GuiLinkedTank.FONT_RENDERER.drawString(
 				channel.displayName,
 				this.x + GuiLinkedTank.LINK_BTN_TEXT_OFF_X,

@@ -2,7 +2,7 @@ package io.enderdev.linkedcbt
 
 import io.enderdev.linkedcbt.blocks.ModBlocks
 import io.enderdev.linkedcbt.command.LinkedCBTCommand
-import io.enderdev.linkedcbt.data.LTPersistentData
+import io.enderdev.linkedcbt.data.tanks.LTPersistentData
 import io.enderdev.linkedcbt.items.ModItems
 import io.enderdev.linkedcbt.network.PacketHandler
 import net.minecraft.creativetab.CreativeTabs

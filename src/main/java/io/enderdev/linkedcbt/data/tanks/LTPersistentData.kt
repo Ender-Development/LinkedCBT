@@ -1,7 +1,8 @@
-package io.enderdev.linkedcbt.data
+package io.enderdev.linkedcbt.data.tanks
 
 import io.enderdev.linkedcbt.LinkedCBT
 import io.enderdev.linkedcbt.Tags
+import io.enderdev.linkedcbt.data.DimBlockPos
 import io.enderdev.linkedcbt.tiles.TileLinkedTank
 import io.enderdev.linkedcbt.util.extensions.dim
 import io.enderdev.linkedcbt.util.extensions.dimId
@@ -17,7 +18,7 @@ object LTPersistentData {
 	private val dataNBT = WorldPersistentData(ResourceLocation(Tags.MOD_ID, "tanks"), true, ::read, ::unload)
 	private var wasRead = false
 	private var nextChannelId = 1
-	val data: Int2ObjectMap<ChannelData> = Int2ObjectOpenHashMap()
+	val data: Int2ObjectMap<TankChannelData> = Int2ObjectOpenHashMap()
 
 	fun read() {
 		if(wasRead)
@@ -39,12 +40,12 @@ object LTPersistentData {
 			val linkedPositionCount = tag.getInteger("LinkedPositionCount")
 			val linkedPositions = HashSet<DimBlockPos>(linkedPositionCount)
 			(0..<linkedPositionCount).mapTo(linkedPositions) {
-				DimBlockPos.fromString(tag.getString("LinkedPosition$$it"))
+				DimBlockPos.Companion.fromString(tag.getString("LinkedPosition$$it"))
 			}
 			val fluid = FluidRegistry.getFluid(tag.getString("FluidName"))
 			val fluidAmount = tag.getInteger("FluidAmount")
 
-			data.put(it.toInt(), ChannelData(deleted, ownerUUID, ownerUsername, name, fluid, fluidAmount, linkedPositions))
+			data.put(it.toInt(), TankChannelData(deleted, ownerUUID, ownerUsername, name, fluid, fluidAmount, linkedPositions))
 		}
 
 		nextChannelId = nextUnbrokenId
@@ -84,7 +85,7 @@ object LTPersistentData {
 	}
 
 	fun createNewChannel(player: EntityPlayer, te: TileLinkedTank, channelName: String? = null): Int {
-		val channelData = ChannelData(false, player.uniqueID, player.gameProfile.name, channelName ?: "New channel $nextChannelId", null, 0, hashSetOf(te.pos dim te.world.dimId))
+		val channelData = TankChannelData(false, player.uniqueID, player.gameProfile.name, channelName ?: "New channel $nextChannelId", null, 0, hashSetOf(te.pos dim te.world.dimId))
 		data.put(nextChannelId, channelData)
 		return nextChannelId.also {
 			nextChannelId = findNextFreeChannelId()

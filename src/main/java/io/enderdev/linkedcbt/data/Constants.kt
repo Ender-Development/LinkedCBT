@@ -1,7 +1,7 @@
 package io.enderdev.linkedcbt.data
 
 import io.enderdev.linkedcbt.Tags
-import io.enderdev.linkedcbt.client.ClientChannelData
+import io.enderdev.linkedcbt.data.tanks.client.ClientTankChannelData
 import io.enderdev.linkedcbt.util.extensions.guiTranslate
 import net.minecraft.util.ResourceLocation
 
@@ -18,6 +18,6 @@ internal object Constants {
 	// client-side only, used in [handleUpdateTag] to try to avoid creating useless class instances
 	val NO_LINKED_POSITIONS = HashSet<DimBlockPos>(0)
 
-	// special [ClientChannelData] instance that has the id of [CREATE_NEW_CHANNEL]
-	val CLIENT_CHANNEL_CREATE_NEW = ClientChannelData(CREATE_NEW_CHANNEL, "create_new".guiTranslate(), null, 0, 0)
+	// special [ClientTankChannelData] instance that has the id of [CREATE_NEW_CHANNEL]
+	val CLIENT_CHANNEL_CREATE_NEW = ClientTankChannelData(CREATE_NEW_CHANNEL, "create_new".guiTranslate(), null, 0, 0)
 }

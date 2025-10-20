@@ -1,8 +1,10 @@
-package io.enderdev.linkedcbt.data
+package io.enderdev.linkedcbt.data.tanks
 
 import io.enderdev.linkedcbt.LTConfig
+import io.enderdev.linkedcbt.data.DimBlockPos
 import net.minecraftforge.fluids.Fluid
-import java.util.*
+import java.util.HashSet
+import java.util.UUID
 
 /*
  * We have to keep [deleted] channels in the channelData because otherwise there could be a situation where:
@@ -14,7 +16,7 @@ import java.util.*
  * This is the most resilient way of ensuring this doesn't happen, sadly it also wastes a little bit of space, but I think that's a sacrifice worth paying
  */
 /** **Do NOT** use [ownerUsername] nor [name] for any checking */
-data class ChannelData(var deleted: Boolean, var ownerUUID: UUID, var ownerUsername: String, var name: String, var fluid: Fluid?, var fluidAmount: Int, val linkedPositions: HashSet<DimBlockPos>) {
+data class TankChannelData(var deleted: Boolean, var ownerUUID: UUID, var ownerUsername: String, var name: String, var fluid: Fluid?, var fluidAmount: Int, val linkedPositions: HashSet<DimBlockPos>) {
 	/**
 	 * Used clientside to make stuff display properly
 	 */

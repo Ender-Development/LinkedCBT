@@ -1,7 +1,7 @@
 package io.enderdev.linkedcbt.client.gui
 
 import io.enderdev.linkedcbt.Tags
-import io.enderdev.linkedcbt.client.ClientChannelListManager
+import io.enderdev.linkedcbt.data.tanks.client.ClientTankChannelListManager
 import io.enderdev.linkedcbt.client.container.ContainerLinkedTank
 import io.enderdev.linkedcbt.data.Constants
 import io.enderdev.linkedcbt.tiles.TileLinkedTank
@@ -149,7 +149,7 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 				channelListMatchingChannels = 0
 				var skip = channelListSkipChannels
 				var btnIdx = 0
-				for(channel in ClientChannelListManager.channels) {
+				for(channel in ClientTankChannelListManager.channels) {
 					if(!channel.displayName.contains(channelListSearchBar.text, true))
 						continue
 
@@ -278,7 +278,7 @@ class GuiLinkedTank(playerInv: IInventory, val tile: TileLinkedTank) : BaseGuiTy
 			else {
 				// update client-side tile to hopefully display the correct data faster (also needed for unlinkButton visiblity)
 				tile.channelId = it.channelId
-				tile.channelData = ClientChannelListManager.channels.find { ch -> ch.id == it.channelId }?.toFakeChannelData()
+				tile.channelData = ClientTankChannelListManager.channels.find { ch -> ch.id == it.channelId }?.toFakeChannelData()
 				switchDisplay(CurrentDisplay.MAIN_OVERVIEW)
 			}
 		}

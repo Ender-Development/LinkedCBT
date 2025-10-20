@@ -12,17 +12,17 @@ import org.ender_development.catalyx.modules.CatalyxModule
 import org.ender_development.catalyx.modules.ICatalyxModule
 
 @CatalyxModule(
-	moduleID = LTModuleContainer.MODULE_TOP,
+	moduleID = LCBTModuleContainer.MODULE_TOP,
 	containerID = Tags.MOD_ID,
 	modDependencies = [Mods.TOP],
 	name = "${Tags.MOD_NAME} The One Probe Integration Module",
 	description = "Adds integration with The One Probe"
 )
-class LTTOPModule : ICatalyxModule {
+class LCBTTOPModule : ICatalyxModule {
 	override val logger = LinkedCBT.logger
 
 	override val dependencyUids: Set<ResourceLocation> =
-		ObjectSets.singleton(ResourceLocation(Tags.MOD_ID, LTModuleContainer.MODULE_CORE))
+		ObjectSets.singleton(ResourceLocation(Tags.MOD_ID, LCBTModuleContainer.MODULE_CORE))
 
 	override fun init(event: FMLInitializationEvent) {
 		logger.info("TheOneProbe found. Enabling integration...")

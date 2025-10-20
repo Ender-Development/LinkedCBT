@@ -1,9 +1,9 @@
 package io.enderdev.linkedcbt.tiles
 
 import io.enderdev.linkedcbt.LinkedCBT
-import io.enderdev.linkedcbt.data.ChannelData
+import io.enderdev.linkedcbt.data.tanks.TankChannelData
 import io.enderdev.linkedcbt.data.Constants
-import io.enderdev.linkedcbt.data.LTPersistentData
+import io.enderdev.linkedcbt.data.tanks.LTPersistentData
 import io.enderdev.linkedcbt.tiles.buttons.DeleteButtonWrapper
 import io.enderdev.linkedcbt.tiles.buttons.LinkButtonWrapper
 import io.enderdev.linkedcbt.tiles.buttons.RenameButtonWrapper
@@ -40,7 +40,7 @@ class TileLinkedTank : BaseTile(LinkedCBT), IFluidTile, ITickable, IGuiTile, IBu
 	override var needsRedstonePower = false
 
 	var channelId = Constants.NO_CHANNEL
-	var channelData: ChannelData? = LTPersistentData.data.get(channelId)
+	var channelData: TankChannelData? = LTPersistentData.data.get(channelId)
 		set(value) {
 			field = value
 			fluidHandler.channelData = value
@@ -262,7 +262,7 @@ class TileLinkedTank : BaseTile(LinkedCBT), IFluidTile, ITickable, IGuiTile, IBu
 		val ownerUUID = tag.getUniqueId("OwnerUUID")!!
 		val fluid = FluidRegistry.getFluid(tag.getString("FluidName"))
 		val fluidAmount = tag.getInteger("FluidAmount")
-		channelData = ChannelData(false, ownerUUID, ownerUsername, name, fluid, fluidAmount, Constants.NO_LINKED_POSITIONS).apply {
+		channelData = TankChannelData(false, ownerUUID, ownerUsername, name, fluid, fluidAmount, Constants.NO_LINKED_POSITIONS).apply {
 			fluidCapacityOverride = tag.getInteger("FluidCapacity")
 		}
 	}

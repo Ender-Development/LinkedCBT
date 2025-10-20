@@ -9,8 +9,8 @@ internal object PacketHandler {
 	val channel: SimpleNetworkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(Tags.MOD_ID)
 
 	fun init() {
-		channel.registerMessage(ChannelListPacket.ServerHandler::class.java, ChannelListPacket::class.java, 0, Side.SERVER)
-		channel.registerMessage(ChannelListPacket.ClientHandler::class.java, ChannelListPacket::class.java, 0, Side.CLIENT)
+		channel.registerMessage(TankChannelListPacket.ServerHandler::class.java, TankChannelListPacket::class.java, 0, Side.SERVER)
+		channel.registerMessage(TankChannelListPacket.ClientHandler::class.java, TankChannelListPacket::class.java, 0, Side.CLIENT)
 	}
 }
 
