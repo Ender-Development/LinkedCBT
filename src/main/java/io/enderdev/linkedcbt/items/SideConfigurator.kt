@@ -3,6 +3,7 @@ package io.enderdev.linkedcbt.items
 import io.enderdev.linkedcbt.LinkedCBT
 import io.enderdev.linkedcbt.Tags
 import io.enderdev.linkedcbt.client.gui.BaseLinkedGui
+import io.enderdev.linkedcbt.tiles.BaseLinkedTile
 import io.enderdev.linkedcbt.tiles.TileLinkedTank
 import io.enderdev.linkedcbt.util.extensions.reply
 import io.enderdev.linkedcbt.util.extensions.replyFail
@@ -31,7 +32,7 @@ class SideConfigurator : BaseItem(LinkedCBT, "side_configurator") {
 		if(world.isRemote || hand != EnumHand.MAIN_HAND)
 			return EnumActionResult.PASS
 
-		val te = world.getTileEntity(pos) as? TileLinkedTank ?: return EnumActionResult.PASS
+		val te = world.getTileEntity(pos) as? BaseLinkedTile<*, *, *, *> ?: return EnumActionResult.PASS
 		if(te.channelData?.canBeEditedBy(player.uniqueID) == false) {
 			player.replyFail(TextComponentTranslation("info.${Tags.MOD_ID}:no_permission"))
 			return EnumActionResult.FAIL
