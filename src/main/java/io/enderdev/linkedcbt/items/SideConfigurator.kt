@@ -2,7 +2,7 @@ package io.enderdev.linkedcbt.items
 
 import io.enderdev.linkedcbt.LinkedCBT
 import io.enderdev.linkedcbt.Tags
-import io.enderdev.linkedcbt.client.gui.GuiLinkedTank
+import io.enderdev.linkedcbt.client.gui.BaseLinkedGui
 import io.enderdev.linkedcbt.tiles.TileLinkedTank
 import io.enderdev.linkedcbt.util.extensions.reply
 import io.enderdev.linkedcbt.util.extensions.replyFail
@@ -37,13 +37,13 @@ class SideConfigurator : BaseItem(LinkedCBT, "side_configurator") {
 			return EnumActionResult.FAIL
 		}
 
-		val newSideConfiguration = te.fluidSideConfiguration[facing].let {
+		val newSideConfiguration = te.sideConfiguration[facing].let {
 			if(player.isSneaking)
 				it.previous()
 			else
 				it.next()
 		}
-		te.fluidSideConfiguration[facing] = newSideConfiguration
+		te.sideConfiguration[facing] = newSideConfiguration
 		player.reply(newSideConfiguration.describe(facing), newSideConfiguration.colour)
 
 		return EnumActionResult.SUCCESS
@@ -67,17 +67,17 @@ class SideConfigurator : BaseItem(LinkedCBT, "side_configurator") {
 		val te = mc.world.getTileEntity(mousedOver.blockPos ?: return) as? TileLinkedTank ?: return
 		val res = ev.resolution
 		val facing = mousedOver.sideHit
-		val side = te.fluidSideConfiguration[facing]
+		val side = te.sideConfiguration[facing]
 
 		GlStateManager.pushMatrix()
 		GlStateManager.color(1f, 1f, 1f, 1f)
 
 		val text = "§${side.colour.formattingCode}${side.describe(facing)}"
-		val w = GuiLinkedTank.FONT_RENDERER.getStringWidth(text)
+		val w = BaseLinkedGui.FONT_RENDERER.getStringWidth(text)
 		val x = (res.scaledWidth - w) shr 1
 		val y = res.scaledHeight - OVERLAY_OFF_Y
-		Gui.drawRect(x - 2, y - 2, x + w + 2, y + GuiLinkedTank.FONT_HEIGHT + 2, OVERLAY_BG)
-		GuiLinkedTank.FONT_RENDERER.drawString(text, x, y, 0)
+		Gui.drawRect(x - 2, y - 2, x + w + 2, y + BaseLinkedGui.FONT_HEIGHT + 2, OVERLAY_BG)
+		BaseLinkedGui.FONT_RENDERER.drawString(text, x, y, 0)
 
 		GlStateManager.popMatrix()
 	}

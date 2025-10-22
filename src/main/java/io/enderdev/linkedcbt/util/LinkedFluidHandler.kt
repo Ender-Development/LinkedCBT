@@ -8,7 +8,7 @@ import net.minecraftforge.fluids.capability.FluidTankProperties
 import net.minecraftforge.fluids.capability.IFluidHandler
 import net.minecraftforge.fluids.capability.IFluidTankProperties
 
-class LinkedFluidHandler(var channelData: TankChannelData?) : IFluidHandler, IFluidTank {
+class LinkedFluidHandler(override var channelData: TankChannelData?) : BaseLinkedHandler<IFluidHandler, TankChannelData>(), IFluidHandler, IFluidTank {
 	val contents
 		get() = channelData?.fluid?.let { FluidStack(it, channelData!!.fluidAmount) }
 

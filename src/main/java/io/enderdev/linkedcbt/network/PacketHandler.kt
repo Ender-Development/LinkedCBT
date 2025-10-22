@@ -11,6 +11,8 @@ internal object PacketHandler {
 	fun init() {
 		channel.registerMessage(TankChannelListPacket.ServerHandler::class.java, TankChannelListPacket::class.java, 0, Side.SERVER)
 		channel.registerMessage(TankChannelListPacket.ClientHandler::class.java, TankChannelListPacket::class.java, 0, Side.CLIENT)
+		channel.registerMessage(BatteryChannelListPacket.ServerHandler::class.java, BatteryChannelListPacket::class.java, 1, Side.SERVER)
+		channel.registerMessage(BatteryChannelListPacket.ClientHandler::class.java, BatteryChannelListPacket::class.java, 1, Side.CLIENT)
 	}
 }
 

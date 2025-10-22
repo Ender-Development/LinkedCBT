@@ -1,13 +1,14 @@
 tile.linkedcbt:linked_tank.name=Linked Tank
-tile.linkedcbt:linked_tank.gui.owner=Owner: %s
-tile.linkedcbt:linked_tank.gui.confirmation=Are you sure?
-tile.linkedcbt:linked_tank.gui.channels=Channels:
-tile.linkedcbt:linked_tank.gui.unlink_btn=Unlink
-tile.linkedcbt:linked_tank.gui.delete_btn=Delete
-tile.linkedcbt:linked_tank.gui.create_new=Create new
 
-item.linkedcbt:tank_configurator.name=I/O Configurator
+item.linkedcbt:side_configurator.name=Side Configurator
 
 info.linkedcbt:no_permission=You don't have sufficient permissions to edit this tank
+
+gui.linkedcbt:bt.owner=Owner: %s
+gui.linkedcbt:bt.confirmation=Are you sure?
+gui.linkedcbt:bt.channels=Channels:
+gui.linkedcbt:bt.unlink_btn=Unlink
+gui.linkedcbt:bt.delete_btn=Delete
+gui.linkedcbt:bt.create_new=Create new
 
 itemGroup.linkedcbt=Linked CBT

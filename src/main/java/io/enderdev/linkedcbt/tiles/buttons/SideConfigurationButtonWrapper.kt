@@ -1,8 +1,8 @@
 package io.enderdev.linkedcbt.tiles.buttons
 
-import io.enderdev.linkedcbt.client.gui.GuiLinkedTank
+import io.enderdev.linkedcbt.client.gui.BaseLinkedGui
 import io.enderdev.linkedcbt.data.Constants
-import io.enderdev.linkedcbt.tiles.util.FluidSideConfiguration
+import io.enderdev.linkedcbt.tiles.util.SideConfiguration
 import io.netty.buffer.ByteBuf
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
@@ -11,8 +11,8 @@ import net.minecraft.util.EnumFacing
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
 import org.ender_development.catalyx.client.button.AbstractButtonWrapper
 
-class SideConfigurationButtonWrapper(x: Int, y: Int) : AbstractButtonWrapper(x, y, GuiLinkedTank.SIDE_CONFIG_BTN_W, GuiLinkedTank.SIDE_CONFIG_BTN_H) {
-	override val textureLocation = Constants.LINKED_TANK_GUI
+class SideConfigurationButtonWrapper(x: Int, y: Int) : AbstractButtonWrapper(x, y, BaseLinkedGui.SIDE_CONFIG_BTN_W, BaseLinkedGui.SIDE_CONFIG_BTN_H) {
+	override val textureLocation = Constants.LINKED_BT_GUI
 
 	override val drawButton: () -> GuiButton.(Minecraft, Int, Int, Float) -> Unit = { { mc, mouseX, mouseY, partialTicks ->
 		mc.textureManager.bindTexture(textureLocation)
@@ -21,14 +21,14 @@ class SideConfigurationButtonWrapper(x: Int, y: Int) : AbstractButtonWrapper(x, 
 	} }
 
 	lateinit var facing: EnumFacing
-	lateinit var side: FluidSideConfiguration.Side
+	lateinit var side: SideConfiguration
 	lateinit var ctx: MessageContext
 	var affectsAll = false
 
 	override fun readExtraData(buf: ByteBuf, ctx: MessageContext) {
 		this.ctx = ctx
 		facing = EnumFacing.byIndex(buf.readInt())
-		side = FluidSideConfiguration.Side.entries[buf.readInt()]
+		side = SideConfiguration.entries[buf.readInt()]
 		affectsAll = buf.readBoolean()
 	}
 

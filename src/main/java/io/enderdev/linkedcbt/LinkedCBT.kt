@@ -78,12 +78,8 @@ object LinkedCBT : ICatalyxMod {
 
 	// because of the way Java loads classes, need to do this lol
 	init {
-		LTConfig.jvmLoadClass()
+		LCBTConfig.jvmLoadClass()
 		ModBlocks.jvmLoadClass()
 		ModItems.jvmLoadClass()
 	}
-
-	@Suppress("NOTHING_TO_INLINE")
-	inline fun Int.formatNumber(): String =
-		numberFormat.format(this)
 }

@@ -1,16 +1,15 @@
-package io.enderdev.linkedcbt.data.tanks
+package io.enderdev.linkedcbt.data.batteries
 
 import io.enderdev.linkedcbt.data.DimBlockPos
 import io.enderdev.linkedcbt.data.base.BasePersistentData
-import io.enderdev.linkedcbt.tiles.TileLinkedTank
+import io.enderdev.linkedcbt.tiles.TileLinkedBattery
 import io.enderdev.linkedcbt.util.extensions.dim
 import io.enderdev.linkedcbt.util.extensions.dimId
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraftforge.fluids.FluidRegistry
 
-object LTPersistentData : BasePersistentData<TankChannelData, TileLinkedTank>("tanks") {
-	override fun readChannel(tag: NBTTagCompound): TankChannelData {
+object LBPersistentData : BasePersistentData<BatteryChannelData, TileLinkedBattery>("batteries") {
+	override fun readChannel(tag: NBTTagCompound): BatteryChannelData {
 		val deleted = tag.getBoolean("Deleted")
 		val ownerUUID = tag.getUniqueId("OwnerUUID")!!
 		val ownerUsername = tag.getString("OwnerUsername")
@@ -20,13 +19,12 @@ object LTPersistentData : BasePersistentData<TankChannelData, TileLinkedTank>("t
 		(0..<linkedPositionCount).mapTo(linkedPositions) {
 			DimBlockPos.Companion.fromString(tag.getString("LinkedPosition$$it"))
 		}
-		val fluid = FluidRegistry.getFluid(tag.getString("FluidName"))
-		val fluidAmount = tag.getInteger("FluidAmount")
+		val energyAmount = tag.getInteger("EnergyAmount")
 
-		return TankChannelData(deleted, ownerUUID, ownerUsername, name, fluid, fluidAmount, linkedPositions)
+		return BatteryChannelData(deleted, ownerUUID, ownerUsername, name, energyAmount, linkedPositions)
 	}
 
-	override fun writeChannel(channelData: TankChannelData) =
+	override fun writeChannel(channelData: BatteryChannelData) =
 		NBTTagCompound().apply {
 			setBoolean("Deleted", channelData.deleted)
 			setUniqueId("OwnerUUID", channelData.ownerUUID)
@@ -36,11 +34,9 @@ object LTPersistentData : BasePersistentData<TankChannelData, TileLinkedTank>("t
 			channelData.linkedPositions.forEachIndexed { idx, pos ->
 				setString("LinkedPosition$$idx", pos.toString())
 			}
-			if(channelData.fluid != null)
-				setString("FluidName", FluidRegistry.getFluidName(channelData.fluid))
-			setInteger("FluidAmount", channelData.fluidAmount)
+			setInteger("EnergyAmount", channelData.energyAmount)
 		}
 
-	override fun createEmptyChannel(player: EntityPlayer, te: TileLinkedTank, channelName: String?) =
-		TankChannelData(false, player.uniqueID, player.gameProfile.name, channelName ?: "New channel $nextChannelId", null, 0, hashSetOf(te.pos dim te.world.dimId))
+	override fun createEmptyChannel(player: EntityPlayer, te: TileLinkedBattery, channelName: String?) =
+		BatteryChannelData(false, player.uniqueID, player.gameProfile.name, channelName ?: "New channel $nextChannelId", 0, hashSetOf(te.pos dim te.world.dimId))
 }
