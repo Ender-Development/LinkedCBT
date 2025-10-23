@@ -24,7 +24,7 @@ class LinkButtonWrapper : AbstractButtonWrapper {
 	constructor(x: Int, y: Int, width: Int, height: Int) : super(x, y, width, height)
 
 	// TODO create an icon for the unlink part instead of drawing text
-	override val textureLocation = Constants.LINKED_BT_GUI
+	override val textureLocation = Constants.LINKED_CBT_GUI
 
 	override val drawDefaultHoverOverlay = false
 

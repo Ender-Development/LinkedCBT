@@ -1,14 +1,16 @@
 tile.linkedcbt:linked_tank.name=Linked Tank
+tile.linkedcbt:linked_battery.name=Linked Battery
+tile.linkedcbt:linked_chest.name=Linked Chest
 
 item.linkedcbt:side_configurator.name=Side Configurator
 
-info.linkedcbt:no_permission=You don't have sufficient permissions to edit this tank
+info.linkedcbt:no_permission=You don't have sufficient permissions to edit this linked block
 
-gui.linkedcbt:bt.owner=Owner: %s
-gui.linkedcbt:bt.confirmation=Are you sure?
-gui.linkedcbt:bt.channels=Channels:
-gui.linkedcbt:bt.unlink_btn=Unlink
-gui.linkedcbt:bt.delete_btn=Delete
-gui.linkedcbt:bt.create_new=Create new
+gui.linkedcbt:cbt.owner=Owner: %s
+gui.linkedcbt:cbt.confirmation=Are you sure?
+gui.linkedcbt:cbt.channels=Channels:
+gui.linkedcbt:cbt.unlink_btn=Unlink
+gui.linkedcbt:cbt.delete_btn=Delete
+gui.linkedcbt:cbt.create_new=Create new
 
 itemGroup.linkedcbt=Linked CBT

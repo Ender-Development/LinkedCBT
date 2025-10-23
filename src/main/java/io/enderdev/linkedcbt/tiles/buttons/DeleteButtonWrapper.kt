@@ -12,7 +12,7 @@ import org.ender_development.catalyx.client.button.AbstractButtonWrapper
 
 class DeleteButtonWrapper(x: Int, y: Int) : AbstractButtonWrapper(x, y, BaseLinkedGui.DELETE_BTN_W, BaseLinkedGui.DELETE_BTN_H) {
 	// TODO create an icon for this instead of drawing text
-	override val textureLocation = Constants.LINKED_BT_GUI
+	override val textureLocation = Constants.LINKED_CBT_GUI
 
 	override val drawDefaultHoverOverlay = false
 

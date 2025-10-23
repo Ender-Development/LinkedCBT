@@ -29,10 +29,10 @@ import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
 abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>, CLIENT_CH_DATA : ClientBaseChannelData<CLIENT_CH_DATA, CH_DATA>, TE : BaseLinkedTile<TE, CH_DATA, *, *>>(container: BaseContainer, val tile: TE, val channelListManager: BaseClientChannelListManager<CH_DATA, CLIENT_CH_DATA, *>) : BaseGuiTyped<TE>(container, tile) {
-	override val textureLocation = Constants.LINKED_BT_GUI
+	override val textureLocation = Constants.LINKED_CBT_GUI
 	override val displayName = ""
 
-	abstract val displayWrapper: CapabilityDisplayWrapper
+	abstract val displayWrapper: CapabilityDisplayWrapper?
 
 	var currentDisplay = CurrentDisplay.NONE
 	val unlinkButton = LinkButtonWrapper(0, 0, UNLINK_BTN_W, UNLINK_BTN_H, channelListManager) // MAIN_OVERVIEW
@@ -70,13 +70,6 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 	override fun initGui() {
 		super.initGui()
 
-		if(currentDisplay == CurrentDisplay.NONE) {
-			if(tile.channelId == Constants.NO_CHANNEL)
-				switchDisplay(CurrentDisplay.CHANNEL_LINK)
-			else
-				switchDisplay(CurrentDisplay.MAIN_OVERVIEW)
-		9999999999999}
-
 		// remove the default buttons cause meh
 		buttonList.remove(redstoneButton.button)
 		buttonList.remove(pauseButton.button)
@@ -87,6 +80,14 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 		unlinkButton.y = guiTop + UNLINK_BTN_Y
 		repositionAndUpdateSideConfigurationButtons()
 		repositionLinkChannelButtons()
+
+		if(currentDisplay == CurrentDisplay.NONE) {
+			if(tile.channelId == Constants.NO_CHANNEL)
+				switchDisplay(CurrentDisplay.CHANNEL_LINK)
+			else
+				switchDisplay(CurrentDisplay.MAIN_OVERVIEW)
+			return
+		}
 
 		if(currentDisplay == CurrentDisplay.MAIN_OVERVIEW) {
 			if(deleteButton.button!!.visible)
@@ -133,7 +134,9 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 		displayData.remove(displayWrapper)
 		super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY)
 		if(currentDisplay == CurrentDisplay.MAIN_OVERVIEW)
-			displayData.add(displayWrapper)
+			displayWrapper?.let {
+				displayData.add(it)
+			}
 
 		@Suppress("REDUNDANT_ELSE_IN_WHEN")
 		when(currentDisplay) {
@@ -142,9 +145,11 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 				// draw bar bg
 				drawTexturedModalRect(guiLeft + BAR_BACKGROUND_X, guiTop + BAR_BACKGROUND_Y, BAR_BACKGROUND_U, BAR_BACKGROUND_V, BAR_BACKGROUND_W, BAR_BACKGROUND_H)
 				// draw bar
-				when(displayWrapper) {
-					is CapabilityFluidDisplayWrapper -> drawFluidTank(displayWrapper as CapabilityFluidDisplayWrapper, guiLeft + displayWrapper.x, guiTop + displayWrapper.y)
-					is CapabilityEnergyDisplayWrapper -> drawPowerBar(displayWrapper as CapabilityEnergyDisplayWrapper, powerBarTexture, powerBarX, powerBarY)
+				val wrapper = displayWrapper
+				when(wrapper) {
+					null -> customDrawMainOverview(partialTicks, mouseX, mouseY)
+					is CapabilityFluidDisplayWrapper -> drawFluidTank(wrapper, guiLeft + wrapper.x, guiTop + wrapper.y)
+					is CapabilityEnergyDisplayWrapper -> drawPowerBar(wrapper, powerBarTexture, powerBarX, powerBarY)
 				}
 			}
 			CurrentDisplay.CHANNEL_LINK -> {
@@ -181,6 +186,8 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 		}
 	}
 
+	open fun customDrawMainOverview(partialTicks: Float, mouseX: Int, mouseY: Int) {}
+
 	override fun drawGuiContainerForegroundLayer(mouseX: Int, mouseY: Int) {
 		super.drawGuiContainerForegroundLayer(mouseX, mouseY)
 
@@ -199,7 +206,7 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 				FONT_RENDERER.drawString(nameText, NAME_TEXT_X, NAME_TEXT_Y, nameColour)
 				// for some reason, this cannot use "owner".guiTranslate(...); in the GUI it shows up as "Owner: [Ljava.lang.Object;@address"
 				FONT_RENDERER.drawString(I18n.format("${TRANSLATION_BASE}owner", tile.channelData?.ownerUsername), OWNER_TEXT_X, OWNER_TEXT_Y, TEXT_COLOUR)
-				FONT_RENDERER.drawString(displayWrapper.textLines[0], CONTENTS_TEXT_X, CONTENTS_TEXT_Y, TEXT_COLOUR)
+				FONT_RENDERER.drawString(displayWrapper?.textLines?.get(0) ?: "", CONTENTS_TEXT_X, CONTENTS_TEXT_Y, TEXT_COLOUR)
 
 				if(mainOverviewDeleteClicked) {
 					drawCenteredString(FONT_RENDERER, "confirmation".guiTranslate(), DELETE_BTN_CONFIRMATION_TEXT_X, DELETE_BTN_CONFIRMATION_TEXT_Y, RED_TEXT_COLOUR)
@@ -362,7 +369,7 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 		}
 
 		if(new == CurrentDisplay.MAIN_OVERVIEW) {
-			displayData.add(displayWrapper)
+			displayWrapper?.let { displayData.add(it) }
 			buttonList.add(unlinkButton.button)
 			buttonList.add(deleteButton.button)
 			sideConfigurationButtons.mapTo(buttonList, SideConfigurationButtonWrapper::button)
@@ -428,7 +435,7 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 		const val RED_TEXT_COLOUR = 0xFF0000 or TEXT_COLOUR
 		const val BASE_TEXT_X = 8
 		const val BASE_TEXT_Y = 8
-		const val TRANSLATION_BASE = "gui.${Tags.MOD_ID}:bt."
+		const val TRANSLATION_BASE = "gui.${Tags.MOD_ID}:cbt."
 
 		val FONT_RENDERER: FontRenderer = Minecraft.getMinecraft().fontRenderer
 		val FONT_HEIGHT = FONT_RENDERER.FONT_HEIGHT

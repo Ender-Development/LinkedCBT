@@ -8,7 +8,6 @@ import net.minecraftforge.fluids.capability.IFluidHandler
 import org.ender_development.catalyx.tiles.BaseTile.Companion.FLUID_CAP
 import org.ender_development.catalyx.utils.Delegates
 
-// this could be generalized and thrown into Catalyx ;p
 class FluidSideConfiguration(val tile: TileLinkedTank) : BaseSideConfiguration<IFluidHandler>() {
 	override val handler by Delegates.lazyProperty(tile::fluidHandler)
 	override val inputOnlyWrapper by Delegates.lazyProperty {

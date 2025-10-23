@@ -5,29 +5,20 @@ import net.minecraftforge.common.config.Config
 @Config(modid = Tags.MOD_ID, name = Tags.MOD_ID)
 object LCBTConfig {
 	@JvmStatic
-	@Config.Name("Tanks")
-	val tanks = Tanks()
+	@Config.Name("Chests")
+	val chests = Chests()
 
-	class Tanks {
-		@Config.Name("Tank capacity")
-		@Config.Comment("Max fluid amount [mB] stored in a channel")
+	class Chests() {
+		@Config.Name("Push/pull only every [ticks]")
+		@Config.Comment("Process push/pull operations only every [ticks] (i.e. 1 => every tick, 2 => every other tick, …)")
 		@Config.RangeInt(min = 1, max = Int.MAX_VALUE)
-		var capacity = 8000
+		var pushPullEvery = 1
 
-		@Config.Name("Tank capacity changes with tank count")
-		@Config.Comment(
-			"Should tank capacity be multiplied by the total amount of tanks in a channel",
-			"ex. if you have a tank capacity of 8,000 mB, and the channel has 3 tanks connected to it, the total channel capacity will be 24,000 mB"
-		)
-		var capacityChangesWithTankCount = false
-
-		@Config.Name("Max tank push/pull throughput per side")
-		@Config.Comment(
-			"Max fluid amount [mB] that a tank will try to push/pull per side per tick",
-			"0 to disable any limits"
-		)
-		@Config.RangeInt(min = 0, max = Int.MAX_VALUE)
-		var maxPushPullThroughput = 250
+		// didn't feel like implementing right meow
+		//@Config.Name("Push/pull slot limit")
+		//@Config.Comment("When processing push/pull operations, only the given amount of possible slots may be transferred at a time")
+		//@Config.RangeInt(min = 1, max = Constants.LINKED_CHEST_INVENTORY_SIZE)
+		//var pushPullMaxSlots = 2
 	}
 
 	@JvmStatic
@@ -54,6 +45,32 @@ object LCBTConfig {
 		)
 		@Config.RangeInt(min = 0, max = Int.MAX_VALUE)
 		var maxPushPullThroughput = 1500
+	}
+
+	@JvmStatic
+	@Config.Name("Tanks")
+	val tanks = Tanks()
+
+	class Tanks {
+		@Config.Name("Tank capacity")
+		@Config.Comment("Max fluid amount [mB] stored in a channel")
+		@Config.RangeInt(min = 1, max = Int.MAX_VALUE)
+		var capacity = 8000
+
+		@Config.Name("Tank capacity changes with tank count")
+		@Config.Comment(
+			"Should tank capacity be multiplied by the total amount of tanks in a channel",
+			"ex. if you have a tank capacity of 8,000 mB, and the channel has 3 tanks connected to it, the total channel capacity will be 24,000 mB"
+		)
+		var capacityChangesWithTankCount = false
+
+		@Config.Name("Max tank push/pull throughput per side")
+		@Config.Comment(
+			"Max fluid amount [mB] that a tank will try to push/pull per side per tick",
+			"0 to disable any limits"
+		)
+		@Config.RangeInt(min = 0, max = Int.MAX_VALUE)
+		var maxPushPullThroughput = 250
 	}
 
 	fun jvmLoadClass() {}

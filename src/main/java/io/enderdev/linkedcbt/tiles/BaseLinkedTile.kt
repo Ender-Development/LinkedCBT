@@ -204,6 +204,11 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 	override fun writeToNBT(compound: NBTTagCompound): NBTTagCompound {
 		super.writeToNBT(compound)
 
+		// these might mess with our TEs and cause duplication
+		compound.removeTag("EnergyStored")
+		compound.removeTag("input")
+		compound.removeTag("output")
+
 		if(channelId != Constants.NO_CHANNEL)
 			compound.setInteger("ChannelId", channelId)
 

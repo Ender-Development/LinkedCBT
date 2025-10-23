@@ -18,7 +18,7 @@ object LTPersistentData : BasePersistentData<TankChannelData, TileLinkedTank>("t
 		val linkedPositionCount = tag.getInteger("LinkedPositionCount")
 		val linkedPositions = HashSet<DimBlockPos>(linkedPositionCount)
 		(0..<linkedPositionCount).mapTo(linkedPositions) {
-			DimBlockPos.Companion.fromString(tag.getString("LinkedPosition$$it"))
+			DimBlockPos.fromString(tag.getString("LinkedPosition$$it"))
 		}
 		val fluid = FluidRegistry.getFluid(tag.getString("FluidName"))
 		val fluidAmount = tag.getInteger("FluidAmount")

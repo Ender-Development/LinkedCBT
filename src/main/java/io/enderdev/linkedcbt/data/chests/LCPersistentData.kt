@@ -1,15 +1,17 @@
-package io.enderdev.linkedcbt.data.batteries
+package io.enderdev.linkedcbt.data.chests
 
+import io.enderdev.linkedcbt.data.Constants
 import io.enderdev.linkedcbt.data.DimBlockPos
 import io.enderdev.linkedcbt.data.base.BasePersistentData
-import io.enderdev.linkedcbt.tiles.TileLinkedBattery
+import io.enderdev.linkedcbt.tiles.TileLinkedChest
 import io.enderdev.linkedcbt.util.extensions.dim
 import io.enderdev.linkedcbt.util.extensions.dimId
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 
-object LBPersistentData : BasePersistentData<BatteryChannelData, TileLinkedBattery>("batteries") {
-	override fun readChannel(tag: NBTTagCompound): BatteryChannelData {
+object LCPersistentData : BasePersistentData<ChestChannelData, TileLinkedChest>("chests") {
+	override fun readChannel(tag: NBTTagCompound): ChestChannelData {
 		val deleted = tag.getBoolean("Deleted")
 		val ownerUUID = tag.getUniqueId("OwnerUUID")!!
 		val ownerUsername = tag.getString("OwnerUsername")
@@ -19,12 +21,17 @@ object LBPersistentData : BasePersistentData<BatteryChannelData, TileLinkedBatte
 		(0..<linkedPositionCount).mapTo(linkedPositions) {
 			DimBlockPos.fromString(tag.getString("LinkedPosition$$it"))
 		}
-		val energyAmount = tag.getInteger("EnergyAmount")
+		val items = Array(Constants.LINKED_CHEST_INVENTORY_SIZE) { idx ->
+			if(!tag.hasKey("Item$$idx"))
+				ItemStack.EMPTY
+			else
+				ItemStack(tag.getCompoundTag("Item$$idx"))
+		}
 
-		return BatteryChannelData(deleted, ownerUUID, ownerUsername, name, energyAmount, linkedPositions)
+		return ChestChannelData(deleted, ownerUUID, ownerUsername, name, items, linkedPositions)
 	}
 
-	override fun writeChannel(channelData: BatteryChannelData) =
+	override fun writeChannel(channelData: ChestChannelData) =
 		NBTTagCompound().apply {
 			setBoolean("Deleted", channelData.deleted)
 			setUniqueId("OwnerUUID", channelData.ownerUUID)
@@ -34,9 +41,12 @@ object LBPersistentData : BasePersistentData<BatteryChannelData, TileLinkedBatte
 			channelData.linkedPositions.forEachIndexed { idx, pos ->
 				setString("LinkedPosition$$idx", pos.toString())
 			}
-			setInteger("EnergyAmount", channelData.energyAmount)
+			channelData.items.forEachIndexed { idx, stack ->
+				if(!stack.isEmpty)
+					setTag("Item$$idx", stack.writeToNBT(NBTTagCompound()))
+			}
 		}
 
-	override fun createEmptyChannel(player: EntityPlayer, te: TileLinkedBattery, channelName: String?) =
-		BatteryChannelData(false, player.uniqueID, player.gameProfile.name, channelName ?: "New channel $nextChannelId", 0, hashSetOf(te.pos dim te.world.dimId))
+	override fun createEmptyChannel(player: EntityPlayer, te: TileLinkedChest, channelName: String?) =
+		ChestChannelData(false, player.uniqueID, player.gameProfile.name, channelName ?: "New channel $nextChannelId", Array(Constants.LINKED_CHEST_INVENTORY_SIZE) { ItemStack.EMPTY }, hashSetOf(te.pos dim te.world.dimId))
 }
