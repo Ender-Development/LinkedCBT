@@ -1,0 +1,16 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"GOG",
+		"ECE",
+		"GRG"
+	],
+	"key": {
+		"C": { "item": "minecraft:chest" },
+		"G": { "type": "minecraft:stained_glass", "meta": 1 },
+		"E": { "item": "minecraft:ender_pearl" },
+		"R": { "item": "minecraft:redstone_torch" },
+		"O": { "item": "minecraft:gold_ingot" }
+	},
+	"result": { "item": "linked_battery" }
+}

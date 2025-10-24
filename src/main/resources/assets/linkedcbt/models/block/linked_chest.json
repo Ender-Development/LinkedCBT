@@ -1,6 +1,6 @@
 {
 	"parent": "block/cube_all",
 	"textures": {
-		"all": "linkedcbt:blocks/linked_tank"
+		"all": "linkedcbt:blocks/linked_chest"
 	}
 }

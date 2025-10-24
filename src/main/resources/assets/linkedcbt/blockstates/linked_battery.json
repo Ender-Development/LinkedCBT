@@ -1,0 +1,10 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"model": "linkedcbt:linked_battery"
+	},
+	"variants": {
+		"normal": [{}],
+		"inventory": [{}]
+	}
+}
