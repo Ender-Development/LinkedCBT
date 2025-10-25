@@ -18,7 +18,6 @@ import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ITickable
-import net.minecraft.util.math.AxisAlignedBB
 import net.minecraftforge.common.capabilities.Capability
 import org.ender_development.catalyx.client.button.AbstractButtonWrapper
 import org.ender_development.catalyx.client.button.PauseButtonWrapper

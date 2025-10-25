@@ -5,12 +5,7 @@ import io.enderdev.linkedcbt.command.LinkedCBTCommand
 import io.enderdev.linkedcbt.data.tanks.LTPersistentData
 import io.enderdev.linkedcbt.items.ModItems
 import io.enderdev.linkedcbt.network.PacketHandler
-import net.minecraft.block.state.IBlockState
-import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.color.IBlockColor
 import net.minecraft.creativetab.CreativeTabs
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.IBlockAccess
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.common.config.Config
 import net.minecraftforge.common.config.ConfigManager
@@ -18,7 +13,6 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.client.event.ConfigChangedEvent
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.Mod.EventHandler
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -57,17 +51,6 @@ object LinkedCBT : ICatalyxMod {
 		MinecraftForge.EVENT_BUS.register(this)
 		if(SideUtils.isClient)
 			MinecraftForge.EVENT_BUS.register(ModItems.sideConfigurator)
-	}
-
-	@EventHandler
-	fun postInit(ev: FMLPostInitializationEvent) {
-		if(SideUtils.isClient)
-			Minecraft.getMinecraft().blockColors.registerBlockColorHandler({ state, world, pos, tintIndex ->
-				if(tintIndex != 0)
-					return@registerBlockColorHandler -1
-
-				return@registerBlockColorHandler 0x1FFFFFFF
-			}, ModBlocks.linkedTank)
 	}
 
 	@EventHandler

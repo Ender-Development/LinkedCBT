@@ -4,9 +4,7 @@ import io.enderdev.linkedcbt.data.DimBlockPos
 import io.enderdev.linkedcbt.data.base.BaseChannelData
 import io.enderdev.linkedcbt.data.chests.client.ClientChestChannelData
 import net.minecraft.item.ItemStack
-import java.util.HashSet
-import java.util.Objects
-import java.util.UUID
+import java.util.*
 
 data class ChestChannelData(override var deleted: Boolean, override var ownerUUID: UUID, override var ownerUsername: String, override var name: String, val items: Array<ItemStack>, override val linkedPositions: HashSet<DimBlockPos>) : BaseChannelData<ChestChannelData, ClientChestChannelData>() {
 	override fun equals(other: Any?) =

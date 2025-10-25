@@ -8,7 +8,6 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import org.ender_development.catalyx.blocks.BaseMachineBlock
-import kotlin.jvm.java
 
 class LinkedChestBlock : BaseMachineBlock(LinkedCBT, "linked_chest", LinkedCBT.guiHandler.registerId(TileLinkedChest::class.java, ContainerLinkedChest::class.java) { GuiLinkedChest::class.java }) {
 	override fun breakBlock(world: World, pos: BlockPos, state: IBlockState) {
