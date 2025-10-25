@@ -20,5 +20,5 @@ data class BatteryChannelData(override var deleted: Boolean, override var ownerU
 			LCBTConfig.batteries.capacity * if(LCBTConfig.batteries.capacityChangesWithBatteryCount) linkedPositions.size else 1
 
 	override fun toClientChannelData(id: Int) =
-		ClientBatteryChannelData(id, name, energyAmount, energyCapacity)
+		ClientBatteryChannelData(id, name)
 }

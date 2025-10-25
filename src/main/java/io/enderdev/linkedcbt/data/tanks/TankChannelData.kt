@@ -30,5 +30,5 @@ data class TankChannelData(override var deleted: Boolean, override var ownerUUID
 			LCBTConfig.tanks.capacity * if(LCBTConfig.tanks.capacityChangesWithTankCount) linkedPositions.size else 1
 
 	override fun toClientChannelData(id: Int) =
-		ClientTankChannelData(id, name, fluid, fluidAmount, fluidCapacity)
+		ClientTankChannelData(id, name)
 }

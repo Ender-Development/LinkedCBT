@@ -90,6 +90,7 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 		if(newChannelId == Constants.NO_CHANNEL) {
 			if(channelData!!.canBeEditedBy(player.uniqueID))
 				unlink()
+			markDirtyGUI()
 			return
 		}
 
@@ -123,8 +124,10 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 		unlink()
 
 		// unlink
-		if(newChannelId == Constants.NO_CHANNEL)
+		if(newChannelId == Constants.NO_CHANNEL) {
+			markDirtyGUI()
 			return
+		}
 
 		if(world != null) // in early readFromNBT, world is still null
 			newChannelData.linkedPositions.add(pos dim world.dimId)

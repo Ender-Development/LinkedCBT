@@ -23,7 +23,9 @@ internal object Constants {
 	val NO_LINKED_POSITIONS = HashSet<DimBlockPos>(0)
 
 	// special channel instances that have the id of [CREATE_NEW_CHANNEL]
-	val CLIENT_TANK_CHANNEL_CREATE_NEW = ClientTankChannelData(CREATE_NEW_CHANNEL, "create_new".guiTranslate(), null, 0, 0)
-	val CLIENT_BATTERY_CHANNEL_CREATE_NEW = ClientBatteryChannelData(CREATE_NEW_CHANNEL, "create_new".guiTranslate(), 0, 0)
-	val CLIENT_CHEST_CHANNEL_CREATE_NEW = ClientChestChannelData(CREATE_NEW_CHANNEL, "create_new".guiTranslate(), emptyArray())
+	val CLIENT_TANK_CHANNEL_CREATE_NEW = ClientTankChannelData(CREATE_NEW_CHANNEL, "create_new".guiTranslate())
+	val CLIENT_BATTERY_CHANNEL_CREATE_NEW = ClientBatteryChannelData(CREATE_NEW_CHANNEL, "create_new".guiTranslate())
+	val CLIENT_CHEST_CHANNEL_CREATE_NEW = ClientChestChannelData(CREATE_NEW_CHANNEL, "create_new".guiTranslate())
+
+	const val DEBUG = true
 }

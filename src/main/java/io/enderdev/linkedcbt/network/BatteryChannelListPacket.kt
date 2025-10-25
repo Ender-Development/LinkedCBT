@@ -16,7 +16,7 @@ class BatteryChannelListPacket : BaseChannelListPacket<BatteryChannelData, Clien
 	}
 
 	override fun readChannel(buf: ByteBuf) =
-		ClientBatteryChannelData(buf.readInt(), buf.readString(), -1, -1)
+		ClientBatteryChannelData(buf.readInt(), buf.readString())
 
 	constructor(id: Int) {
 		this.id = id

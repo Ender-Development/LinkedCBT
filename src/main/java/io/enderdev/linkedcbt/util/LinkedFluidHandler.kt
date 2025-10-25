@@ -1,5 +1,6 @@
 package io.enderdev.linkedcbt.util
 
+import io.enderdev.linkedcbt.data.Constants
 import io.enderdev.linkedcbt.data.tanks.TankChannelData
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.FluidTankInfo
@@ -98,6 +99,7 @@ class LinkedFluidHandler(override var channelData: TankChannelData?) : BaseLinke
 		FluidTankInfo(this)
 
 	private companion object {
-		const val DEBUG_LOG = false
+		@Suppress("SimplifyBooleanWithConstants", "KotlinConstantConditions")
+		const val DEBUG_LOG = false && Constants.DEBUG
 	}
 }

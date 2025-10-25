@@ -16,7 +16,7 @@ class ChestChannelListPacket : BaseChannelListPacket<ChestChannelData, ClientChe
 	}
 
 	override fun readChannel(buf: ByteBuf) =
-		ClientChestChannelData(buf.readInt(), buf.readString(), emptyArray())
+		ClientChestChannelData(buf.readInt(), buf.readString())
 
 	constructor(id: Int) {
 		this.id = id

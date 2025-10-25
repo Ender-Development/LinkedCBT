@@ -14,5 +14,5 @@ data class ChestChannelData(override var deleted: Boolean, override var ownerUUI
 		Objects.hash(deleted, ownerUUID, name, items.contentHashCode(), linkedPositions)
 
 	override fun toClientChannelData(id: Int) =
-		ClientChestChannelData(id, name, items)
+		ClientChestChannelData(id, name)
 }

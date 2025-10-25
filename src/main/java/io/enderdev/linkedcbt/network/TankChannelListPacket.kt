@@ -17,7 +17,7 @@ class TankChannelListPacket : BaseChannelListPacket<TankChannelData, ClientTankC
 	}
 
 	override fun readChannel(buf: ByteBuf) =
-		ClientTankChannelData(buf.readInt(), buf.readString(), null, -1, -1)
+		ClientTankChannelData(buf.readInt(), buf.readString())
 
 	constructor(id: Int) {
 		this.id = id

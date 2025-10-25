@@ -45,6 +45,9 @@ class LinkButtonWrapper : AbstractButtonWrapper {
 				this.y + BaseLinkedGui.LINK_BTN_TEXT_OFF_Y,
 				BaseLinkedGui.TEXT_COLOUR
 			)
+			@Suppress("KotlinConstantConditions")
+			if(Constants.DEBUG)
+				BaseLinkedGui.FONT_RENDERER.drawString(channel.toString(), this.x - 300, this.y + BaseLinkedGui.LINK_BTN_TEXT_OFF_Y, if(hovered) BaseLinkedGui.RED_TEXT_COLOUR else BaseLinkedGui.TEXT_COLOUR)
 		}
 	} }
 

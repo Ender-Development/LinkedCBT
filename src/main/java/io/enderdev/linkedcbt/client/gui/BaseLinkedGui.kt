@@ -236,7 +236,8 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 			else -> error(currentDisplay.debugName)
 		}
 
-		if(DevUtils.isDeobfuscated) {
+		@Suppress("KotlinConstantConditions")
+		if(Constants.DEBUG) {
 			FONT_RENDERER.drawString(currentDisplay.debugName, 50, -10, RED_TEXT_COLOUR)
 			FONT_RENDERER.drawString(tile.channelId.toString(), -300, (ySize shr 1) - FONT_HEIGHT, RED_TEXT_COLOUR)
 			FONT_RENDERER.drawSplitString(tile.channelData.toString(), -300, ySize shr 1, 300, RED_TEXT_COLOUR)
