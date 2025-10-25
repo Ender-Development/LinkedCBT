@@ -15,13 +15,14 @@ internal object LinkedCBTCommand : CommandTreeBase() {
 		listOf("lcbt")
 	
 	override fun getUsage(sender: ICommandSender) =
-		"meow"
+		"see /linkedcbt help"
 
 	init {
 		addSubcommand(Help)
 		addSubcommand(Version)
 		addSubcommand(TanksSubcommand)
 		addSubcommand(BatteriesSubcommand)
+		addSubcommand(ChestsSubcommand)
 	}
 
 	object Help : BaseCommand("help") {
@@ -30,6 +31,7 @@ internal object LinkedCBTCommand : CommandTreeBase() {
 			sender.reply("/linkedcbt version - show the ${Tags.MOD_NAME} version")
 			sender.reply("/linkedcbt tanks help - show tank management help")
 			sender.reply("/linkedcbt batteries help - show battery management help")
+			sender.reply("/linkedcbt chests help - show chest management help")
 		}
 	}
 

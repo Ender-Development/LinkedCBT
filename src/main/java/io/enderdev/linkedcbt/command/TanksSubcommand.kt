@@ -5,12 +5,10 @@ import io.enderdev.linkedcbt.command.SharedSubcommands.getChannelId
 import io.enderdev.linkedcbt.data.tanks.LTPersistentData
 import io.enderdev.linkedcbt.data.tanks.TankChannelData
 import io.enderdev.linkedcbt.util.extensions.*
-import it.unimi.dsi.fastutil.ints.Int2LongArrayMap
 import net.minecraft.command.ICommandSender
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.server.MinecraftServer
 import net.minecraft.util.text.TextComponentTranslation
-import net.minecraft.util.text.TextFormatting
 import net.minecraftforge.fluids.Fluid
 import net.minecraftforge.fluids.FluidRegistry
 import net.minecraftforge.server.command.CommandTreeBase
@@ -30,7 +28,7 @@ internal object TanksSubcommand : CommandTreeBase() {
 		if(server.isSinglePlayer)
 			return true
 
-		return sender !is EntityPlayer || server.playerList.oppedPlayers.getPermissionLevel(sender.gameProfile) >= 2
+		return sender !is EntityPlayer || server.playerList.oppedPlayers.getPermissionLevel(sender.gameProfile) >= requiredPermissionLevel
 	}
 
 	init {
@@ -56,18 +54,10 @@ internal object TanksSubcommand : CommandTreeBase() {
 	}
 
 	object List : BaseCommand("list") {
-		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<out String?>) {
-			sender.reply("Channels:")
-			LTPersistentData.data.toList().sortedBy { it.first }.forEach { (id, data) ->
-				val colour = if(data.deleted) TextFormatting.GRAY else TextFormatting.WHITE
-				sender.reply("- ${data.displayName(id)}${if(data.deleted) " (deleted)" else ""}", colour)
-				sender.reply("owner: ${data.ownerUsername} (uuid: ${data.ownerUUID})", colour)
-				sender.reply((+"${data.fluidAmount.formatNumber()} / ${data.fluidCapacity.formatNumber()} mB of " + data.fluid.nameComponent + +"; ${data.linkedPositions.size} endpoint${if(data.linkedPositions.size == 1) "" else "s"}"), colour)
-				sender.reply("")
+		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) =
+			SharedSubcommands.list(server, sender, args, LTPersistentData) { data ->
+				+"${data.fluidAmount.formatNumber()} / ${data.fluidCapacity.formatNumber()} mB of " + data.fluid.nameComponent
 			}
-			val endpoints = LTPersistentData.data.map { it.value.linkedPositions.size }.sum()
-			sender.reply("Total: ${LTPersistentData.data.size} (${LTPersistentData.data.count { !it.value.deleted }} not deleted) tank channels with $endpoints total endpoint${if(endpoints == 1) "" else "s"}")
-		}
 	}
 
 	object Hijack : BaseCommand("hijack") {
@@ -127,45 +117,15 @@ internal object TanksSubcommand : CommandTreeBase() {
 		}
 	}
 
-	// TODO throw into SharedSubcommands
-	object Purge : BaseCommand("purge") {
-		// channelId to milliseconds
-		val channelIdConfirmations = Int2LongArrayMap(2).apply {
-			defaultReturnValue(0L)
-		}
-		private const val CONFIRMATION_SECONDS = 5
-
-		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) {
-			if(args.isEmpty()) {
-				sender.replyFail("Usage: $BASE_COMMAND $name <channel id>")
-				return
-			}
-
-			val (channelId, channel) = getChannelData(sender, args[0], false) ?: return
-
-			if(channel.linkedPositions.isNotEmpty() && System.currentTimeMillis() - channelIdConfirmations[channelId] > CONFIRMATION_SECONDS * 1000L) {
-				sender.replyWarn("Channel $channelId still has ${channel.linkedPositions.size} endpoint${if(channel.linkedPositions.size == 1) "" else "s"}")
-				sender.replyWarn(+"This can happen due to a " + TextComponentTranslation("${ModBlocks.linkedTank.translationKey}.name") + +" being in an unloaded chunk, and it might relink to the next created channel with id $channelId")
-				sender.replyWarn("If you're sure you want to purge this channel, type this command again within $CONFIRMATION_SECONDS seconds")
-				channelIdConfirmations.put(channelId, System.currentTimeMillis())
-				return
-			}
-
-			LTPersistentData.data.remove(channelId)
-
-			sender.reply("Channel $channelId and all of its associated data has been purged, and its channel id is free to be reused")
-		}
-	}
+	object Purge : SharedSubcommands.PurgeSubcommand(BASE_COMMAND, ::getChannelData, LTPersistentData, ModBlocks.linkedTank)
 
 	object Revalidate : BaseCommand("revalidate") {
 		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) =
 			SharedSubcommands.revalidate(server, sender, args, LTPersistentData, "Linked Tank")
 	}
 
-
-	@Suppress("NOTHING_TO_INLINE")
-	private inline val Fluid?.nameComponent
-		get() = if(this == null) +"<empty>" else TextComponentTranslation(realUnlocalisedName)
+	private val Fluid?.nameComponent
+		inline get() = if(this == null) +"<empty>" else TextComponentTranslation(realUnlocalisedName)
 
 	// for some reason Fluid#getLocalisedName is overwritten but not this
 	private val Fluid.realUnlocalisedName: String
