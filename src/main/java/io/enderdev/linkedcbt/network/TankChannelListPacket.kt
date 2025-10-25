@@ -14,13 +14,10 @@ class TankChannelListPacket : BaseChannelListPacket<TankChannelData, ClientTankC
 	override fun writeChannel(buf: ByteBuf, channel: ClientTankChannelData) {
 		buf.writeInt(channel.id)
 		buf.writeString(channel.name)
-		buf.writeString(FluidRegistry.getFluidName(channel.fluid) ?: "")
-		buf.writeInt(channel.fluidAmount)
-		buf.writeInt(channel.fluidCapacity)
 	}
 
 	override fun readChannel(buf: ByteBuf) =
-		ClientTankChannelData(buf.readInt(), buf.readString(), FluidRegistry.getFluid(buf.readString()), buf.readInt(), buf.readInt())
+		ClientTankChannelData(buf.readInt(), buf.readString(), null, -1, -1)
 
 	constructor(id: Int) {
 		this.id = id
