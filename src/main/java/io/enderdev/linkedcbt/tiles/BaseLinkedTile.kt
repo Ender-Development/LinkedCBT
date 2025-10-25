@@ -300,12 +300,4 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 		AbstractButtonWrapper.registerWrapper(DeleteButtonWrapper::class.java)
 		AbstractButtonWrapper.registerWrapper(SideConfigurationButtonWrapper::class.java)
 	}
-
-	override fun getRenderBoundingBox(): AxisAlignedBB {
-		return super.getRenderBoundingBox().grow(2.0) // TODO is this needed?
-	}
-
-	override fun hasFastRenderer(): Boolean {
-		return true
-	}
 }
