@@ -14,7 +14,7 @@ object LCBTConfig {
 		@Config.RangeInt(min = 1, max = Int.MAX_VALUE)
 		var pushPullEvery = 1
 
-		// didn't feel like implementing right meow
+		// TODO: didn't feel like implementing right meow (implement this maybe? or maybe not ;p)
 		//@Config.Name("Push/pull slot limit")
 		//@Config.Comment("When processing push/pull operations, only the given amount of possible slots may be transferred at a time")
 		//@Config.RangeInt(min = 1, max = Constants.LINKED_CHEST_INVENTORY_SIZE)

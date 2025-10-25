@@ -11,6 +11,5 @@ import org.ender_development.catalyx.client.gui.wrappers.CapabilityFluidDisplayW
 class GuiLinkedTank(playerInv: IInventory, tile: TileLinkedTank) : BaseLinkedGui<TankChannelData, ClientTankChannelData, TileLinkedTank>(ContainerLinkedTank(playerInv, tile), tile, ClientTankChannelListManager) {
 	override val displayWrapper = CapabilityFluidDisplayWrapper(BAR_X, BAR_Y, BAR_W, BAR_H, tile::fluidHandler)
 
-	// TODO
-	// - fluid whitelist selector?
+	// TODO - fluid whitelist selector?
 }
