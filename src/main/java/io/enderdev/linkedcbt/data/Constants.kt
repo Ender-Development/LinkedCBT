@@ -19,7 +19,7 @@ internal object Constants {
 
 	const val LINKED_CHEST_INVENTORY_SIZE = 9 * 3
 
-	// client-side only, used in [toFakeChannelData] to try to avoid creating useless class instances
+	// client-side only, used to try to avoid creating useless class instances
 	val NO_LINKED_POSITIONS = HashSet<DimBlockPos>(0)
 
 	// special channel instances that have the id of [CREATE_NEW_CHANNEL]

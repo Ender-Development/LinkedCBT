@@ -2,6 +2,8 @@ package io.enderdev.linkedcbt
 
 import io.enderdev.linkedcbt.blocks.ModBlocks
 import io.enderdev.linkedcbt.command.LinkedCBTCommand
+import io.enderdev.linkedcbt.data.batteries.LBPersistentData
+import io.enderdev.linkedcbt.data.chests.LCPersistentData
 import io.enderdev.linkedcbt.data.tanks.LTPersistentData
 import io.enderdev.linkedcbt.items.ModItems
 import io.enderdev.linkedcbt.network.PacketHandler
@@ -63,9 +65,11 @@ object LinkedCBT : ICatalyxMod {
 	@SubscribeEvent
 	fun worldSave(ev: WorldEvent.Save) {
 		val currentTime = System.currentTimeMillis()
-		// write to disk at most every 250ms (5t) when caused by worlds saving to hopefully avoid writing the same data n times when all n dimensions save at the same time
-		if(currentTime - lastWriteCausedBySave > 250L) {
+		// write to disk at most every 500ms when caused by worlds saving to hopefully avoid writing the same data n times when all n dimensions save at the same time
+		if(currentTime - lastWriteCausedBySave > 500L) {
 			lastWriteCausedBySave = currentTime
+			LCPersistentData.write()
+			LBPersistentData.write()
 			LTPersistentData.write()
 		}
 	}

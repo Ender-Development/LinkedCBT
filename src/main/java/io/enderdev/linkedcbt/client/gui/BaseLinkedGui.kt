@@ -24,7 +24,6 @@ import org.ender_development.catalyx.client.gui.BaseGuiTyped
 import org.ender_development.catalyx.client.gui.wrappers.CapabilityDisplayWrapper
 import org.ender_development.catalyx.client.gui.wrappers.CapabilityEnergyDisplayWrapper
 import org.ender_development.catalyx.client.gui.wrappers.CapabilityFluidDisplayWrapper
-import org.ender_development.catalyx.utils.DevUtils
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 

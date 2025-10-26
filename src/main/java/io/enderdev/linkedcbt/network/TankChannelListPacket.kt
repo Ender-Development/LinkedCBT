@@ -5,7 +5,6 @@ import io.enderdev.linkedcbt.data.tanks.TankChannelData
 import io.enderdev.linkedcbt.data.tanks.client.ClientTankChannelData
 import io.netty.buffer.ByteBuf
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap
-import net.minecraftforge.fluids.FluidRegistry
 import org.ender_development.catalyx.utils.extensions.readString
 import org.ender_development.catalyx.utils.extensions.writeString
 import kotlin.random.Random
