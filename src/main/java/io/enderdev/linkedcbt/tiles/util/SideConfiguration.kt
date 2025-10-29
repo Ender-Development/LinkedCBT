@@ -63,6 +63,7 @@ enum class SideConfiguration(val named: String, val colour: TextFormatting) {
 		}
 
 	// should this be translatable? maybe.
+	// TODO make these rotation-aware
 	fun describe(facing: EnumFacing) =
 		"${facing.name.lowercase().replaceFirstChar(Char::uppercaseChar)} - $named"
 }

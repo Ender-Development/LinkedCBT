@@ -1,22 +1,13 @@
 {
 	"forge_marker": 1,
 	"defaults": {
-		"model": "catalyx:layered_cube_merged",
-		"textures": {
-			"particle": "linkedcbt:blocks/tank_front",
-			"up": "linkedcbt:blocks/tank_top",
-			"down": "linkedcbt:blocks/tank_bottom",
-			"north": "linkedcbt:blocks/tank_front",
-			"south": "linkedcbt:blocks/tank_side",
-			"east": "linkedcbt:blocks/tank_side",
-			"west": "linkedcbt:blocks/tank_side"
-		}
+		"model": "linkedcbt:linked_tank"
 	},
 	"variants": {
 		"normal": [{}],
 		"inventory": [{}],
 		"facing": {
-			"north": {"y": 0},
+			"north": {},
 			"east": {"y": 90},
 			"south": {"y": 180},
 			"west": {"y": 270}

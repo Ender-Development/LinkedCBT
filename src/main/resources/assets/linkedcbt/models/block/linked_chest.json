@@ -1,6 +1,10 @@
 {
 	"parent": "block/cube_all",
 	"textures": {
-		"all": "linkedcbt:blocks/linked_chest"
+		"all": "linkedcbt:blocks/linked_chest_side",
+		"particle": "linkedcbt:blocks/linked_chest_front",
+		"north": "linkedcbt:blocks/linked_chest_front",
+		"up": "linkedcbt:blocks/linked_chest_top",
+		"down": "linkedcbt:blocks/linked_chest_bottom"
 	}
 }

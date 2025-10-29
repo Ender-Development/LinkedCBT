@@ -18,4 +18,5 @@ class LinkedTankBlock : BaseRotatableMachineBlock(LinkedCBT, "linked_tank", Link
 
 	// TODO: Once the TESR stuff in catalyx is ready, use it to draw the fluid inside the tank on its block model
 	// We already do something similar in Alchemistry Redox with the Evaporator, so it can possibly be reused here
+	// ^ this doesn't need to be a TESR, it can be a simple BlockColorHandler thingy
 }
