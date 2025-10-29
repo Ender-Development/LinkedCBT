@@ -1,10 +1,33 @@
 {
 	"forge_marker": 1,
 	"defaults": {
-		"model": "linkedcbt:linked_battery"
+		"model": "catalyx:layered_cube_merged",
+		"textures": {
+			"particle": "linkedcbt:blocks/battery_front_off",
+			"up": "linkedcbt:blocks/battery_top",
+			"down": "linkedcbt:blocks/battery_bottom",
+			"north": "linkedcbt:blocks/battery_front_off",
+			"south": "linkedcbt:blocks/battery_side",
+			"east": "linkedcbt:blocks/battery_side",
+			"west": "linkedcbt:blocks/battery_side"
+		}
 	},
 	"variants": {
 		"normal": [{}],
-		"inventory": [{}]
+		"inventory": [{}],
+		"facing": {
+			"north": {"y": 0},
+			"east": {"y": 90},
+			"south": {"y": 180},
+			"west": {"y": 270}
+		},
+		"contains_energy" : {
+			"true": {
+				"textures": {
+					"north": "linkedcbt:blocks/battery_front_on"
+				}
+			},
+			"false": {}
+		}
 	}
 }

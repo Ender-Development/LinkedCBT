@@ -7,12 +7,15 @@ import io.enderdev.linkedcbt.tiles.TileLinkedTank
 import net.minecraft.block.state.IBlockState
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
-import org.ender_development.catalyx.blocks.BaseMachineBlock
+import org.ender_development.catalyx.blocks.BaseRotatableMachineBlock
 
-class LinkedTankBlock : BaseMachineBlock(LinkedCBT, "linked_tank", LinkedCBT.guiHandler.registerId(TileLinkedTank::class.java, ContainerLinkedTank::class.java) { GuiLinkedTank::class.java }) {
+class LinkedTankBlock : BaseRotatableMachineBlock(LinkedCBT, "linked_tank", LinkedCBT.guiHandler.registerId(TileLinkedTank::class.java, ContainerLinkedTank::class.java) { GuiLinkedTank::class.java }) {
 	override fun breakBlock(world: World, pos: BlockPos, state: IBlockState) {
 		// super destroys the TE
 		(world.getTileEntity(pos) as? TileLinkedTank)?.notifyBreak()
 		super.breakBlock(world, pos, state)
 	}
+
+	// TODO: Once the TESR stuff in catalyx is ready, use it to draw the fluid inside the tank on its block model
+	// We already do something similar in Alchemistry Redox with the Evaporator, so it can possibly be reused here
 }
