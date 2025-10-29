@@ -8,6 +8,9 @@ import net.minecraft.block.BlockHorizontal
 import net.minecraft.block.properties.PropertyBool
 import net.minecraft.block.state.BlockStateContainer
 import net.minecraft.block.state.IBlockState
+import net.minecraft.entity.EntityLivingBase
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.EnumHand
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
@@ -31,9 +34,20 @@ class LinkedBatteryBlock : BaseRotatableMachineBlock(LinkedCBT, "linked_battery"
 		super.breakBlock(world, pos, state)
 	}
 
-	@Deprecated("Implementation is fine.")
-	override fun getActualState(state: IBlockState, world: IBlockAccess, pos: BlockPos): IBlockState {
-		val tile = world.getTileEntity(pos) as? TileLinkedBattery ?: return state
-		return state.withProperty(hasEnergy, tile.channelData?.energyAmount?.compareTo(0) == 1)
+	override fun getStateForPlacement(world: World, pos: BlockPos, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float, meta: Int, placer: EntityLivingBase, hand: EnumHand): IBlockState =
+		super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer, hand).withProperty(hasEnergy, false)
+
+	@Deprecated("")
+	override fun getStateFromMeta(meta: Int): IBlockState =
+		@Suppress("DEPRECATION")
+		super.getStateFromMeta(meta and 0b0011).withProperty(hasEnergy, meta and 0b0100 != 0)
+
+	override fun getMetaFromState(state: IBlockState) =
+		super.getMetaFromState(state) or (if(state.getValue(hasEnergy)) 0b0100 else 0)
+
+	@Deprecated("")
+	override fun shouldSideBeRendered(blockState: IBlockState, blockAccess: IBlockAccess, pos: BlockPos, side: EnumFacing): Boolean {
+		val other = blockAccess.getBlockState(pos.offset(side)).block
+		return other !== ModBlocks.linkedBattery && other !== ModBlocks.linkedTank && other !== ModBlocks.linkedChest
 	}
 }

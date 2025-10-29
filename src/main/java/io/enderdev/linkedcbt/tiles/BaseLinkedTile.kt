@@ -1,9 +1,11 @@
 package io.enderdev.linkedcbt.tiles
 
 import io.enderdev.linkedcbt.LinkedCBT
+import io.enderdev.linkedcbt.client.tesr.SideConfigurationTESR
 import io.enderdev.linkedcbt.data.Constants
 import io.enderdev.linkedcbt.data.base.BaseChannelData
 import io.enderdev.linkedcbt.data.base.BasePersistentData
+import io.enderdev.linkedcbt.items.ModItems
 import io.enderdev.linkedcbt.tiles.buttons.DeleteButtonWrapper
 import io.enderdev.linkedcbt.tiles.buttons.LinkButtonWrapper
 import io.enderdev.linkedcbt.tiles.buttons.RenameButtonWrapper
@@ -12,6 +14,7 @@ import io.enderdev.linkedcbt.tiles.util.BaseSideConfiguration
 import io.enderdev.linkedcbt.util.BaseLinkedHandler
 import io.enderdev.linkedcbt.util.extensions.dim
 import io.enderdev.linkedcbt.util.extensions.dimId
+import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.NetworkManager
@@ -19,17 +22,22 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ITickable
 import net.minecraftforge.common.capabilities.Capability
+import net.minecraftforge.fml.client.registry.ClientRegistry
 import org.ender_development.catalyx.client.button.AbstractButtonWrapper
 import org.ender_development.catalyx.client.button.PauseButtonWrapper
 import org.ender_development.catalyx.client.button.RedstoneButtonWrapper
 import org.ender_development.catalyx.client.gui.BaseGuiTyped
+import org.ender_development.catalyx.client.tesr.AbstractTESRenderer
+import org.ender_development.catalyx.client.tesr.HudInfoRenderer
+import org.ender_development.catalyx.client.tesr.TileRenderer
 import org.ender_development.catalyx.tiles.BaseTile
-import org.ender_development.catalyx.tiles.helper.IButtonTile
-import org.ender_development.catalyx.tiles.helper.ICopyPasteExtraTile
-import org.ender_development.catalyx.tiles.helper.IGuiTile
+import org.ender_development.catalyx.tiles.helper.*
+import org.ender_development.catalyx.utils.SideUtils
+import org.ender_development.catalyx.utils.extensions.withAlpha
+import java.awt.Color
 import java.util.*
 
-abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_HANDLER>, CH_DATA : BaseChannelData<CH_DATA, *>, CAP_TYPE : Any, LINKED_HANDLER : BaseLinkedHandler<CAP_TYPE, CH_DATA>>(val persistentData: BasePersistentData<CH_DATA, TE>, val capType: Capability<CAP_TYPE>) : BaseTile(LinkedCBT), ITickable, IGuiTile, IButtonTile, BaseGuiTyped.IDefaultButtonVariables, ICopyPasteExtraTile {
+abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_HANDLER>, CH_DATA : BaseChannelData<CH_DATA, *>, CAP_TYPE : Any, LINKED_HANDLER : BaseLinkedHandler<CAP_TYPE, CH_DATA>>(val persistentData: BasePersistentData<CH_DATA, TE>, val capType: Capability<CAP_TYPE>) : BaseTile(LinkedCBT), ITickable, IGuiTile, IButtonTile, BaseGuiTyped.IDefaultButtonVariables, ICopyPasteExtraTile, ITESRTile, IHudInfoProvider {
 	override var isPaused = false
 	override var needsRedstonePower = false
 
@@ -276,6 +284,24 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 			null
 	}
 
+	// ITESRTile
+	override val renderers: Array<AbstractTESRenderer>
+		get() {
+			val player = Minecraft.getMinecraft().player
+			val shifting = player.isSneaking
+			val holdingSideConfigurator = player.heldItemMainhand.item === ModItems.sideConfigurator
+			return when {
+				!shifting && !holdingSideConfigurator -> emptyArray()
+				!shifting && holdingSideConfigurator -> arrayOf(SideConfigurationTESR)
+				shifting && !holdingSideConfigurator -> arrayOf(HudInfoRenderer)
+				else -> arrayOf(HudInfoRenderer, SideConfigurationTESR)
+			}
+		}
+
+	// IHudInfoProvider
+	override fun getHudInfo(face: EnumFacing) =
+		arrayOf(HudInfoLine("${face.name.lowercase().replaceFirstChar(Char::uppercaseChar)} - ${sideConfiguration[face].named}", Color.LIGHT_GRAY, Color.DARK_GRAY.withAlpha(.5f)))
+
 	// ICopyPasteExtraTile
 	override fun copyData(tag: NBTTagCompound) {
 		tag.setInteger("ChannelId", channelId)
@@ -301,5 +327,8 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 		AbstractButtonWrapper.registerWrapper(RenameButtonWrapper::class.java)
 		AbstractButtonWrapper.registerWrapper(DeleteButtonWrapper::class.java)
 		AbstractButtonWrapper.registerWrapper(SideConfigurationButtonWrapper::class.java)
+
+		if(SideUtils.isDedicatedClient)
+			ClientRegistry.bindTileEntitySpecialRenderer(this::class.java, TileRenderer)
 	}
 }
