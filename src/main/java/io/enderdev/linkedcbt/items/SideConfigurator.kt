@@ -65,7 +65,7 @@ class SideConfigurator : BaseItem(LinkedCBT, "side_configurator") {
 		if(mousedOver.typeOfHit != RayTraceResult.Type.BLOCK)
 			return
 
-		val te = mc.world.getTileEntity(mousedOver.blockPos ?: return) as? TileLinkedTank ?: return
+		val te = mc.world.getTileEntity(mousedOver.blockPos ?: return) as? BaseLinkedTile<*, *, *, *> ?: return
 		val res = ev.resolution
 		val facing = mousedOver.sideHit
 		val side = te.sideConfiguration[facing]
