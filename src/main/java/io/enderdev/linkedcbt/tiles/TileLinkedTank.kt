@@ -1,5 +1,6 @@
 package io.enderdev.linkedcbt.tiles
 
+import io.enderdev.linkedcbt.blocks.LinkedTankBlock
 import io.enderdev.linkedcbt.data.Constants
 import io.enderdev.linkedcbt.data.tanks.LTPersistentData
 import io.enderdev.linkedcbt.data.tanks.TankChannelData
@@ -47,5 +48,21 @@ class TileLinkedTank : BaseLinkedTile<TileLinkedTank, TankChannelData, IFluidHan
 			FluidUtil.interactWithFluidHandler(player, hand, world, pos, facing).also { markDirtyGUI() }
 
 		return false
+	}
+
+	val currentlyHasFluid
+		inline get() = channelData?.fluid != null
+
+	var hasFluidPreviously = false
+	// change the behaviour of super@BaseLinkedTile without overriding everything because this is easier
+	override fun markDirtyGUI() {
+		val currentlyHasFluid = currentlyHasFluid
+		if(world != null && currentlyHasFluid != hasFluidPreviously) {
+			// similar to [markDirtyClient]
+			world.setBlockState(pos, world.getBlockState(pos).withProperty(LinkedTankBlock.forceUpdate, currentlyHasFluid), 2)
+			markDirty()
+			hasFluidPreviously = currentlyHasFluid
+		} else
+			super.markDirtyGUI()
 	}
 }

@@ -7,6 +7,9 @@ import io.enderdev.linkedcbt.data.chests.LCPersistentData
 import io.enderdev.linkedcbt.data.tanks.LTPersistentData
 import io.enderdev.linkedcbt.items.ModItems
 import io.enderdev.linkedcbt.network.PacketHandler
+import io.enderdev.linkedcbt.tiles.TileLinkedTank
+import io.enderdev.linkedcbt.util.extensions.getRealColor
+import net.minecraft.client.Minecraft
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.common.config.Config
@@ -15,6 +18,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.client.event.ConfigChangedEvent
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.Mod.EventHandler
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -53,6 +57,17 @@ object LinkedCBT : ICatalyxMod {
 		MinecraftForge.EVENT_BUS.register(this)
 		if(SideUtils.isClient)
 			MinecraftForge.EVENT_BUS.register(ModItems.sideConfigurator)
+	}
+
+	@EventHandler
+	fun postInit(ev: FMLPostInitializationEvent) {
+		if(SideUtils.isClient)
+			Minecraft.getMinecraft().blockColors.registerBlockColorHandler({ state, world, pos, tintIndex ->
+				if(tintIndex != 0 || world == null || pos == null)
+					return@registerBlockColorHandler -1
+				val te = world.getTileEntity(pos) as? TileLinkedTank ?: return@registerBlockColorHandler -1
+				return@registerBlockColorHandler (te.fluidHandler.fluid?.getRealColor() ?: -1).also(::println)
+			}, ModBlocks.linkedTank)
 	}
 
 	@EventHandler

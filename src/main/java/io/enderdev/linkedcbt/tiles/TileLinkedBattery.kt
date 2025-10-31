@@ -37,7 +37,7 @@ class TileLinkedBattery : BaseLinkedTile<TileLinkedBattery, BatteryChannelData, 
 		val currentlyHasEnergy = currentlyHasEnergy
 		if(world != null && currentlyHasEnergy != hadEnergyPreviously) {
 			// similar to [markDirtyClient]
-			world.setBlockState(pos, world.getBlockState(pos).withProperty(LinkedBatteryBlock.hasEnergy, currentlyHasEnergy), 6)
+			world.setBlockState(pos, world.getBlockState(pos).withProperty(LinkedBatteryBlock.hasEnergy, currentlyHasEnergy), 2)
 			markDirty()
 			hadEnergyPreviously = currentlyHasEnergy
 		} else
