@@ -2,25 +2,24 @@ package io.enderdev.linkedcbt.client.tesr
 
 import io.enderdev.linkedcbt.LCBTConfig
 import io.enderdev.linkedcbt.tiles.TileLinkedTank
-import io.enderdev.linkedcbt.util.ConfigHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import org.ender_development.catalyx.client.tesr.AbstractTESRenderer
-import org.ender_development.catalyx.config.ConfigHandler
 import org.ender_development.catalyx.tiles.BaseTile
+import org.ender_development.catalyx.utils.Delegates
 import org.ender_development.catalyx.utils.RenderUtils
 import org.ender_development.catalyx.utils.extensions.withAlpha
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 
 internal object LinkedTankTESR : AbstractTESRenderer() {
-	val color = ConfigHelper({ LCBTConfig.client.tankOverlayAlpha }) { Color.WHITE.withAlpha(it / 100f) }
+	val color by Delegates.cachedConfigParser({ LCBTConfig.client.tankOverlayAlpha }) { Color.WHITE.withAlpha(it / 100f) }
 
-	override fun render(te: BaseTile, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float) {
-		if(te !is TileLinkedTank)
+	override fun render(tileEntity: BaseTile, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float) {
+		if(tileEntity !is TileLinkedTank)
 			return
 
-		val fluid = te.fluidHandler.contents
+		val fluid = tileEntity.fluidHandler.contents
 		if(fluid == null)
 			return
 
@@ -30,7 +29,7 @@ internal object LinkedTankTESR : AbstractTESRenderer() {
 		val minV = icon.minV.toDouble() * icon.iconHeight
 		val maxV = icon.maxV.toDouble() * icon.iconHeight
 
-		SideConfigurationTESR.translateToSide(te.facing, x, y, z)
+		SideConfigurationTESR.translateToSide(tileEntity.facing, x, y, z)
 		// the beginning is basically SCTESR#renderTexture
 		GlStateManager.pushMatrix()
 
@@ -40,7 +39,7 @@ internal object LinkedTankTESR : AbstractTESRenderer() {
 		GlStateManager.color(1f, 1f, 1f, 1f)
 		GlStateManager.enableBlend()
 		RenderUtils.bindBlockTexture()
-		drawScaledCustomSizeModalRect(OFFSET_X, OFFSET_Y, minU, minV, (maxU - minU) * WIDTH_SCALE, (maxV - minV) * HEIGHT_SCALE, WIDTH, HEIGHT, 16.0, 16.0, color = color.value)
+		drawScaledCustomSizeModalRect(OFFSET_X, OFFSET_Y, minU, minV, (maxU - minU) * WIDTH_SCALE, (maxV - minV) * HEIGHT_SCALE, WIDTH, HEIGHT, 16.0, 16.0, color = color)
 
 		GlStateManager.disableBlend()
 		GlStateManager.popMatrix()
