@@ -16,7 +16,7 @@ import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
 import org.ender_development.catalyx.blocks.BaseRotatableMachineBlock
 
-class LinkedBatteryBlock : BaseRotatableMachineBlock(LinkedCBT, "linked_battery", LinkedCBT.guiHandler.registerId(TileLinkedBattery::class.java, ContainerLinkedBattery::class.java) { GuiLinkedBattery::class.java }) {
+class LinkedBatteryBlock : BaseLinkedBlock("battery", LinkedCBT.guiHandler.registerId(TileLinkedBattery::class.java, ContainerLinkedBattery::class.java) { GuiLinkedBattery::class.java }) {
 	companion object {
 		val hasEnergy: PropertyBool = PropertyBool.create("has_energy")
 	}
@@ -28,12 +28,6 @@ class LinkedBatteryBlock : BaseRotatableMachineBlock(LinkedCBT, "linked_battery"
 	override fun createBlockState() =
 		BlockStateContainer(this, BlockHorizontal.FACING, hasEnergy)
 
-	override fun breakBlock(world: World, pos: BlockPos, state: IBlockState) {
-		// super destroys the TE
-		(world.getTileEntity(pos) as? TileLinkedBattery)?.notifyBreak()
-		super.breakBlock(world, pos, state)
-	}
-
 	override fun getStateForPlacement(world: World, pos: BlockPos, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float, meta: Int, placer: EntityLivingBase, hand: EnumHand): IBlockState =
 		super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer, hand).withProperty(hasEnergy, false)
 
@@ -44,10 +38,4 @@ class LinkedBatteryBlock : BaseRotatableMachineBlock(LinkedCBT, "linked_battery"
 
 	override fun getMetaFromState(state: IBlockState) =
 		super.getMetaFromState(state) or (if(state.getValue(hasEnergy)) 0b0100 else 0)
-
-	@Deprecated("")
-	override fun shouldSideBeRendered(blockState: IBlockState, blockAccess: IBlockAccess, pos: BlockPos, side: EnumFacing): Boolean {
-		val other = blockAccess.getBlockState(pos.offset(side)).block
-		return other !== ModBlocks.linkedBattery && other !== ModBlocks.linkedTank && other !== ModBlocks.linkedChest
-	}
 }

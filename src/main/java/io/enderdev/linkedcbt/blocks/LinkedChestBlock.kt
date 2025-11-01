@@ -11,16 +11,4 @@ import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
 import org.ender_development.catalyx.blocks.BaseRotatableMachineBlock
 
-class LinkedChestBlock : BaseRotatableMachineBlock(LinkedCBT, "linked_chest", LinkedCBT.guiHandler.registerId(TileLinkedChest::class.java, ContainerLinkedChest::class.java) { GuiLinkedChest::class.java }) {
-	override fun breakBlock(world: World, pos: BlockPos, state: IBlockState) {
-		// super destroys the TE
-		(world.getTileEntity(pos) as? TileLinkedChest)?.notifyBreak()
-		super.breakBlock(world, pos, state)
-	}
-
-	@Deprecated("")
-	override fun shouldSideBeRendered(blockState: IBlockState, blockAccess: IBlockAccess, pos: BlockPos, side: EnumFacing): Boolean {
-		val other = blockAccess.getBlockState(pos.offset(side)).block
-		return other !== ModBlocks.linkedBattery && other !== ModBlocks.linkedTank && other !== ModBlocks.linkedChest
-	}
-}
+class LinkedChestBlock : BaseLinkedBlock("chest", LinkedCBT.guiHandler.registerId(TileLinkedChest::class.java, ContainerLinkedChest::class.java) { GuiLinkedChest::class.java })

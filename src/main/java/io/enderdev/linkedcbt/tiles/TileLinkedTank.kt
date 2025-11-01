@@ -1,6 +1,7 @@
 package io.enderdev.linkedcbt.tiles
 
-import io.enderdev.linkedcbt.blocks.LinkedTankBlock
+import io.enderdev.linkedcbt.LCBTConfig
+import io.enderdev.linkedcbt.client.tesr.LinkedTankTESR
 import io.enderdev.linkedcbt.data.Constants
 import io.enderdev.linkedcbt.data.tanks.LTPersistentData
 import io.enderdev.linkedcbt.data.tanks.TankChannelData
@@ -16,6 +17,7 @@ import net.minecraft.world.World
 import net.minecraftforge.fluids.FluidRegistry
 import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fluids.capability.IFluidHandler
+import org.ender_development.catalyx.client.tesr.AbstractTESRenderer
 import org.ender_development.catalyx.tiles.helper.IFluidTile
 import java.util.*
 
@@ -45,24 +47,17 @@ class TileLinkedTank : BaseLinkedTile<TileLinkedTank, TankChannelData, IFluidHan
 
 		val heldItem = player.getHeldItem(hand)
 		if(heldItem.hasCapability(ITEM_FLUID_CAP, facing) || heldItem.hasCapability(FLUID_CAP, facing))
-			FluidUtil.interactWithFluidHandler(player, hand, world, pos, facing).also { markDirtyGUI() }
+			return FluidUtil.interactWithFluidHandler(player, hand, world, pos, facing).also { markDirtyGUI() }
 
 		return false
 	}
 
-	val currentlyHasFluid
-		inline get() = channelData?.fluid != null
-
-	var hasFluidPreviously = false
-	// change the behaviour of super@BaseLinkedTile without overriding everything because this is easier
-	override fun markDirtyGUI() {
-		val currentlyHasFluid = currentlyHasFluid
-		if(world != null && currentlyHasFluid != hasFluidPreviously) {
-			// similar to [markDirtyClient]
-			world.setBlockState(pos, world.getBlockState(pos).withProperty(LinkedTankBlock.forceUpdate, currentlyHasFluid), 2)
-			markDirty()
-			hasFluidPreviously = currentlyHasFluid
-		} else
-			super.markDirtyGUI()
-	}
+	override val renderers: Array<AbstractTESRenderer>
+		get() {
+			val default = super.renderers
+			return if(LCBTConfig.client.tankOverlayAlpha == 0)
+				default
+			else
+				default + LinkedTankTESR
+		}
 }

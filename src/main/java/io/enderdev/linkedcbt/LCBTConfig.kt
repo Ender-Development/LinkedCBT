@@ -4,13 +4,14 @@ import net.minecraftforge.common.config.Config
 
 @Config(modid = Tags.MOD_ID, name = Tags.MOD_ID)
 object LCBTConfig {
-	@JvmStatic
+	@JvmField
 	@Config.Name("Chests")
 	val chests = Chests()
 
 	class Chests() {
+		@JvmField
 		@Config.Name("Push/pull only every [ticks]")
-		@Config.Comment("Process push/pull operations only every [ticks] (i.e. 1 => every tick, 2 => every other tick, …)")
+		@Config.Comment("Process push/pull operations only every N ticks (i.e. 1 => every tick, 2 => every other tick, …)")
 		@Config.RangeInt(min = 1, max = Int.MAX_VALUE)
 		var pushPullEvery = 1
 
@@ -21,16 +22,18 @@ object LCBTConfig {
 		//var pushPullMaxSlots = 2
 	}
 
-	@JvmStatic
+	@JvmField
 	@Config.Name("Batteries")
 	val batteries = Batteries()
 
 	class Batteries {
+		@JvmField
 		@Config.Name("Battery capacity")
 		@Config.Comment("Max energy amount [FE] stored in a channel")
 		@Config.RangeInt(min = 1, max = Int.MAX_VALUE)
 		var capacity = 20000
 
+		@JvmField
 		@Config.Name("Battery capacity changes with battery count")
 		@Config.Comment(
 			"Should battery capacity be multiplied by the total amount of batteries in a channel",
@@ -38,6 +41,7 @@ object LCBTConfig {
 		)
 		var capacityChangesWithBatteryCount = false
 
+		@JvmField
 		@Config.Name("Max battery push/pull throughput per side")
 		@Config.Comment(
 			"Max energy amount [FE] that a battery will try to push/pull per side per tick",
@@ -47,16 +51,18 @@ object LCBTConfig {
 		var maxPushPullThroughput = 1500
 	}
 
-	@JvmStatic
+	@JvmField
 	@Config.Name("Tanks")
 	val tanks = Tanks()
 
 	class Tanks {
+		@JvmField
 		@Config.Name("Tank capacity")
 		@Config.Comment("Max fluid amount [mB] stored in a channel")
 		@Config.RangeInt(min = 1, max = Int.MAX_VALUE)
 		var capacity = 8000
 
+		@JvmField
 		@Config.Name("Tank capacity changes with tank count")
 		@Config.Comment(
 			"Should tank capacity be multiplied by the total amount of tanks in a channel",
@@ -64,6 +70,7 @@ object LCBTConfig {
 		)
 		var capacityChangesWithTankCount = false
 
+		@JvmField
 		@Config.Name("Max tank push/pull throughput per side")
 		@Config.Comment(
 			"Max fluid amount [mB] that a tank will try to push/pull per side per tick",
@@ -71,6 +78,30 @@ object LCBTConfig {
 		)
 		@Config.RangeInt(min = 0, max = Int.MAX_VALUE)
 		var maxPushPullThroughput = 250
+	}
+
+	@JvmField
+	@Config.Name("Client-side settings")
+	val client = Client()
+
+	class Client {
+		@JvmField
+		@Config.Name("Linked Tank - fluid overlay transparency")
+		@Config.Comment(
+			"The transparency of the overlay of the currently stored fluid in a Linked Tank (in %)",
+			"0 to disable"
+		)
+		@Config.RangeInt(min = 0, max = 100)
+		var tankOverlayAlpha = 75
+
+		enum class OverlaySetting {
+			ALWAYS, SIDE_CONFIGURATOR, NEVER;
+		}
+
+		@JvmField
+		@Config.Name("I/O overlay")
+		@Config.Comment("When to show the I/O overlay on linked blocks")
+		var overlaySetting = OverlaySetting.SIDE_CONFIGURATOR
 	}
 
 	fun jvmLoadClass() {}

@@ -1,5 +1,6 @@
 package io.enderdev.linkedcbt.tiles
 
+import io.enderdev.linkedcbt.LCBTConfig
 import io.enderdev.linkedcbt.LinkedCBT
 import io.enderdev.linkedcbt.client.tesr.SideConfigurationTESR
 import io.enderdev.linkedcbt.data.Constants
@@ -290,7 +291,8 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 		get() {
 			val player = Minecraft.getMinecraft().player
 			val shifting = player.isSneaking
-			val holdingSideConfigurator = player.heldItemMainhand.item === ModItems.sideConfigurator
+			val config = LCBTConfig.client.overlaySetting
+			val holdingSideConfigurator = config === LCBTConfig.Client.OverlaySetting.ALWAYS || (config === LCBTConfig.Client.OverlaySetting.SIDE_CONFIGURATOR && player.heldItemMainhand.item === ModItems.sideConfigurator)
 			return when {
 				!shifting && !holdingSideConfigurator -> emptyArray()
 				!shifting && holdingSideConfigurator -> arrayOf(SideConfigurationTESR)
