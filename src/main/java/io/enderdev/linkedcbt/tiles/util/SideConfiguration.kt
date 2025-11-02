@@ -2,6 +2,7 @@ package io.enderdev.linkedcbt.tiles.util
 
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.text.TextFormatting
+import org.ender_development.catalyx.utils.extensions.relativeDirectionTo
 
 enum class SideConfiguration(val named: String, val colour: TextFormatting) {
 	/**
@@ -62,8 +63,6 @@ enum class SideConfiguration(val named: String, val colour: TextFormatting) {
 			PULL, OUTPUT, PUSH -> 62
 		}
 
-	// should this be translatable? maybe.
-	// TODO make these rotation-aware
-	fun describe(facing: EnumFacing) =
-		"${facing.name.lowercase().replaceFirstChar(Char::uppercaseChar)} - $named"
+	fun describe(facing: EnumFacing, relativeTo: EnumFacing) =
+		"${relativeTo.relativeDirectionTo(facing).name.lowercase().replaceFirstChar(Char::uppercaseChar)} - $named"
 }

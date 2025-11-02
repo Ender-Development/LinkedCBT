@@ -17,7 +17,6 @@ import io.enderdev.linkedcbt.util.extensions.dim
 import io.enderdev.linkedcbt.util.extensions.dimId
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.item.EnumDyeColor
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.SPacketUpdateTileEntity
@@ -35,6 +34,7 @@ import org.ender_development.catalyx.client.tesr.TileRenderer
 import org.ender_development.catalyx.tiles.BaseTile
 import org.ender_development.catalyx.tiles.helper.*
 import org.ender_development.catalyx.utils.SideUtils
+import org.ender_development.catalyx.utils.extensions.colorObject
 import org.ender_development.catalyx.utils.extensions.withAlpha
 import java.awt.Color
 import java.util.*
@@ -304,7 +304,7 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 	// IHudInfoProvider
 	override fun getHudInfo(face: EnumFacing): Array<HudInfoLine> {
 		val side = sideConfiguration[face]
-		return arrayOf(HudInfoLine("${face.name.lowercase().replaceFirstChar(Char::uppercaseChar)} - ${side.named}", Color(EnumDyeColor.entries.first { it.chatColor === side.colour }.colorValue), Color.DARK_GRAY.withAlpha(.5f)))
+		return arrayOf(HudInfoLine(side.describe(face, facing), side.colour.colorObject, Color.DARK_GRAY.withAlpha(.5f)))
 	}
 
 	// ICopyPasteExtraTile

@@ -24,6 +24,7 @@ import org.ender_development.catalyx.client.gui.BaseGuiTyped
 import org.ender_development.catalyx.client.gui.wrappers.CapabilityDisplayWrapper
 import org.ender_development.catalyx.client.gui.wrappers.CapabilityEnergyDisplayWrapper
 import org.ender_development.catalyx.client.gui.wrappers.CapabilityFluidDisplayWrapper
+import org.ender_development.catalyx.utils.extensions.colorValue
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
@@ -102,13 +103,14 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 
 	@Suppress("NOTHING_TO_INLINE") // this is only here to segment it off from initGui
 	private inline fun repositionAndUpdateSideConfigurationButtons() {
-		// .NU
-		// W.E
-		// .SD
+		// .BD
+		// L.R
+		// .FU
+		val front = tile.facing
 		val gridArrangement = arrayOf(
-			null, EnumFacing.NORTH, EnumFacing.UP,
-			EnumFacing.WEST, null, EnumFacing.EAST,
-			null, EnumFacing.SOUTH, EnumFacing.DOWN
+			null,            front.opposite, EnumFacing.DOWN,
+			front.rotateY(), null,           front.rotateYCCW(),
+			null,            front,          EnumFacing.UP
 		)
 
 		sideConfigurationButtons.forEach { btn ->
@@ -215,7 +217,7 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 				// this could be theoretically moved to [SideConfigurationButtonWrapper], but then I'd need to pass in the gridOffsetX/Y to it to properly position the text
 				sideConfigurationButtons.forEach { btn ->
 					if(btn.button!!.hovered)
-						drawCenteredString(FONT_RENDERER, "§${btn.side.colour.formattingCode}${btn.side.describe(btn.facing)}", SIDE_CONFIG_BTN_X + SIDE_CONFIG_TOOLTIP_OFF_X, SIDE_CONFIG_BTN_Y + SIDE_CONFIG_TOOLTIP_OFF_Y, 0)
+						drawCenteredString(FONT_RENDERER, btn.side.describe(btn.facing, tile.facing), SIDE_CONFIG_BTN_X + SIDE_CONFIG_TOOLTIP_OFF_X, SIDE_CONFIG_BTN_Y + SIDE_CONFIG_TOOLTIP_OFF_Y, btn.side.colour.colorValue)
 				}
 			}
 			CurrentDisplay.CHANNEL_LINK -> {
