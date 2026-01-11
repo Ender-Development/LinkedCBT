@@ -2,15 +2,15 @@
 	"type": "minecraft:crafting_shaped",
 	"pattern": [
 		"GOG",
-		"EBE",
+		"ECE",
 		"GRG"
 	],
 	"key": {
-		"B": { "item": "minecraft:redstone_block" },
-		"G": { "item": "minecraft:stained_glass", "data": 14 },
-		"E": { "item": "minecraft:ender_pearl" },
+		"C": { "type": "forge:ore_dict", "ore": "chest"},
+		"G": { "type": "forge:ore_dict", "ore": "blockGlassBrown"},
+		"E": { "type": "forge:ore_dict", "ore": "enderpearl" },
 		"R": { "item": "minecraft:redstone_torch" },
-		"O": { "item": "minecraft:gold_ingot" }
+		"O": { "type": "forge:ore_dict", "ore": "ingotGold"}
 	},
-	"result": { "item": "linked_battery" }
+	"result": { "item": "linked_chest" }
 }

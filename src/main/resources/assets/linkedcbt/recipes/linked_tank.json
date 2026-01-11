@@ -6,11 +6,11 @@
 		"GRG"
 	],
 	"key": {
-		"L": { "item": "minecraft:lapis_block" },
-		"G": { "type": "forge:ore_dict", "ore": "blockGlass"},
-		"E": { "item": "minecraft:ender_pearl" },
+		"L": { "type": "forge:ore_dict", "ore": "blockLapis"},
+		"G": { "type": "forge:ore_dict", "ore": "blockGlassBlue"},
+		"E": { "type": "forge:ore_dict", "ore": "enderpearl" },
 		"R": { "item": "minecraft:redstone_torch" },
-		"O": { "item": "minecraft:gold_ingot" }
+		"O": { "type": "forge:ore_dict", "ore": "ingotGold"}
 	},
 	"result": { "item": "linked_tank" }
 }
