@@ -20,7 +20,8 @@ class LinkButtonWrapper : AbstractButtonWrapper {
 		this.channelListManager = channelListManager
 	}
 
-	@Deprecated("only used by Catalyx with reflection", level = DeprecationLevel.HIDDEN)
+	@Deprecated("only used by Catalyx with Reflection", level = DeprecationLevel.HIDDEN)
+	@Suppress("unused")
 	constructor(x: Int, y: Int, width: Int, height: Int) : super(x, y, width, height)
 
 	// TODO create an icon for the unlink part instead of drawing text

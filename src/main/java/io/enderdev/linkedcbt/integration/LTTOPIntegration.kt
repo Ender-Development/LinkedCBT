@@ -2,6 +2,7 @@ package io.enderdev.linkedcbt.integration
 
 import io.enderdev.linkedcbt.Tags
 import io.enderdev.linkedcbt.data.Constants
+import io.enderdev.linkedcbt.tiles.BaseLinkedTile
 import io.enderdev.linkedcbt.tiles.TileLinkedTank
 import mcjty.theoneprobe.api.IProbeHitData
 import mcjty.theoneprobe.api.IProbeInfo
@@ -16,7 +17,7 @@ object LTTOPIntegration : IProbeInfoProvider {
 		Tags.MOD_ID
 
 	override fun addProbeInfo(mode: ProbeMode, info: IProbeInfo, player: EntityPlayer, world: World, state: IBlockState, data: IProbeHitData) {
-		val tile = world.getTileEntity(data.pos) as? TileLinkedTank ?: return
+		val tile = world.getTileEntity(data.pos) as? BaseLinkedTile<*, *, *, *> ?: return
 
 		info.text(when(tile.channelId) {
 			Constants.NO_CHANNEL -> "Unlinked"
