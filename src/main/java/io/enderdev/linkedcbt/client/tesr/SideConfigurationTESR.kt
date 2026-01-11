@@ -22,16 +22,17 @@ internal object SideConfigurationTESR : AbstractTESRenderer() {
 
 		te.sideConfiguration.sides.forEach { (side, state) ->
 			val texture = ResourceLocation(Tags.MOD_ID, "textures/blocks/io/${state.name.lowercase()}.png")
+
 			GlStateManager.pushMatrix()
+
 			translateToSide(side, x, y, z)
 			renderTexture(texture)
+
 			GlStateManager.popMatrix()
 		}
 	}
 
-	fun renderTexture(texture: ResourceLocation) {
-		GlStateManager.pushMatrix()
-
+	private fun renderTexture(texture: ResourceLocation) {
 		GlStateManager.shadeModel(if(Minecraft.isAmbientOcclusionEnabled()) GL11.GL_SMOOTH else GL11.GL_FLAT)
 
 		GlStateManager.translate(-.5, .0, .01)
@@ -39,9 +40,7 @@ internal object SideConfigurationTESR : AbstractTESRenderer() {
 		GlStateManager.color(1f, 1f, 1f, 1f)
 
 		RenderUtils.bindTexture(texture)
-		drawScaledCustomSizeModalRect(.0, .0, .0, .0, 16.0, 16.0, ONE_BLOCK_WIDTH, ONE_BLOCK_WIDTH, 16.0, 16.0)
-
-		GlStateManager.popMatrix()
+		RenderUtils.drawScaledCustomSizeModalRect(.0, .0, .0, .0, 16.0, 16.0, ONE_BLOCK_WIDTH, ONE_BLOCK_WIDTH, 16.0, 16.0)
 	}
 
 	/**

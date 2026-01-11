@@ -29,24 +29,23 @@ internal object LinkedTankTESR : AbstractTESRenderer() {
 		val minV = icon.minV.toDouble() * icon.iconHeight
 		val maxV = icon.maxV.toDouble() * icon.iconHeight
 
-		SideConfigurationTESR.translateToSide(tileEntity.facing, x, y, z)
-		// the beginning is basically SCTESR#renderTexture
 		GlStateManager.pushMatrix()
 
+		SideConfigurationTESR.translateToSide(tileEntity.facing, x, y, z)
+		// this is basically just SCTESR#renderTexture
 		GlStateManager.shadeModel(if(Minecraft.isAmbientOcclusionEnabled()) GL11.GL_SMOOTH else GL11.GL_FLAT)
 		GlStateManager.translate(-.5, .0, .0001)
 		GlStateManager.scale(TESR_MAGIC_NUMBER, -TESR_MAGIC_NUMBER, TESR_MAGIC_NUMBER)
 		GlStateManager.color(1f, 1f, 1f, 1f)
 		GlStateManager.enableBlend()
 		RenderUtils.bindBlockTexture()
-		drawScaledCustomSizeModalRect(OFFSET_X, OFFSET_Y, minU, minV, (maxU - minU) * WIDTH_SCALE, (maxV - minV) * HEIGHT_SCALE, WIDTH, HEIGHT, 16.0, 16.0, color = color)
-
+		RenderUtils.drawScaledCustomSizeModalRect(OFFSET_X, OFFSET_Y, minU, minV, (maxU - minU) * WIDTH_SCALE, (maxV - minV) * HEIGHT_SCALE, WIDTH, HEIGHT, 16.0, 16.0, color = color)
 		GlStateManager.disableBlend()
+
 		GlStateManager.popMatrix()
 	}
 
 	const val PX_PER_BLOCK = 16
-	const val PX_PER_BLOCK_D = 16.0
 	const val PX_OFFSET_X = 6
 	const val PX_OFFSET_Y = 3
 	const val PX_WIDTH = 4
@@ -56,7 +55,7 @@ internal object LinkedTankTESR : AbstractTESRenderer() {
 	const val OFFSET_Y = ONE_PX * PX_OFFSET_Y
 	const val WIDTH = ONE_PX * PX_WIDTH
 	const val HEIGHT = ONE_PX * PX_HEIGHT
-	const val WIDTH_SCALE = PX_WIDTH / PX_PER_BLOCK_D
-	const val HEIGHT_SCALE = PX_HEIGHT / PX_PER_BLOCK_D
+	const val WIDTH_SCALE = PX_WIDTH / PX_PER_BLOCK.toDouble()
+	const val HEIGHT_SCALE = PX_HEIGHT / PX_PER_BLOCK.toDouble()
 }
 
