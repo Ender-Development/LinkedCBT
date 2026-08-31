@@ -9,7 +9,7 @@ import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
-import org.ender_development.catalyx.blocks.BaseRotatableMachineBlock
+import org.ender_development.catalyx.core.blocks.BaseRotatableMachineBlock
 
 abstract class BaseLinkedBlock(type: String, guiId: Int) : BaseRotatableMachineBlock(LinkedCBT, "linked_$type", guiId) {
 	override fun breakBlock(world: World, pos: BlockPos, state: IBlockState) {

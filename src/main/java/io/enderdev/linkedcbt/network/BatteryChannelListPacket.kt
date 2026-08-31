@@ -5,8 +5,8 @@ import io.enderdev.linkedcbt.data.batteries.LBPersistentData
 import io.enderdev.linkedcbt.data.batteries.client.ClientBatteryChannelData
 import io.netty.buffer.ByteBuf
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap
-import org.ender_development.catalyx.utils.extensions.readString
-import org.ender_development.catalyx.utils.extensions.writeString
+import org.ender_development.catalyx.api.v1.common.extensions.readString
+import org.ender_development.catalyx.api.v1.common.extensions.writeString
 import kotlin.random.Random
 
 class BatteryChannelListPacket : BaseChannelListPacket<BatteryChannelData, ClientBatteryChannelData> {

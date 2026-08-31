@@ -21,8 +21,8 @@ import net.minecraft.world.World
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.ender_development.catalyx.items.BaseItem
-import org.ender_development.catalyx.utils.extensions.colorValue
+import org.ender_development.catalyx.api.v1.common.extensions.colorValue
+import org.ender_development.catalyx.core.items.BaseItem
 
 class SideConfigurator : BaseItem(LinkedCBT, "side_configurator") {
 	init {

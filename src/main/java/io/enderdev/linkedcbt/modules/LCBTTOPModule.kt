@@ -4,9 +4,9 @@ import io.enderdev.linkedcbt.Tags
 import io.enderdev.linkedcbt.integration.LTTOPIntegration
 import mcjty.theoneprobe.TheOneProbe
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
-import org.ender_development.catalyx.integration.Mods
-import org.ender_development.catalyx.modules.CatalyxModule
-import org.ender_development.catalyx.utils.extensions.subLogger
+import org.ender_development.catalyx.api.v1.common.Mods
+import org.ender_development.catalyx.api.v1.common.extensions.subLogger
+import org.ender_development.catalyx.api.v1.modules.annotations.CatalyxModule
 
 @CatalyxModule(
 	moduleId = LCBTModuleContainer.MODULE_TOP,

@@ -5,9 +5,9 @@ import io.enderdev.linkedcbt.tiles.TileLinkedChest
 import io.enderdev.linkedcbt.util.ItemUtils
 import net.minecraft.item.ItemStack
 import net.minecraftforge.items.IItemHandler
-import org.ender_development.catalyx.tiles.BaseTile.Companion.ITEM_CAP
-import org.ender_development.catalyx.utils.Delegates
-import org.ender_development.catalyx.utils.extensions.tryInsert
+import org.ender_development.catalyx.api.v1.common.extensions.tryInsert
+import org.ender_development.catalyx.core.tiles.BaseTile.Companion.ITEM_CAP
+import org.ender_development.catalyx.core.utils.Delegates
 
 class ItemSideConfiguration(val tile: TileLinkedChest) : BaseSideConfiguration<IItemHandler>() {
 	override val handler by Delegates.lazyProperty(tile::linkedHandler)

@@ -2,8 +2,8 @@ package io.enderdev.linkedcbt.modules
 
 import io.enderdev.linkedcbt.LinkedCBT
 import io.enderdev.linkedcbt.Tags
-import org.ender_development.catalyx.modules.CatalyxModule
-import org.ender_development.catalyx.modules.ICatalyxModule
+import org.ender_development.catalyx.api.v1.modules.annotations.CatalyxModule
+import org.ender_development.catalyx.api.v1.modules.interfaces.ICatalyxModule
 
 @CatalyxModule(
 	moduleId = LCBTModuleContainer.MODULE_CORE,

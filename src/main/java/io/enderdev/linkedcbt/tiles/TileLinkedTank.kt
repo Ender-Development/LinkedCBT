@@ -17,8 +17,8 @@ import net.minecraft.world.World
 import net.minecraftforge.fluids.FluidRegistry
 import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fluids.capability.IFluidHandler
-import org.ender_development.catalyx.client.tesr.AbstractTESRenderer
-import org.ender_development.catalyx.tiles.helper.IFluidTile
+import org.ender_development.catalyx.core.client.tesr.AbstractTESRenderer
+import org.ender_development.catalyx.core.tiles.helper.IFluidTile
 import java.util.*
 
 class TileLinkedTank : BaseLinkedTile<TileLinkedTank, TankChannelData, IFluidHandler, LinkedFluidHandler>(LTPersistentData, FLUID_CAP), IFluidTile {

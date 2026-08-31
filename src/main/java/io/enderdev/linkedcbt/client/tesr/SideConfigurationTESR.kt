@@ -6,13 +6,13 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
-import org.ender_development.catalyx.client.tesr.AbstractTESRenderer
-import org.ender_development.catalyx.tiles.BaseTile
-import org.ender_development.catalyx.utils.RenderUtils
-import org.ender_development.catalyx.utils.extensions.glOffsetX
-import org.ender_development.catalyx.utils.extensions.glOffsetZ
-import org.ender_development.catalyx.utils.extensions.glRotate
-import org.ender_development.catalyx.utils.extensions.glRotationAngle
+import org.ender_development.catalyx.api.v1.common.extensions.glOffsetX
+import org.ender_development.catalyx.api.v1.common.extensions.glOffsetZ
+import org.ender_development.catalyx.api.v1.common.extensions.glRotate
+import org.ender_development.catalyx.api.v1.common.extensions.glRotationAngle
+import org.ender_development.catalyx.core.client.tesr.AbstractTESRenderer
+import org.ender_development.catalyx.core.tiles.BaseTile
+import org.ender_development.catalyx.core.utils.RenderUtils
 import org.lwjgl.opengl.GL11
 
 internal object SideConfigurationTESR : AbstractTESRenderer() {

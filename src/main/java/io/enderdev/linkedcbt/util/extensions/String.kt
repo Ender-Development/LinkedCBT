@@ -4,7 +4,7 @@ package io.enderdev.linkedcbt.util.extensions
 
 import io.enderdev.linkedcbt.client.gui.BaseLinkedGui
 import net.minecraft.util.text.TextComponentString
-import org.ender_development.catalyx.utils.extensions.translate
+import org.ender_development.catalyx.api.v1.common.extensions.translate
 
 inline fun String.component() =
 	TextComponentString(this)

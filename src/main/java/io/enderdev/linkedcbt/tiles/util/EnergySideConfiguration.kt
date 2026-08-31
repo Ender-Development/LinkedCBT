@@ -4,8 +4,8 @@ import io.enderdev.linkedcbt.LCBTConfig
 import io.enderdev.linkedcbt.tiles.TileLinkedBattery
 import io.enderdev.linkedcbt.util.EnergyUtils
 import net.minecraftforge.energy.IEnergyStorage
-import org.ender_development.catalyx.tiles.BaseTile.Companion.ENERGY_CAP
-import org.ender_development.catalyx.utils.Delegates
+import org.ender_development.catalyx.core.tiles.BaseTile.Companion.ENERGY_CAP
+import org.ender_development.catalyx.core.utils.Delegates
 
 class EnergySideConfiguration(val tile: TileLinkedBattery) : BaseSideConfiguration<IEnergyStorage>() {
 	override val handler by Delegates.lazyProperty(tile::energyStorage)

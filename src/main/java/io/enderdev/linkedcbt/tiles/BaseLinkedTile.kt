@@ -24,22 +24,27 @@ import net.minecraft.util.EnumFacing
 import net.minecraft.util.ITickable
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.fml.client.registry.ClientRegistry
-import org.ender_development.catalyx.client.button.AbstractButtonWrapper
-import org.ender_development.catalyx.client.button.PauseButtonWrapper
-import org.ender_development.catalyx.client.button.RedstoneButtonWrapper
-import org.ender_development.catalyx.client.gui.BaseGuiTyped
-import org.ender_development.catalyx.client.tesr.AbstractTESRenderer
-import org.ender_development.catalyx.client.tesr.HudInfoRenderer
-import org.ender_development.catalyx.client.tesr.TileRenderer
-import org.ender_development.catalyx.tiles.BaseTile
-import org.ender_development.catalyx.tiles.helper.*
-import org.ender_development.catalyx.utils.SideUtils
-import org.ender_development.catalyx.utils.extensions.colorObject
-import org.ender_development.catalyx.utils.extensions.withAlpha
+import org.ender_development.catalyx.api.v1.common.extensions.colorObject
+import org.ender_development.catalyx.api.v1.common.extensions.withAlpha
+import org.ender_development.catalyx.api.v1.utils.Utils
+import org.ender_development.catalyx.core.client.button.AbstractButtonWrapper
+import org.ender_development.catalyx.core.client.button.PauseButtonWrapper
+import org.ender_development.catalyx.core.client.button.RedstoneButtonWrapper
+import org.ender_development.catalyx.core.client.gui.BaseGuiTyped
+import org.ender_development.catalyx.core.client.tesr.AbstractTESRenderer
+import org.ender_development.catalyx.core.client.tesr.HudInfoRenderer
+import org.ender_development.catalyx.core.client.tesr.TileRenderer
+import org.ender_development.catalyx.core.tiles.BaseTile
+import org.ender_development.catalyx.core.tiles.helper.HudInfoLine
+import org.ender_development.catalyx.core.tiles.helper.IButtonTile
+import org.ender_development.catalyx.core.tiles.helper.ICopyPasteExtraDataTile
+import org.ender_development.catalyx.core.tiles.helper.IGuiTile
+import org.ender_development.catalyx.core.tiles.helper.IHudInfoProvider
+import org.ender_development.catalyx.core.tiles.helper.ITESRTile
 import java.awt.Color
 import java.util.*
 
-abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_HANDLER>, CH_DATA : BaseChannelData<CH_DATA, *>, CAP_TYPE : Any, LINKED_HANDLER : BaseLinkedHandler<CAP_TYPE, CH_DATA>>(val persistentData: BasePersistentData<CH_DATA, TE>, val capType: Capability<CAP_TYPE>) : BaseTile(LinkedCBT), ITickable, IGuiTile, IButtonTile, BaseGuiTyped.IDefaultButtonVariables, ICopyPasteExtraTile, ITESRTile, IHudInfoProvider {
+abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_HANDLER>, CH_DATA : BaseChannelData<CH_DATA, *>, CAP_TYPE : Any, LINKED_HANDLER : BaseLinkedHandler<CAP_TYPE, CH_DATA>>(val persistentData: BasePersistentData<CH_DATA, TE>, val capType: Capability<CAP_TYPE>) : BaseTile(LinkedCBT), ITickable, IGuiTile, IButtonTile, BaseGuiTyped.IDefaultButtonVariables, ICopyPasteExtraDataTile, ITESRTile, IHudInfoProvider {
 	override var isPaused = false
 	override var needsRedstonePower = false
 
@@ -333,7 +338,7 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 		AbstractButtonWrapper.registerWrapper(DeleteButtonWrapper::class.java)
 		AbstractButtonWrapper.registerWrapper(SideConfigurationButtonWrapper::class.java)
 
-		if(SideUtils.isDedicatedClient)
+		if(Utils.environment.isDedicatedClient)
 			ClientRegistry.bindTileEntitySpecialRenderer(this::class.java, TileRenderer)
 	}
 }

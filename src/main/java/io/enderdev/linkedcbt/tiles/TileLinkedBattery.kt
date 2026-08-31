@@ -8,8 +8,7 @@ import io.enderdev.linkedcbt.tiles.util.EnergySideConfiguration
 import io.enderdev.linkedcbt.util.LinkedEnergyHandler
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.energy.IEnergyStorage
-import org.ender_development.catalyx.tiles.helper.IEnergyTile
-import org.ender_development.catalyx.tiles.helper.ITESRTile
+import org.ender_development.catalyx.core.tiles.helper.IEnergyTile
 import java.util.*
 
 class TileLinkedBattery : BaseLinkedTile<TileLinkedBattery, BatteryChannelData, IEnergyStorage, LinkedEnergyHandler>(LBPersistentData, ENERGY_CAP), IEnergyTile {

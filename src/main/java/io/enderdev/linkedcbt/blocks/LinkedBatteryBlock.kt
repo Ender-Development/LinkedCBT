@@ -14,7 +14,6 @@ import net.minecraft.util.EnumHand
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
-import org.ender_development.catalyx.blocks.BaseRotatableMachineBlock
 
 class LinkedBatteryBlock : BaseLinkedBlock("battery", LinkedCBT.guiHandler.registerId(TileLinkedBattery::class.java, ContainerLinkedBattery::class.java) { GuiLinkedBattery::class.java }) {
 	companion object {

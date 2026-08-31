@@ -9,7 +9,7 @@ import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
-import org.ender_development.catalyx.client.button.AbstractButtonWrapper
+import org.ender_development.catalyx.core.client.button.AbstractButtonWrapper
 
 class SideConfigurationButtonWrapper(x: Int, y: Int) : AbstractButtonWrapper(x, y, BaseLinkedGui.SIDE_CONFIG_BTN_W, BaseLinkedGui.SIDE_CONFIG_BTN_H) {
 	override val textureLocation = Constants.LINKED_CBT_GUI

@@ -6,7 +6,7 @@ import io.enderdev.linkedcbt.data.tanks.client.ClientTankChannelData
 import io.enderdev.linkedcbt.data.tanks.client.ClientTankChannelListManager
 import io.enderdev.linkedcbt.tiles.TileLinkedTank
 import net.minecraft.inventory.IInventory
-import org.ender_development.catalyx.client.gui.wrappers.CapabilityFluidDisplayWrapper
+import org.ender_development.catalyx.core.client.gui.wrappers.CapabilityFluidDisplayWrapper
 
 class GuiLinkedTank(playerInv: IInventory, tile: TileLinkedTank) : BaseLinkedGui<TankChannelData, ClientTankChannelData, TileLinkedTank>(ContainerLinkedTank(playerInv, tile), tile, ClientTankChannelListManager) {
 	override val displayWrapper = CapabilityFluidDisplayWrapper(BAR_X, BAR_Y, BAR_W, BAR_H, tile::fluidHandler)

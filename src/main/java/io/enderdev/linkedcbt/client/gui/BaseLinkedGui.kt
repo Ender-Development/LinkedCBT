@@ -18,13 +18,13 @@ import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiTextField
 import net.minecraft.client.resources.I18n
 import net.minecraft.util.EnumFacing
-import org.ender_development.catalyx.client.button.AbstractButtonWrapper
-import org.ender_development.catalyx.client.container.BaseContainer
-import org.ender_development.catalyx.client.gui.BaseGuiTyped
-import org.ender_development.catalyx.client.gui.wrappers.CapabilityDisplayWrapper
-import org.ender_development.catalyx.client.gui.wrappers.CapabilityEnergyDisplayWrapper
-import org.ender_development.catalyx.client.gui.wrappers.CapabilityFluidDisplayWrapper
-import org.ender_development.catalyx.utils.extensions.colorValue
+import org.ender_development.catalyx.api.v1.common.extensions.colorValue
+import org.ender_development.catalyx.core.client.button.AbstractButtonWrapper
+import org.ender_development.catalyx.core.client.container.BaseContainer
+import org.ender_development.catalyx.core.client.gui.BaseGuiTyped
+import org.ender_development.catalyx.core.client.gui.wrappers.CapabilityDisplayWrapper
+import org.ender_development.catalyx.core.client.gui.wrappers.CapabilityEnergyDisplayWrapper
+import org.ender_development.catalyx.core.client.gui.wrappers.CapabilityFluidDisplayWrapper
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 

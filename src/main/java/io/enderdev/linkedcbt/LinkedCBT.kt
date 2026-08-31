@@ -21,10 +21,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.NetworkRegistry
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
-import org.ender_development.catalyx.client.gui.CatalyxGuiHandler
+import org.ender_development.catalyx.api.v1.common.extensions.toStack
+import org.ender_development.catalyx.api.v1.utils.Utils
 import org.ender_development.catalyx.core.ICatalyxMod
-import org.ender_development.catalyx.utils.SideUtils
-import org.ender_development.catalyx.utils.extensions.toStack
+import org.ender_development.catalyx.core.client.gui.CatalyxGuiHandler
 import java.text.NumberFormat
 
 @Mod(
@@ -51,7 +51,7 @@ object LinkedCBT : ICatalyxMod {
 		PacketHandler.init()
 		NetworkRegistry.INSTANCE.registerGuiHandler(LinkedCBT, guiHandler)
 		MinecraftForge.EVENT_BUS.register(this)
-		if(SideUtils.isClient)
+		if(Utils.environment.isClient)
 			MinecraftForge.EVENT_BUS.register(ModItems.sideConfigurator)
 	}
 

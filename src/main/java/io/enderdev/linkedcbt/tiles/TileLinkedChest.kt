@@ -25,6 +25,6 @@ class TileLinkedChest : BaseLinkedTile<TileLinkedChest, ChestChannelData, IItemH
 		ChestChannelData(false, ownerUUID, ownerUsername, name, Array(Constants.LINKED_CHEST_INVENTORY_SIZE) { ItemStack(tag.getCompoundTag("Item$$it")) }, Constants.NO_LINKED_POSITIONS)
 
 	// disable Catalyx auto-shift insertion, among other things
-	override val SIZE = 0
+	override val inventorySlotCount = 0
 	override val inventory = EmptyHandler()
 }

@@ -4,11 +4,11 @@ import io.enderdev.linkedcbt.LCBTConfig
 import io.enderdev.linkedcbt.tiles.TileLinkedTank
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
-import org.ender_development.catalyx.client.tesr.AbstractTESRenderer
-import org.ender_development.catalyx.tiles.BaseTile
-import org.ender_development.catalyx.utils.Delegates
-import org.ender_development.catalyx.utils.RenderUtils
-import org.ender_development.catalyx.utils.extensions.withAlpha
+import org.ender_development.catalyx.api.v1.common.extensions.withAlpha
+import org.ender_development.catalyx.core.client.tesr.AbstractTESRenderer
+import org.ender_development.catalyx.core.tiles.BaseTile
+import org.ender_development.catalyx.core.utils.Delegates
+import org.ender_development.catalyx.core.utils.RenderUtils
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 

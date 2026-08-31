@@ -8,7 +8,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
-import org.ender_development.catalyx.client.button.AbstractButtonWrapper
+import org.ender_development.catalyx.core.client.button.AbstractButtonWrapper
 
 class DeleteButtonWrapper(x: Int, y: Int) : AbstractButtonWrapper(x, y, BaseLinkedGui.DELETE_BTN_W, BaseLinkedGui.DELETE_BTN_H) {
 	// TODO create an icon for this instead of drawing text

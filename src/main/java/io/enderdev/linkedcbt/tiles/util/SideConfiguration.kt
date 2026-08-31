@@ -2,7 +2,7 @@ package io.enderdev.linkedcbt.tiles.util
 
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.text.TextFormatting
-import org.ender_development.catalyx.utils.extensions.relativeDirectionTo
+import org.ender_development.catalyx.api.v1.common.extensions.relativeDirectionTo
 
 enum class SideConfiguration(val named: String, val colour: TextFormatting) {
 	/**

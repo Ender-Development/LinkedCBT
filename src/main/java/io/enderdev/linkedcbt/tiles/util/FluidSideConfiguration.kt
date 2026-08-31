@@ -5,8 +5,8 @@ import io.enderdev.linkedcbt.tiles.TileLinkedTank
 import io.enderdev.linkedcbt.util.FluidUtils
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
-import org.ender_development.catalyx.tiles.BaseTile.Companion.FLUID_CAP
-import org.ender_development.catalyx.utils.Delegates
+import org.ender_development.catalyx.core.tiles.BaseTile.Companion.FLUID_CAP
+import org.ender_development.catalyx.core.utils.Delegates
 
 class FluidSideConfiguration(val tile: TileLinkedTank) : BaseSideConfiguration<IFluidHandler>() {
 	override val handler by Delegates.lazyProperty(tile::fluidHandler)

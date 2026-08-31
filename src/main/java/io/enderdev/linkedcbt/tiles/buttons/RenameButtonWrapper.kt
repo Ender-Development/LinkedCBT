@@ -4,9 +4,9 @@ import io.netty.buffer.ByteBuf
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
-import org.ender_development.catalyx.client.button.AbstractButtonWrapper
-import org.ender_development.catalyx.utils.extensions.readString
-import org.ender_development.catalyx.utils.extensions.writeString
+import org.ender_development.catalyx.api.v1.common.extensions.readString
+import org.ender_development.catalyx.api.v1.common.extensions.writeString
+import org.ender_development.catalyx.core.client.button.AbstractButtonWrapper
 
 class RenameButtonWrapper(x: Int, y: Int) : AbstractButtonWrapper(x, y) {
 	override val drawButton: () -> GuiButton.(Minecraft, Int, Int, Float) -> Unit = { { mc, mouseX, mouseY, partialTicks ->

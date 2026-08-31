@@ -9,9 +9,9 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
-import org.ender_development.catalyx.client.button.AbstractButtonWrapper
-import org.ender_development.catalyx.utils.extensions.readString
-import org.ender_development.catalyx.utils.extensions.writeString
+import org.ender_development.catalyx.api.v1.common.extensions.readString
+import org.ender_development.catalyx.api.v1.common.extensions.writeString
+import org.ender_development.catalyx.core.client.button.AbstractButtonWrapper
 
 class LinkButtonWrapper : AbstractButtonWrapper {
 	private lateinit var channelListManager: BaseClientChannelListManager<*, *, *>
