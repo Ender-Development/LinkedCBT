@@ -1,19 +1,19 @@
 package org.ender_development.linkedcbt.command
 
-import org.ender_development.linkedcbt.Tags
 import org.ender_development.linkedcbt.util.extensions.reply
 import net.minecraft.command.ICommandSender
 import net.minecraft.server.MinecraftServer
 import net.minecraft.util.text.TextFormatting
 import net.minecraftforge.server.command.CommandTreeBase
+import org.ender_development.linkedcbt.Reference
 
 internal object LinkedCBTCommand : CommandTreeBase() {
 	override fun getName() =
-		Tags.MOD_ID
+		Reference.MODID
 
 	override fun getAliases() =
 		listOf("lcbt")
-	
+
 	override fun getUsage(sender: ICommandSender) =
 		"see /linkedcbt help"
 
@@ -28,7 +28,7 @@ internal object LinkedCBTCommand : CommandTreeBase() {
 	object Help : BaseCommand("help") {
 		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<out String?>) {
 			sender.reply("/linkedcbt help - show this text")
-			sender.reply("/linkedcbt version - show the ${Tags.MOD_NAME} version")
+			sender.reply("/linkedcbt version - show the ${Reference.MOD_NAME} version")
 			sender.reply("/linkedcbt tanks help - show tank management help")
 			sender.reply("/linkedcbt batteries help - show battery management help")
 			sender.reply("/linkedcbt chests help - show chest management help")
@@ -37,6 +37,6 @@ internal object LinkedCBTCommand : CommandTreeBase() {
 
 	object Version : BaseCommand("version") {
 		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<out String?>) =
-			sender.reply("${Tags.MOD_NAME} version ${Tags.VERSION}", TextFormatting.AQUA)
+			sender.reply("${Reference.MOD_NAME} version ${Reference.VERSION}", TextFormatting.AQUA)
 	}
 }

@@ -3,7 +3,7 @@ package org.ender_development.linkedcbt.tiles.util
 import net.minecraft.item.ItemStack
 import net.minecraftforge.items.IItemHandler
 import org.ender_development.catalyx.api.v1.common.extensions.tryInsert
-import org.ender_development.catalyx.core.tiles.BaseTile.Companion.ITEM_CAP
+import org.ender_development.catalyx.core.common.tileentities.BaseTile.Companion.ITEM_CAP
 import org.ender_development.catalyx.core.utils.Delegates
 import org.ender_development.linkedcbt.LCBTConfig
 import org.ender_development.linkedcbt.tiles.TileLinkedChest

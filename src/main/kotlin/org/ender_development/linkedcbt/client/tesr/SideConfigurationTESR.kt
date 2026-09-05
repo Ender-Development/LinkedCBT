@@ -1,7 +1,5 @@
 package org.ender_development.linkedcbt.client.tesr
 
-import org.ender_development.linkedcbt.Tags
-import org.ender_development.linkedcbt.tiles.BaseLinkedTile
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.EnumFacing
@@ -11,17 +9,19 @@ import org.ender_development.catalyx.api.v1.common.extensions.glOffsetZ
 import org.ender_development.catalyx.api.v1.common.extensions.glRotate
 import org.ender_development.catalyx.api.v1.common.extensions.glRotationAngle
 import org.ender_development.catalyx.core.client.tesr.AbstractTESRenderer
-import org.ender_development.catalyx.core.tiles.BaseTile
+import org.ender_development.catalyx.core.common.tileentities.BaseTile
 import org.ender_development.catalyx.core.utils.RenderUtils
+import org.ender_development.linkedcbt.Reference
+import org.ender_development.linkedcbt.tiles.BaseLinkedTile
 import org.lwjgl.opengl.GL11
 
 internal object SideConfigurationTESR : AbstractTESRenderer() {
-	override fun render(te: BaseTile, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float) {
-		if(te !is BaseLinkedTile<*, *, *, *>)
+	override fun render(tileEntity: BaseTile, x: Double, y: Double, z: Double, partialTicks: Float, destroyStage: Int, alpha: Float) {
+		if(tileEntity !is BaseLinkedTile<*, *, *, *>)
 			error("how")
 
-		te.sideConfiguration.sides.forEach { (side, state) ->
-			val texture = ResourceLocation(Tags.MOD_ID, "textures/blocks/io/${state.name.lowercase()}.png")
+		tileEntity.sideConfiguration.sides.forEach { (side, state) ->
+			val texture = ResourceLocation(Reference.MODID, "textures/blocks/io/${state.name.lowercase()}.png")
 
 			GlStateManager.pushMatrix()
 

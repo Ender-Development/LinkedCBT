@@ -1,12 +1,5 @@
 package org.ender_development.linkedcbt.items
 
-import org.ender_development.linkedcbt.LinkedCBT
-import org.ender_development.linkedcbt.Tags
-import org.ender_development.linkedcbt.client.gui.BaseLinkedGui
-import org.ender_development.linkedcbt.tiles.BaseLinkedTile
-import org.ender_development.linkedcbt.tiles.TileLinkedTank
-import org.ender_development.linkedcbt.util.extensions.reply
-import org.ender_development.linkedcbt.util.extensions.replyFail
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
@@ -22,9 +15,15 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.ender_development.catalyx.api.v1.common.extensions.colorValue
-import org.ender_development.catalyx.core.items.BaseItem
+import org.ender_development.catalyx.core.common.items.base.CatItem
+import org.ender_development.linkedcbt.LinkedCBT
+import org.ender_development.linkedcbt.Reference
+import org.ender_development.linkedcbt.client.gui.BaseLinkedGui
+import org.ender_development.linkedcbt.tiles.BaseLinkedTile
+import org.ender_development.linkedcbt.util.extensions.reply
+import org.ender_development.linkedcbt.util.extensions.replyFail
 
-class SideConfigurator : BaseItem(LinkedCBT, "side_configurator") {
+class SideConfigurator : CatItem(LinkedCBT, "side_configurator") {
 	init {
 		maxStackSize = 1
 	}
@@ -35,7 +34,7 @@ class SideConfigurator : BaseItem(LinkedCBT, "side_configurator") {
 
 		val te = world.getTileEntity(pos) as? BaseLinkedTile<*, *, *, *> ?: return EnumActionResult.PASS
 		if(te.channelData?.canBeEditedBy(player.uniqueID) == false) {
-			player.replyFail(TextComponentTranslation("info.${Tags.MOD_ID}:no_permission"))
+			player.replyFail(TextComponentTranslation("info.${Reference.MODID}:no_permission"))
 			return EnumActionResult.FAIL
 		}
 

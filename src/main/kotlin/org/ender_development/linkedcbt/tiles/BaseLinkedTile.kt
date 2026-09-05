@@ -11,6 +11,12 @@ import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.fml.client.registry.ClientRegistry
 import org.ender_development.catalyx.api.v1.common.extensions.colorObject
 import org.ender_development.catalyx.api.v1.common.extensions.withAlpha
+import org.ender_development.catalyx.api.v1.common.tileentities.interfaces.HudInfoLine
+import org.ender_development.catalyx.api.v1.common.tileentities.interfaces.IButtonTile
+import org.ender_development.catalyx.api.v1.common.tileentities.interfaces.ICopyPasteExtraDataTile
+import org.ender_development.catalyx.api.v1.common.tileentities.interfaces.IGuiTile
+import org.ender_development.catalyx.api.v1.common.tileentities.interfaces.IHudInfoProvider
+import org.ender_development.catalyx.api.v1.common.tileentities.interfaces.ITESRTile
 import org.ender_development.catalyx.api.v1.utils.Utils
 import org.ender_development.catalyx.core.client.button.AbstractButtonWrapper
 import org.ender_development.catalyx.core.client.button.PauseButtonWrapper
@@ -19,8 +25,7 @@ import org.ender_development.catalyx.core.client.gui.BaseGuiTyped
 import org.ender_development.catalyx.core.client.tesr.AbstractTESRenderer
 import org.ender_development.catalyx.core.client.tesr.HudInfoRenderer
 import org.ender_development.catalyx.core.client.tesr.TileRenderer
-import org.ender_development.catalyx.core.tiles.BaseTile
-import org.ender_development.catalyx.core.tiles.helper.*
+import org.ender_development.catalyx.core.common.tileentities.BaseTile
 import org.ender_development.linkedcbt.LCBTConfig
 import org.ender_development.linkedcbt.LinkedCBT
 import org.ender_development.linkedcbt.client.tesr.SideConfigurationTESR
@@ -39,7 +44,8 @@ import org.ender_development.linkedcbt.util.extensions.dimId
 import java.awt.Color
 import java.util.*
 
-abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_HANDLER>, CH_DATA : BaseChannelData<CH_DATA, *>, CAP_TYPE : Any, LINKED_HANDLER : BaseLinkedHandler<CAP_TYPE, CH_DATA>>(val persistentData: BasePersistentData<CH_DATA, TE>, val capType: Capability<CAP_TYPE>) : BaseTile(LinkedCBT), ITickable, IGuiTile, IButtonTile, BaseGuiTyped.IDefaultButtonVariables, ICopyPasteExtraDataTile, ITESRTile, IHudInfoProvider {
+abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_HANDLER>, CH_DATA : BaseChannelData<CH_DATA, *>, CAP_TYPE : Any, LINKED_HANDLER : BaseLinkedHandler<CAP_TYPE, CH_DATA>>(val persistentData: BasePersistentData<CH_DATA, TE>, val capType: Capability<CAP_TYPE>) : BaseTile(LinkedCBT), ITickable,
+    IGuiTile, IButtonTile, BaseGuiTyped.IDefaultButtonVariables, ICopyPasteExtraDataTile, ITESRTile, IHudInfoProvider {
 	override var isPaused = false
 	override var needsRedstonePower = false
 
@@ -236,7 +242,8 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 	// server-side, sent to client-side [handleUpdateTag]
 	override fun getUpdateTag(): NBTTagCompound {
 		return NBTTagCompound().apply {
-			writeInternal(this) // write stuff like x,y,z + Forge stuff, since we don't call writeToNBT
+			// TODO: Let roz check why we can't just use the public version?
+			writeToNBT(this) // write stuff like x,y,z + Forge stuff, since we don't call writeToNBT
 			setTag("SideConfiguration", sideConfiguration.writeToNBT(true))
 			setInteger("ChannelId", channelId)
 

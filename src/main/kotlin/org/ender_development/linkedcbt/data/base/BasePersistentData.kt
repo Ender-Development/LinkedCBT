@@ -1,17 +1,17 @@
 package org.ender_development.linkedcbt.data.base
 
-import org.ender_development.linkedcbt.LinkedCBT
-import org.ender_development.linkedcbt.Tags
-import org.ender_development.linkedcbt.tiles.BaseLinkedTile
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
-import org.ender_development.catalyx.core.utils.persistence.WorldPersistentData
+import org.ender_development.catalyx.core.common.persistence.WorldPersistentData
+import org.ender_development.linkedcbt.LinkedCBT
+import org.ender_development.linkedcbt.Reference
+import org.ender_development.linkedcbt.tiles.BaseLinkedTile
 
 abstract class BasePersistentData<CH_DATA : BaseChannelData<CH_DATA, *>, TE : BaseLinkedTile<TE, CH_DATA, *, *>>(type: String) {
-	protected val dataNBT = WorldPersistentData(ResourceLocation(Tags.MOD_ID, type), true, ::read, ::unload)
+	protected val dataNBT = WorldPersistentData(ResourceLocation(Reference.MODID, type), true, ::read, ::unload)
 	private var wasRead = false
 	protected var nextChannelId = 1
 	val data: Int2ObjectMap<CH_DATA> = Int2ObjectOpenHashMap()

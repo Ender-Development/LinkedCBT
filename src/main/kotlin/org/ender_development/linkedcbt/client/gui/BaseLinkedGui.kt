@@ -1,6 +1,5 @@
 package org.ender_development.linkedcbt.client.gui
 
-import org.ender_development.linkedcbt.Tags
 import org.ender_development.linkedcbt.data.Constants
 import org.ender_development.linkedcbt.data.base.BaseChannelData
 import org.ender_development.linkedcbt.data.base.client.BaseClientChannelListManager
@@ -25,6 +24,7 @@ import org.ender_development.catalyx.core.client.gui.BaseGuiTyped
 import org.ender_development.catalyx.core.client.gui.wrappers.CapabilityDisplayWrapper
 import org.ender_development.catalyx.core.client.gui.wrappers.CapabilityEnergyDisplayWrapper
 import org.ender_development.catalyx.core.client.gui.wrappers.CapabilityFluidDisplayWrapper
+import org.ender_development.linkedcbt.Reference
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
@@ -437,7 +437,7 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 		const val RED_TEXT_COLOUR = 0xFF0000 or TEXT_COLOUR
 		const val BASE_TEXT_X = 8
 		const val BASE_TEXT_Y = 8
-		const val TRANSLATION_BASE = "gui.${Tags.MOD_ID}:cbt."
+		const val TRANSLATION_BASE = "gui.${Reference.MODID}:cbt."
 
 		val FONT_RENDERER: FontRenderer = Minecraft.getMinecraft().fontRenderer
 		val FONT_HEIGHT = FONT_RENDERER.FONT_HEIGHT

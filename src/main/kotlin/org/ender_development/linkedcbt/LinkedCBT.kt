@@ -14,9 +14,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.network.NetworkRegistry
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import org.ender_development.catalyx.api.v1.ICatalyxMod
 import org.ender_development.catalyx.api.v1.common.extensions.toStack
 import org.ender_development.catalyx.api.v1.utils.Utils
-import org.ender_development.catalyx.core.ICatalyxMod
 import org.ender_development.catalyx.core.client.gui.CatalyxGuiHandler
 import org.ender_development.linkedcbt.blocks.ModBlocks
 import org.ender_development.linkedcbt.command.LinkedCBTCommand
@@ -28,15 +28,15 @@ import org.ender_development.linkedcbt.network.PacketHandler
 import java.text.NumberFormat
 
 @Mod(
-	modid = Tags.MOD_ID,
-	name = Tags.MOD_NAME,
-	version = Tags.VERSION,
+	modid = Reference.MODID,
+	name = Reference.MOD_NAME,
+	version = Reference.VERSION,
 	dependencies = ICatalyxMod.CATALYX_ADDON,
 	modLanguageAdapter = ICatalyxMod.MOD_LANGUAGE_ADAPTER
 )
 @Mod.EventBusSubscriber
 object LinkedCBT : ICatalyxMod {
-	override val creativeTab = object : CreativeTabs(Tags.MOD_ID) {
+	override val creativeTab = object : CreativeTabs(Reference.MODID) {
 		override fun createIcon() =
 			ModBlocks.linkedTank.toStack()
 	}
@@ -44,7 +44,7 @@ object LinkedCBT : ICatalyxMod {
 	val guiHandler = CatalyxGuiHandler(this)
 	val numberFormat: NumberFormat = NumberFormat.getNumberInstance()
 
-	val logger: Logger = LogManager.getLogger(Tags.MOD_ID)
+	val logger: Logger = LogManager.getLogger(Reference.MODID)
 
 	@EventHandler
 	fun preInit(ev: FMLPreInitializationEvent) {
@@ -76,8 +76,8 @@ object LinkedCBT : ICatalyxMod {
 
 	@SubscribeEvent
 	fun onConfigChangedEvent(event: ConfigChangedEvent.OnConfigChangedEvent) {
-		if(event.modID == Tags.MOD_ID)
-			ConfigManager.sync(Tags.MOD_ID, Config.Type.INSTANCE)
+		if(event.modID == Reference.MODID)
+			ConfigManager.sync(Reference.MODID, Config.Type.INSTANCE)
 	}
 
 	// because of the way Java loads classes, need to do this lol

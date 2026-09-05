@@ -1,7 +1,5 @@
 package org.ender_development.linkedcbt.blocks
 
-import org.ender_development.linkedcbt.LinkedCBT
-import org.ender_development.linkedcbt.tiles.BaseLinkedTile
 import net.minecraft.block.state.IBlockState
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.BlockPos
@@ -9,9 +7,11 @@ import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
-import org.ender_development.catalyx.core.blocks.BaseRotatableMachineBlock
+import org.ender_development.catalyx.core.common.blocks.tile.HorizontalMachineBlock
+import org.ender_development.linkedcbt.LinkedCBT
+import org.ender_development.linkedcbt.tiles.BaseLinkedTile
 
-abstract class BaseLinkedBlock(type: String, guiId: Int) : BaseRotatableMachineBlock(LinkedCBT, "linked_$type", guiId) {
+abstract class BaseLinkedBlock(type: String, guiId: Int) : HorizontalMachineBlock(LinkedCBT, "linked_$type", guiId) {
 	override fun breakBlock(world: World, pos: BlockPos, state: IBlockState) {
 		// super destroys the TE
 		(world.getTileEntity(pos) as? BaseLinkedTile<*, *, *, *>)?.notifyBreak()

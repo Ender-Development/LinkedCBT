@@ -257,7 +257,7 @@ tasks.withType<Jar> {
         if (propertyBoolean("use_access_transformer")) {
             attributeMap["FMLAT"] = propertyString("access_transformer_locations")
         }
-        if (propertyBoolean("use_mixinbooter")) {
+        if (propertyBoolean("use_mixinbooter") && propertyString("mixin_connector_class").isNotBlank()) {
             attributeMap["MixinConnector"] = propertyString("mixin_connector_class")
         }
         attributes(attributeMap)

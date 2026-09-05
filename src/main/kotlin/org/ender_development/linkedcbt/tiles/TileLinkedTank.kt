@@ -1,12 +1,5 @@
 package org.ender_development.linkedcbt.tiles
 
-import org.ender_development.linkedcbt.LCBTConfig
-import org.ender_development.linkedcbt.client.tesr.LinkedTankTESR
-import org.ender_development.linkedcbt.data.Constants
-import org.ender_development.linkedcbt.data.tanks.LTPersistentData
-import org.ender_development.linkedcbt.data.tanks.TankChannelData
-import org.ender_development.linkedcbt.tiles.util.FluidSideConfiguration
-import org.ender_development.linkedcbt.util.LinkedFluidHandler
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
@@ -17,9 +10,16 @@ import net.minecraft.world.World
 import net.minecraftforge.fluids.FluidRegistry
 import net.minecraftforge.fluids.FluidUtil
 import net.minecraftforge.fluids.capability.IFluidHandler
+import org.ender_development.catalyx.api.v1.common.tileentities.interfaces.IFluidTile
 import org.ender_development.catalyx.core.client.tesr.AbstractTESRenderer
-import org.ender_development.catalyx.core.tiles.helper.IFluidTile
-import java.util.*
+import org.ender_development.linkedcbt.LCBTConfig
+import org.ender_development.linkedcbt.client.tesr.LinkedTankTESR
+import org.ender_development.linkedcbt.data.Constants
+import org.ender_development.linkedcbt.data.tanks.LTPersistentData
+import org.ender_development.linkedcbt.data.tanks.TankChannelData
+import org.ender_development.linkedcbt.tiles.util.FluidSideConfiguration
+import org.ender_development.linkedcbt.util.LinkedFluidHandler
+import java.util.UUID
 
 class TileLinkedTank : BaseLinkedTile<TileLinkedTank, TankChannelData, IFluidHandler, LinkedFluidHandler>(LTPersistentData, FLUID_CAP), IFluidTile {
 	override val sideConfiguration = FluidSideConfiguration(this)

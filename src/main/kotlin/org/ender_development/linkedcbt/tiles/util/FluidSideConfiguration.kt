@@ -2,7 +2,7 @@ package org.ender_development.linkedcbt.tiles.util
 
 import net.minecraftforge.fluids.FluidStack
 import net.minecraftforge.fluids.capability.IFluidHandler
-import org.ender_development.catalyx.core.tiles.BaseTile.Companion.FLUID_CAP
+import org.ender_development.catalyx.core.common.tileentities.BaseTile.Companion.FLUID_CAP
 import org.ender_development.catalyx.core.utils.Delegates
 import org.ender_development.linkedcbt.LCBTConfig
 import org.ender_development.linkedcbt.tiles.TileLinkedTank

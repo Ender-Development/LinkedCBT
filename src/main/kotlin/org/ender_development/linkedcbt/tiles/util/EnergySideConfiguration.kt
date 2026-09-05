@@ -1,7 +1,7 @@
 package org.ender_development.linkedcbt.tiles.util
 
 import net.minecraftforge.energy.IEnergyStorage
-import org.ender_development.catalyx.core.tiles.BaseTile.Companion.ENERGY_CAP
+import org.ender_development.catalyx.core.common.tileentities.BaseTile.Companion.ENERGY_CAP
 import org.ender_development.catalyx.core.utils.Delegates
 import org.ender_development.linkedcbt.LCBTConfig
 import org.ender_development.linkedcbt.tiles.TileLinkedBattery

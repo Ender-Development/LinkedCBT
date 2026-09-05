@@ -8,7 +8,6 @@
 		"authorList": ["${mod_authors}"],
 		"credits": "${mod_credits}",
 		"url": "${mod_url}",
-		"updateJSON": "${mod_update_json}",
 		"logoFile": "${mod_logo_path}"
 	}
 ]

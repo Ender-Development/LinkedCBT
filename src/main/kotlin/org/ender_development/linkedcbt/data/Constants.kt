@@ -1,11 +1,11 @@
 package org.ender_development.linkedcbt.data
 
-import org.ender_development.linkedcbt.Tags
+import net.minecraft.util.ResourceLocation
+import org.ender_development.linkedcbt.Reference
 import org.ender_development.linkedcbt.data.batteries.client.ClientBatteryChannelData
 import org.ender_development.linkedcbt.data.chests.client.ClientChestChannelData
 import org.ender_development.linkedcbt.data.tanks.client.ClientTankChannelData
 import org.ender_development.linkedcbt.util.extensions.guiTranslate
-import net.minecraft.util.ResourceLocation
 
 internal object Constants {
 	// special channel ids
@@ -15,7 +15,7 @@ internal object Constants {
 	const val CHANNEL_NAME_LENGTH_LIMIT = 20
 
 	const val LINKED_CBT_GUI_PATH = "textures/gui/container/linked_cbt_gui.png"
-	val LINKED_CBT_GUI = ResourceLocation(Tags.MOD_ID, LINKED_CBT_GUI_PATH)
+	val LINKED_CBT_GUI = ResourceLocation(Reference.MODID, LINKED_CBT_GUI_PATH)
 
 	const val LINKED_CHEST_INVENTORY_SIZE = 9 * 3
 

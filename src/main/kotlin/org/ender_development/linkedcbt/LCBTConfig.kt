@@ -2,7 +2,7 @@ package org.ender_development.linkedcbt
 
 import net.minecraftforge.common.config.Config
 
-@Config(modid = Tags.MOD_ID, name = Tags.MOD_ID)
+@Config(modid = Reference.MODID, name = Reference.MODID)
 object LCBTConfig {
 	@JvmField
 	@Config.Name("Chests")
