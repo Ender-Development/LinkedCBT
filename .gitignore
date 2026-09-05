@@ -16,11 +16,13 @@ out
 # gradle
 build
 .gradle
-
-# kotlin
 .kotlin
+secrets.properties
 
 # other
 eclipse
+examples
 run
-examples/**
+.vscode
+*.log
+*.bak

@@ -1,0 +1,5 @@
+src/**	text
+*.kt	text
+
+# This really only applies to repos that clone us, but whatever
+buildSrc/**	-linguist-detectable

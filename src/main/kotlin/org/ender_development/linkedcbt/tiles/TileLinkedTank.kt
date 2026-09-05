@@ -1,0 +1,63 @@
+package org.ender_development.linkedcbt.tiles
+
+import org.ender_development.linkedcbt.LCBTConfig
+import org.ender_development.linkedcbt.client.tesr.LinkedTankTESR
+import org.ender_development.linkedcbt.data.Constants
+import org.ender_development.linkedcbt.data.tanks.LTPersistentData
+import org.ender_development.linkedcbt.data.tanks.TankChannelData
+import org.ender_development.linkedcbt.tiles.util.FluidSideConfiguration
+import org.ender_development.linkedcbt.util.LinkedFluidHandler
+import net.minecraft.block.state.IBlockState
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.EnumHand
+import net.minecraft.util.math.BlockPos
+import net.minecraft.world.World
+import net.minecraftforge.fluids.FluidRegistry
+import net.minecraftforge.fluids.FluidUtil
+import net.minecraftforge.fluids.capability.IFluidHandler
+import org.ender_development.catalyx.core.client.tesr.AbstractTESRenderer
+import org.ender_development.catalyx.core.tiles.helper.IFluidTile
+import java.util.*
+
+class TileLinkedTank : BaseLinkedTile<TileLinkedTank, TankChannelData, IFluidHandler, LinkedFluidHandler>(LTPersistentData, FLUID_CAP), IFluidTile {
+	override val sideConfiguration = FluidSideConfiguration(this)
+	override val linkedHandler = LinkedFluidHandler(channelData)
+	override val fluidHandler = linkedHandler
+
+	override fun writeClientChannelData(channelData: TankChannelData, tag: NBTTagCompound) {
+		if(channelData.fluid != null)
+			tag.setString("FluidName", FluidRegistry.getFluidName(channelData.fluid))
+		tag.setInteger("FluidAmount", channelData.fluidAmount)
+		tag.setInteger("FluidCapacity", channelData.fluidCapacity)
+	}
+
+	override fun readClientChannelData(tag: NBTTagCompound, name: String, ownerUsername: String, ownerUUID: UUID): TankChannelData {
+		val fluid = FluidRegistry.getFluid(tag.getString("FluidName"))
+		val fluidAmount = tag.getInteger("FluidAmount")
+		return TankChannelData(false, ownerUUID, ownerUsername, name, fluid, fluidAmount, Constants.NO_LINKED_POSITIONS).apply {
+			fluidCapacityOverride = tag.getInteger("FluidCapacity")
+		}
+	}
+
+	override fun onBlockActivated(world: World, pos: BlockPos, state: IBlockState, player: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean {
+		if(channelId == Constants.NO_CHANNEL || !channelData!!.canBeEditedBy(player.uniqueID))
+			return false
+
+		val heldItem = player.getHeldItem(hand)
+		if(heldItem.hasCapability(ITEM_FLUID_CAP, facing) || heldItem.hasCapability(FLUID_CAP, facing))
+			return FluidUtil.interactWithFluidHandler(player, hand, world, pos, facing).also { markDirtyGUI() }
+
+		return false
+	}
+
+	override val renderers: Array<AbstractTESRenderer>
+		get() {
+			val default = super.renderers
+			return if(LCBTConfig.client.tankOverlayAlpha == 0)
+				default
+			else
+				default + LinkedTankTESR
+		}
+}

@@ -1,0 +1,8 @@
+package org.ender_development.linkedcbt.data.batteries.client
+
+import org.ender_development.linkedcbt.data.Constants
+import org.ender_development.linkedcbt.data.base.client.BaseClientChannelListManager
+import org.ender_development.linkedcbt.data.batteries.BatteryChannelData
+import org.ender_development.linkedcbt.network.BatteryChannelListPacket
+
+object ClientBatteryChannelListManager : BaseClientChannelListManager<BatteryChannelData, ClientBatteryChannelData, BatteryChannelListPacket>(BatteryChannelListPacket::class.java, BatteryChannelListPacket.handlers, Constants.CLIENT_BATTERY_CHANNEL_CREATE_NEW)
