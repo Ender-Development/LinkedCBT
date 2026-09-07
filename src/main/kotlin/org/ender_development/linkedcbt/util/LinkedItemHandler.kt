@@ -4,9 +4,10 @@ import org.ender_development.linkedcbt.data.Constants
 import org.ender_development.linkedcbt.data.chests.ChestChannelData
 import net.minecraft.item.ItemStack
 import net.minecraftforge.items.IItemHandler
+import net.minecraftforge.items.IItemHandlerModifiable
 import net.minecraftforge.items.ItemHandlerHelper
 
-class LinkedItemHandler(override var channelData: ChestChannelData?) : BaseLinkedHandler<IItemHandler, ChestChannelData>(), IItemHandler {
+class LinkedItemHandler(override var channelData: ChestChannelData?) : BaseLinkedHandler<IItemHandler, ChestChannelData>(), IItemHandlerModifiable {
 	override fun getSlots() =
 		Constants.LINKED_CHEST_INVENTORY_SIZE
 
@@ -70,5 +71,9 @@ class LinkedItemHandler(override var channelData: ChestChannelData?) : BaseLinke
 		return current.copy().apply {
 			shrink(amount)
 		}
+	}
+
+	override fun setStackInSlot(slot: Int, stack: ItemStack) {
+		channelData?.items[slot] = stack
 	}
 }

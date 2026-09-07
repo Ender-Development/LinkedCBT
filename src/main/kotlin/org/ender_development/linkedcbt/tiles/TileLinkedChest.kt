@@ -11,8 +11,7 @@ import org.ender_development.linkedcbt.tiles.util.ItemSideConfiguration
 import org.ender_development.linkedcbt.util.LinkedItemHandler
 import java.util.*
 
-class TileLinkedChest : BaseLinkedTile<TileLinkedChest, ChestChannelData, IItemHandler, LinkedItemHandler>(
-    LCPersistentData, ITEM_CAP) {
+class TileLinkedChest : BaseLinkedTile<TileLinkedChest, ChestChannelData, IItemHandler, LinkedItemHandler>(LCPersistentData, ITEM_CAP) {
 	override val sideConfiguration = ItemSideConfiguration(this)
 	override val linkedHandler = LinkedItemHandler(channelData)
 
@@ -32,7 +31,6 @@ class TileLinkedChest : BaseLinkedTile<TileLinkedChest, ChestChannelData, IItemH
             Constants.NO_LINKED_POSITIONS
         )
 
-	// disable Catalyx auto-shift insertion, among other things
-	override val inventorySlotCount = 0
-	override val inventory = EmptyHandler()
+	override val inventorySlotCount = Constants.LINKED_CHEST_INVENTORY_SIZE
+	override val inventory = linkedHandler
 }

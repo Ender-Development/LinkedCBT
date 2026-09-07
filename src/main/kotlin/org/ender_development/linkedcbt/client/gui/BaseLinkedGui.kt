@@ -148,7 +148,7 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 				// draw bar
 				val wrapper = displayWrapper
 				when(wrapper) {
-					null -> customDrawMainOverview(partialTicks, mouseX, mouseY)
+					null -> drawCustomDisplayWrapper(partialTicks, mouseX, mouseY)
 					is CapabilityFluidDisplayWrapper -> drawFluidTank(wrapper, guiLeft + wrapper.x, guiTop + wrapper.y)
 					is CapabilityEnergyDisplayWrapper -> drawPowerBar(wrapper, powerBarTexture, powerBarX, powerBarY)
 				}
@@ -187,7 +187,7 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 		}
 	}
 
-	open fun customDrawMainOverview(partialTicks: Float, mouseX: Int, mouseY: Int) {}
+	open fun drawCustomDisplayWrapper(partialTicks: Float, mouseX: Int, mouseY: Int) {}
 
 	override fun drawGuiContainerForegroundLayer(mouseX: Int, mouseY: Int) {
 		super.drawGuiContainerForegroundLayer(mouseX, mouseY)
@@ -237,7 +237,6 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 			else -> error(currentDisplay.debugName)
 		}
 
-		@Suppress("KotlinConstantConditions")
 		if(Constants.DEBUG) {
 			FONT_RENDERER.drawString(currentDisplay.debugName, 50, -10, RED_TEXT_COLOUR)
 			FONT_RENDERER.drawString(tile.channelId.toString(), -300, (ySize shr 1) - FONT_HEIGHT, RED_TEXT_COLOUR)
