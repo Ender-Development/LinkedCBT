@@ -10,7 +10,6 @@ import net.minecraft.nbt.NBTTagCompound
 
 object LBPersistentData : BasePersistentData<BatteryChannelData, TileLinkedBattery>("batteries") {
 	override fun readChannel(tag: NBTTagCompound): BatteryChannelData {
-		val deleted = tag.getBoolean("Deleted")
 		val ownerUUID = tag.getUniqueId("OwnerUUID")!!
 		val ownerUsername = tag.getString("OwnerUsername")
 		val name = tag.getString("Name")
@@ -22,12 +21,11 @@ object LBPersistentData : BasePersistentData<BatteryChannelData, TileLinkedBatte
 		val energyAmount = tag.getInteger("EnergyAmount")
 		val creationTime = tag.getLong("CreationTime")
 
-		return BatteryChannelData(deleted, ownerUUID, ownerUsername, name, energyAmount, linkedPositions, creationTime)
+		return BatteryChannelData(ownerUUID, ownerUsername, name, energyAmount, linkedPositions, creationTime)
 	}
 
 	override fun writeChannel(channelData: BatteryChannelData) =
 		NBTTagCompound().apply {
-			setBoolean("Deleted", channelData.deleted)
 			setUniqueId("OwnerUUID", channelData.ownerUUID)
 			setString("OwnerUsername", channelData.ownerUsername)
 			setString("Name", channelData.name)
@@ -40,5 +38,5 @@ object LBPersistentData : BasePersistentData<BatteryChannelData, TileLinkedBatte
 		}
 
 	override fun createEmptyChannel(player: EntityPlayer, te: TileLinkedBattery, channelName: String?) =
-		BatteryChannelData(false, player.uniqueID, player.gameProfile.name, channelName ?: "New channel", 0, hashSetOf(te.pos dim te.world.dimId), System.currentTimeMillis())
+		BatteryChannelData(player.uniqueID, player.gameProfile.name, channelName ?: "New channel", 0, hashSetOf(te.pos dim te.world.dimId), System.currentTimeMillis())
 }

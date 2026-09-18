@@ -1,16 +1,11 @@
 package org.ender_development.linkedcbt.command
 
-import org.ender_development.linkedcbt.blocks.ModBlocks
-import org.ender_development.linkedcbt.command.SharedSubcommands.getChannelId
-import org.ender_development.linkedcbt.data.chests.ChestChannelData
-import org.ender_development.linkedcbt.data.chests.LCPersistentData
-import org.ender_development.linkedcbt.util.extensions.reply
-import org.ender_development.linkedcbt.util.extensions.replyFail
-import org.ender_development.linkedcbt.util.extensions.replyWarn
 import net.minecraft.command.ICommandSender
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.server.MinecraftServer
 import net.minecraftforge.server.command.CommandTreeBase
+import org.ender_development.linkedcbt.data.chests.LCPersistentData
+import org.ender_development.linkedcbt.util.extensions.reply
 
 internal object ChestsSubcommand : CommandTreeBase() {
 	override fun getName() =
@@ -24,10 +19,7 @@ internal object ChestsSubcommand : CommandTreeBase() {
 		2
 
 	override fun checkPermission(server: MinecraftServer, sender: ICommandSender): Boolean {
-		if(server.isSinglePlayer)
-			return true
-
-		return sender !is EntityPlayer || server.playerList.oppedPlayers.getPermissionLevel(sender.gameProfile) >= requiredPermissionLevel
+		return server.isSinglePlayer || sender !is EntityPlayer || server.playerList.oppedPlayers.getPermissionLevel(sender.gameProfile) >= requiredPermissionLevel
 	}
 
 	init {
@@ -35,17 +27,14 @@ internal object ChestsSubcommand : CommandTreeBase() {
 		addSubcommand(List)
 		addSubcommand(Hijack)
 		addSubcommand(Delete)
-		addSubcommand(Restore)
-		addSubcommand(Purge)
 		addSubcommand(Revalidate)
 	}
 
 	object Help : BaseCommand("help") {
 		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<out String?>) {
 			sender.reply("$BASE_COMMAND list - show chest channel list")
-			sender.reply("$BASE_COMMAND hijack <channel id> [player] - change a chest channel's ownership")
-			sender.reply("$BASE_COMMAND delete <channel id> - delete a chest channel")
-			sender.reply("$BASE_COMMAND restore <channel id> - restore a chest channel")
+			sender.reply("$BASE_COMMAND hijack <channel name/UUID> [player] - change a chest channel's ownership")
+			sender.reply("$BASE_COMMAND delete <channel name/UUID> - delete a chest channel")
 			sender.reply("$BASE_COMMAND revalidate - validate if all chest channels have saved correct chest positions, this may load chunks")
 		}
 	}
@@ -57,37 +46,17 @@ internal object ChestsSubcommand : CommandTreeBase() {
 
 	object Hijack : BaseCommand("hijack") {
 		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) =
-			SharedSubcommands.hijack(server, sender, args, BASE_COMMAND, ::getChannelData)
+			SharedSubcommands.hijack(server, sender, args, BASE_COMMAND, LCPersistentData)
 	}
 
 	object Delete : BaseCommand("delete") {
 		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) =
-			SharedSubcommands.delete(server, sender, args, BASE_COMMAND, ::getChannelData)
+			SharedSubcommands.delete(server, sender, args, BASE_COMMAND, LCPersistentData)
 	}
-
-	object Restore : BaseCommand("restore") {
-		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) =
-			SharedSubcommands.restore(server, sender, args, BASE_COMMAND, ::getChannelData)
-	}
-
-	object Purge : SharedSubcommands.PurgeSubcommand(BASE_COMMAND, ::getChannelData, LCPersistentData, ModBlocks.linkedChest)
 
 	object Revalidate : BaseCommand("revalidate") {
 		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) =
 			SharedSubcommands.revalidate(server, sender, args, LCPersistentData, "Linked Chest")
-	}
-
-	private fun getChannelData(sender: ICommandSender, arg: String, deletedWarn: Boolean = true): Pair<Int, ChestChannelData>? {
-		TODO()/*val channelId = getChannelId(sender, arg) ?: return null
-		val channel = LCPersistentData.data.get(channelId) ?: run {
-			sender.replyFail("There is no channel with id $channelId")
-			return null
-		}
-
-		if(channel.deleted && deletedWarn)
-			sender.replyWarn("Channel is deleted")
-
-		return channelId to channel*/
 	}
 
 	private const val BASE_COMMAND = "/linkedcbt chests"

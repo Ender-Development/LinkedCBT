@@ -15,7 +15,7 @@ internal object LinkedCBTCommand : CommandTreeBase() {
 		listOf("lcbt")
 
 	override fun getUsage(sender: ICommandSender) =
-		"see /linkedcbt help"
+		"see /$name help"
 
 	init {
 		addSubcommand(Help)

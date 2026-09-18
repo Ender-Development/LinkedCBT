@@ -69,7 +69,7 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 		markDirtyGUIEvery(5)
 		if(++channelUpdateTicks == 3) {
 			channelUpdateTicks = 0
-			if((channelId != Constants.NO_CHANNEL && channelData == null) || channelData?.deleted == true)
+			if(channelId != Constants.NO_CHANNEL && channelData == null)
 				unlink()
 
 			// this shouldn't happen but might as well
@@ -110,9 +110,7 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 			return
 		}
 
-		val newChannelData = persistentData.data.get(newChannelId)
-		if(newChannelData == null || newChannelData.deleted) // sanity check + never allow connecting to deleted channels
-			return
+		val newChannelData = persistentData.data[newChannelId] ?: return // sanity check
 
 		if(!newChannelData.canBeEditedBy(player.uniqueID))
 			return
@@ -133,9 +131,7 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 		if(channelId == newChannelId)
 			return
 
-		val newChannelData = persistentData.data[newChannelId]
-		if(newChannelData == null || newChannelData.deleted) // sanity check + never allow connecting to deleted channels
-			return
+		val newChannelData = persistentData.data[newChannelId] ?: return // sanity check
 
 		unlink()
 
@@ -184,7 +180,8 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 					if(!channelData.canBeEditedBy(button.ctx.serverHandler.player.uniqueID))
 						return
 
-					channelData.deleted = true
+					persistentData.data.remove(channelId)
+					persistentData.write()
 					unlink()
 					markDirtyGUI()
 				}

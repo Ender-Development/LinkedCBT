@@ -8,5 +8,5 @@ import java.util.UUID
 
 data class ClientChestChannelData(override val id: UUID, override val name: String, override val creationTime: Long) : ClientBaseChannelData<ClientChestChannelData, ChestChannelData>() {
 	override fun toFakeChannelData() =
-		ChestChannelData(false, Minecraft.getMinecraft().player.uniqueID, Minecraft.getMinecraft().player.gameProfile.name, name, emptyArray(), Constants.NO_LINKED_POSITIONS, creationTime)
+		ChestChannelData(Minecraft.getMinecraft().player.uniqueID, Minecraft.getMinecraft().player.gameProfile.name, name, emptyArray(), Constants.NO_LINKED_POSITIONS, creationTime)
 }

@@ -8,5 +8,5 @@ import java.util.UUID
 
 data class ClientBatteryChannelData(override val id: UUID, override val name: String, override val creationTime: Long) : ClientBaseChannelData<ClientBatteryChannelData, BatteryChannelData>() {
 	override fun toFakeChannelData() =
-		BatteryChannelData(false, Minecraft.getMinecraft().player.uniqueID, Minecraft.getMinecraft().player.gameProfile.name, name, -1, Constants.NO_LINKED_POSITIONS, creationTime)
+		BatteryChannelData(Minecraft.getMinecraft().player.uniqueID, Minecraft.getMinecraft().player.gameProfile.name, name, -1, Constants.NO_LINKED_POSITIONS, creationTime)
 }

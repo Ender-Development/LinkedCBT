@@ -1,14 +1,12 @@
 package org.ender_development.linkedcbt.command
 
-import org.ender_development.linkedcbt.blocks.ModBlocks
-import org.ender_development.linkedcbt.command.SharedSubcommands.getChannelId
-import org.ender_development.linkedcbt.data.batteries.BatteryChannelData
-import org.ender_development.linkedcbt.data.batteries.LBPersistentData
-import org.ender_development.linkedcbt.util.extensions.*
 import net.minecraft.command.ICommandSender
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.server.MinecraftServer
 import net.minecraftforge.server.command.CommandTreeBase
+import org.ender_development.linkedcbt.command.SharedSubcommands.getChannelData
+import org.ender_development.linkedcbt.data.batteries.LBPersistentData
+import org.ender_development.linkedcbt.util.extensions.*
 
 internal object BatteriesSubcommand : CommandTreeBase() {
 	override fun getName() =
@@ -33,19 +31,16 @@ internal object BatteriesSubcommand : CommandTreeBase() {
 		addSubcommand(List)
 		addSubcommand(Hijack)
 		addSubcommand(Delete)
-		addSubcommand(Restore)
 		addSubcommand(SetContents)
-		addSubcommand(Purge)
 		addSubcommand(Revalidate)
 	}
 
 	object Help : BaseCommand("help") {
 		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<out String?>) {
 			sender.reply("$BASE_COMMAND list - show battery channel list")
-			sender.reply("$BASE_COMMAND hijack <channel id> [player] - change a battery channel's ownership")
-			sender.reply("$BASE_COMMAND delete <channel id> - delete a battery channel")
-			sender.reply("$BASE_COMMAND restore <channel id> - restore a battery channel")
-			sender.reply("$BASE_COMMAND setcontents <channel id> <amount> - set a battery channel's energy amount")
+			sender.reply("$BASE_COMMAND hijack <channel name/UUID> [player] - change a battery channel's ownership")
+			sender.reply("$BASE_COMMAND delete <channel name/UUID> - delete a battery channel")
+			sender.reply("$BASE_COMMAND setcontents <channel name/UUID> <amount> - set a battery channel's energy amount")
 			sender.reply("$BASE_COMMAND revalidate - validate if all battery channels have saved correct battery positions, this may load chunks")
 		}
 	}
@@ -59,17 +54,12 @@ internal object BatteriesSubcommand : CommandTreeBase() {
 
 	object Hijack : BaseCommand("hijack") {
 		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) =
-			SharedSubcommands.hijack(server, sender, args, BASE_COMMAND, ::getChannelData)
+			SharedSubcommands.hijack(server, sender, args, BASE_COMMAND, LBPersistentData)
 	}
 
 	object Delete : BaseCommand("delete") {
 		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) =
-			SharedSubcommands.delete(server, sender, args, BASE_COMMAND, ::getChannelData)
-	}
-
-	object Restore : BaseCommand("restore") {
-		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) =
-			SharedSubcommands.restore(server, sender, args, BASE_COMMAND, ::getChannelData)
+			SharedSubcommands.delete(server, sender, args, BASE_COMMAND, LBPersistentData)
 	}
 
 	object SetContents : BaseCommand("setcontents") {
@@ -78,17 +68,17 @@ internal object BatteriesSubcommand : CommandTreeBase() {
 
 		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) {
 			if(args.size < 2) {
-				sender.replyFail("Usage: $BASE_COMMAND $name <channel id> <amount>")
+				sender.replyFail("Usage: $BASE_COMMAND $name <channel name/UUID> <amount>")
 				return
 			}
 
-			val (channelId, channel) = getChannelData(sender, args[0]) ?: return
-
-			val energyAmount = args[1].toIntOrNull()
+			val energyAmount = args.last().toIntOrNull()
 			if(energyAmount == null || energyAmount < 0) {
-				sender.replyFail("Couldn't convert '${args[1]}' to a valid number")
+				sender.replyFail("Couldn't convert '${args.last()}' to a valid number")
 				return
 			}
+
+			val (channelId, channel) = getChannelData(sender, args.copyOfRange(0, args.lastIndex), LBPersistentData) ?: return
 
 			if(energyAmount > channel.energyCapacity)
 				sender.replyWarn("Setting energy amount to more than the expected capacity, things might not work as intended")
@@ -98,24 +88,9 @@ internal object BatteriesSubcommand : CommandTreeBase() {
 		}
 	}
 
-	object Purge : SharedSubcommands.PurgeSubcommand(BASE_COMMAND, ::getChannelData, LBPersistentData, ModBlocks.linkedBattery)
-
 	object Revalidate : BaseCommand("revalidate") {
 		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) =
 			SharedSubcommands.revalidate(server, sender, args, LBPersistentData, "Linked Battery")
-	}
-
-	private fun getChannelData(sender: ICommandSender, arg: String, deletedWarn: Boolean = true): Pair<Int, BatteryChannelData>? {
-		TODO()/*val channelId = getChannelId(sender, arg) ?: return null
-		val channel = LBPersistentData.data.get(channelId) ?: run {
-			sender.replyFail("There is no channel with id $channelId")
-			return null
-		}
-
-		if(channel.deleted && deletedWarn)
-			sender.replyWarn("Channel is deleted")
-
-		return channelId to channel*/
 	}
 
 	private const val BASE_COMMAND = "/linkedcbt batteries"

@@ -7,7 +7,6 @@ import net.minecraft.item.ItemStack
 import java.util.*
 
 data class ChestChannelData(
-	override var deleted: Boolean,
 	override var ownerUUID: UUID,
 	override var ownerUsername: String,
 	override var name: String,
@@ -16,10 +15,10 @@ data class ChestChannelData(
 	override val creationTime: Long
 ) : BaseChannelData<ChestChannelData, ClientChestChannelData>() {
 	override fun equals(other: Any?) =
-		this === other || (other is ChestChannelData && deleted == other.deleted && ownerUUID == other.ownerUUID && name == other.name && items.contentEquals(other.items) && linkedPositions == other.linkedPositions && creationTime == other.creationTime)
+		this === other || (other is ChestChannelData && ownerUUID == other.ownerUUID && name == other.name && items.contentEquals(other.items) && linkedPositions == other.linkedPositions && creationTime == other.creationTime)
 
 	override fun hashCode() =
-		Objects.hash(deleted, ownerUUID, name, items.contentHashCode(), linkedPositions)
+		Objects.hash(ownerUUID, name, items.contentHashCode(), linkedPositions)
 
 	override fun toClientChannelData(id: UUID) =
 		ClientChestChannelData(id, name, creationTime)

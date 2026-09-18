@@ -11,7 +11,6 @@ import net.minecraftforge.fluids.FluidRegistry
 
 object LTPersistentData : BasePersistentData<TankChannelData, TileLinkedTank>("tanks") {
 	override fun readChannel(tag: NBTTagCompound): TankChannelData {
-		val deleted = tag.getBoolean("Deleted")
 		val ownerUUID = tag.getUniqueId("OwnerUUID")!!
 		val ownerUsername = tag.getString("OwnerUsername")
 		val name = tag.getString("Name")
@@ -24,12 +23,11 @@ object LTPersistentData : BasePersistentData<TankChannelData, TileLinkedTank>("t
 		val fluidAmount = tag.getInteger("FluidAmount")
 		val creationTime = tag.getLong("CreationTime")
 
-		return TankChannelData(deleted, ownerUUID, ownerUsername, name, fluid, fluidAmount, linkedPositions, creationTime)
+		return TankChannelData(ownerUUID, ownerUsername, name, fluid, fluidAmount, linkedPositions, creationTime)
 	}
 
 	override fun writeChannel(channelData: TankChannelData) =
 		NBTTagCompound().apply {
-			setBoolean("Deleted", channelData.deleted)
 			setUniqueId("OwnerUUID", channelData.ownerUUID)
 			setString("OwnerUsername", channelData.ownerUsername)
 			setString("Name", channelData.name)
@@ -44,5 +42,5 @@ object LTPersistentData : BasePersistentData<TankChannelData, TileLinkedTank>("t
 		}
 
 	override fun createEmptyChannel(player: EntityPlayer, te: TileLinkedTank, channelName: String?) =
-		TankChannelData(false, player.uniqueID, player.gameProfile.name, channelName ?: "New channel", null, 0, hashSetOf(te.pos dim te.world.dimId), System.currentTimeMillis())
+		TankChannelData(player.uniqueID, player.gameProfile.name, channelName ?: "New channel", null, 0, hashSetOf(te.pos dim te.world.dimId), System.currentTimeMillis())
 }

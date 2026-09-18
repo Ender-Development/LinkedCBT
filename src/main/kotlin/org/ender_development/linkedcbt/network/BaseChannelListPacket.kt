@@ -44,7 +44,7 @@ abstract class BaseChannelListPacket<CH_DATA : BaseChannelData<CH_DATA, CLIENT_C
 			val uuid = ctx.serverHandler.player.uniqueID
 
 			persistentData.data.mapNotNullTo(message.channelData) { (id, channel) ->
-				if(channel.deleted || channel.ownerUUID != uuid)
+				if(channel.ownerUUID != uuid)
 					return@mapNotNullTo null
 
 				return@mapNotNullTo channel.toClientChannelData(id)

@@ -5,44 +5,41 @@ import org.ender_development.linkedcbt.data.base.BaseChannelData
 import org.ender_development.linkedcbt.data.base.BasePersistentData
 import org.ender_development.linkedcbt.tiles.BaseLinkedTile
 import org.ender_development.linkedcbt.util.extensions.*
-import it.unimi.dsi.fastutil.ints.Int2LongArrayMap
-import net.minecraft.block.Block
 import net.minecraft.command.ICommandSender
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.server.MinecraftServer
 import net.minecraft.util.text.ITextComponent
-import net.minecraft.util.text.TextComponentTranslation
-import net.minecraft.util.text.TextFormatting
 import net.minecraftforge.common.UsernameCache
+import org.ender_development.linkedcbt.network.PacketHandler.channel
 import java.util.*
-
-private typealias ChannelDataProvider = (ICommandSender, String) -> Pair<Int, BaseChannelData<*, *>>?
-private typealias ChannelDataProviderDeletedWarn = (ICommandSender, String, Boolean) -> Pair<Int, BaseChannelData<*, *>>?
 
 internal object SharedSubcommands {
 	fun <CH_DATA : BaseChannelData<CH_DATA, *>> list(server: MinecraftServer, sender: ICommandSender, args: Array<String>, persistentData: BasePersistentData<CH_DATA, *>, extraData: (CH_DATA) -> ITextComponent?) {
+		val showUUIDs = args.any { it.contains("uuid", true) }
 		sender.reply("Channels:")
-		persistentData.data.values.sortedByDescending { it.creationTime }.forEach { data ->
-			val colour = if(data.deleted) TextFormatting.GRAY else TextFormatting.WHITE
-			sender.reply("- ${data.displayName()}${if(data.deleted) " (deleted)" else ""}", colour)
-			sender.reply("owner: ${data.ownerUsername}; ${data.linkedPositions.size} endpoint${if(data.linkedPositions.size == 1) "" else "s"}", colour)
-			extraData(data)?.let { sender.reply(it, colour) }
+		persistentData.data.entries.sortedByDescending { it.value.creationTime }.forEach { (uuid, data) ->
+			sender.reply("- ${data.displayName()} (${if(showUUIDs) "$uuid; " else ""}${data.linkedPositions.size} endpoint${if(data.linkedPositions.size == 1) "" else "s"})")
+			sender.reply("owner: ${data.ownerUsername}")
+			extraData(data)?.let { sender.reply(it) }
 			sender.reply("")
 		}
-		val endpoints = persistentData.data.map { it.value.linkedPositions.size }.sum()
-		sender.reply("Total: ${persistentData.data.count { !it.value.deleted }} (${persistentData.data.size}) channels with $endpoints total endpoint${if(endpoints == 1) "" else "s"}")
+		val endpoints = persistentData.data.values.sumOf { it.linkedPositions.size }
+		sender.reply("Total: ${persistentData.data.size} channels with $endpoints total endpoint${if(endpoints == 1) "" else "s"}")
 	}
 
-	fun hijack(server: MinecraftServer, sender: ICommandSender, args: Array<String>, baseCommand: String, channelDataProvider: ChannelDataProvider) {
+	fun hijack(server: MinecraftServer, sender: ICommandSender, args: Array<String>, baseCommand: String, persistentData: BasePersistentData<*, *>) {
 		if(args.isEmpty()) {
-			sender.replyFail("Usage: $baseCommand hijack <channel id> [player]")
+			sender.replyFail("Usage: $baseCommand hijack <channel name/UUID> [player]")
 			return
 		}
 
+		var isPlayerSpecified = false
+		val (channelId, channel) = getChannelData(sender, args, persistentData, true) ?: getChannelData(sender, args.copyOfRange(0, args.lastIndex), persistentData)?.also { isPlayerSpecified = true } ?: return
+
 		var playerUUID = (sender as? EntityPlayer)?.uniqueID
 
-		if(args.size > 1) {
-			val playerArg = args[1]
+		if(isPlayerSpecified) {
+			val playerArg = args.last()
 
 			playerUUID = UsernameCache.getMap().firstNotNullOfOrNull { (uuid, username) ->
 				if(username == playerArg)
@@ -62,45 +59,22 @@ internal object SharedSubcommands {
 			return
 		}
 
-		val (channelId, channel) = channelDataProvider(sender, args[0]) ?: return
-
 		channel.ownerUUID = playerUUID
 		channel.ownerUsername = UsernameCache.getLastKnownUsername(playerUUID) ?: playerUUID.toString()
-		sender.reply("Channel $channelId ownership changed to ${channel.ownerUsername} (${channel.ownerUUID})")
+		sender.reply("Channel '${channel.displayName()}' ($channelId) ownership changed to ${channel.ownerUsername} (${channel.ownerUUID})")
 	}
 
-	fun delete(server: MinecraftServer, sender: ICommandSender, args: Array<String>, baseCommand: String, channelDataProvider: ChannelDataProviderDeletedWarn) {
+	fun delete(server: MinecraftServer, sender: ICommandSender, args: Array<String>, baseCommand: String, persistentData: BasePersistentData<*, *>) {
 		if(args.isEmpty()) {
-			sender.replyFail("Usage: $baseCommand delete <channel id>")
+			sender.replyFail("Usage: $baseCommand delete <channel name/UUID>")
 			return
 		}
 
-		val (channelId, channel) = channelDataProvider(sender, args[0], false) ?: return
+		val (channelId, channel) = getChannelData(sender, args, persistentData) ?: return
 
-		if(channel.deleted) {
-			sender.replyFail("Channel $channelId is already deleted")
-			return
-		}
-
-		channel.deleted = true
-		sender.reply("Channel $channelId has been deleted")
-	}
-
-	fun restore(server: MinecraftServer, sender: ICommandSender, args: Array<String>, baseCommand: String, channelDataProvider: ChannelDataProviderDeletedWarn) {
-		if(args.isEmpty()) {
-			sender.replyFail("Usage: $baseCommand restore <channel id>")
-			return
-		}
-
-		val (channelId, channel) = channelDataProvider(sender, args[0], false) ?: return
-
-		if(!channel.deleted) {
-			sender.replyFail("Channel $channelId is not deleted")
-			return
-		}
-
-		channel.deleted = false
-		sender.reply("Channel $channelId has been restored")
+		persistentData.data.remove(channelId)
+		persistentData.write()
+		sender.reply("Channel '${channel.displayName()}' ($channelId) has been deleted")
 	}
 
 	inline fun <reified TE : BaseLinkedTile<TE, *, *, *>> revalidate(server: MinecraftServer, sender: ICommandSender, args: Array<String>, persistentData: BasePersistentData<*, TE>, name: String) {
@@ -122,41 +96,32 @@ internal object SharedSubcommands {
 		sender.reply("Channels revalidated")
 	}
 
-	fun getChannelId(sender: ICommandSender, arg: String) =
-		arg.toIntOrNull().also {
-			if(it == null)
-				sender.replyFail("Couldn't convert '$arg' to a numerical channel id")
+	fun <CH_DATA : BaseChannelData<CH_DATA, *>> getChannelData(sender: ICommandSender, args: Array<String>, persistentData: BasePersistentData<CH_DATA, *>, shutUp: Boolean = false): Pair<UUID, CH_DATA>? {
+		if(args.isEmpty()) {
+			if(!shutUp)
+				sender.replyFail("No channel name/UUID provided")
+			return null
 		}
 
-	abstract class PurgeSubcommand(val baseCommand: String, val channelDataProvider: ChannelDataProviderDeletedWarn, val persistentData: BasePersistentData<*, *>, val block: Block) : BaseCommand("purge") {
-		// channelId to milliseconds
-		val channelIdConfirmations = Int2LongArrayMap(2).apply {
-			defaultReturnValue(0L)
+		if(args.size == 1)
+			try {
+				val uuid = UUID.fromString(args[0])
+				val channel = persistentData.data[uuid]
+				if(channel == null) {
+					if(!shutUp)
+						sender.replyFail("Channel with UUID $uuid doesn't exist")
+					throw IllegalArgumentException() // try to do a lookup by channel name as well
+				}
+				return uuid to channel
+			} catch(ignored: IllegalArgumentException) {}
+
+		val name = args.joinToString(" ")
+		val entry = persistentData.data.entries.firstOrNull { it.value.name.equals(name, true) }
+		if(entry == null) {
+			if(!shutUp)
+				sender.replyFail("No channel with name '$name' was found")
+			return null
 		}
-
-		override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<String>) {
-			if(args.isEmpty()) {
-				sender.replyFail("Usage: $baseCommand $name <channel id>")
-				return
-			}
-
-			val (channelId, channel) = channelDataProvider(sender, args[0], false) ?: return
-
-			if(channel.linkedPositions.isNotEmpty() && System.currentTimeMillis() - channelIdConfirmations[channelId] > CONFIRMATION_SECONDS * 1000L) {
-				sender.replyWarn("Channel $channelId still has ${channel.linkedPositions.size} endpoint${if(channel.linkedPositions.size == 1) "" else "s"}")
-				sender.replyWarn(+"This can happen due to a " + TextComponentTranslation("${block.translationKey}.name") + +" being in an unloaded chunk, and it might relink to the next created channel with id $channelId")
-				sender.replyWarn("If you're sure you want to purge this channel, type this command again within $CONFIRMATION_SECONDS seconds")
-				channelIdConfirmations.put(channelId, System.currentTimeMillis())
-				return
-			}
-
-			TODO()//persistentData.data.remove(channelId)
-
-			sender.reply("Channel $channelId and all of its associated data has been purged, and its channel id is free to be reused")
-		}
-
-		companion object {
-			private const val CONFIRMATION_SECONDS = 5
-		}
+		return entry.key to entry.value
 	}
 }

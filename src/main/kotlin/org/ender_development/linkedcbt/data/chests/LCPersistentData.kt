@@ -12,7 +12,6 @@ import net.minecraft.nbt.NBTTagCompound
 
 object LCPersistentData : BasePersistentData<ChestChannelData, TileLinkedChest>("chests") {
 	override fun readChannel(tag: NBTTagCompound): ChestChannelData {
-		val deleted = tag.getBoolean("Deleted")
 		val ownerUUID = tag.getUniqueId("OwnerUUID")!!
 		val ownerUsername = tag.getString("OwnerUsername")
 		val name = tag.getString("Name")
@@ -29,12 +28,11 @@ object LCPersistentData : BasePersistentData<ChestChannelData, TileLinkedChest>(
 		}
 		val creationTime = tag.getLong("CreationTime")
 
-		return ChestChannelData(deleted, ownerUUID, ownerUsername, name, items, linkedPositions, creationTime)
+		return ChestChannelData(ownerUUID, ownerUsername, name, items, linkedPositions, creationTime)
 	}
 
 	override fun writeChannel(channelData: ChestChannelData) =
 		NBTTagCompound().apply {
-			setBoolean("Deleted", channelData.deleted)
 			setUniqueId("OwnerUUID", channelData.ownerUUID)
 			setString("OwnerUsername", channelData.ownerUsername)
 			setString("Name", channelData.name)
@@ -50,5 +48,5 @@ object LCPersistentData : BasePersistentData<ChestChannelData, TileLinkedChest>(
 		}
 
 	override fun createEmptyChannel(player: EntityPlayer, te: TileLinkedChest, channelName: String?) =
-		ChestChannelData(false, player.uniqueID, player.gameProfile.name, channelName ?: "New channel", Array(Constants.LINKED_CHEST_INVENTORY_SIZE) { ItemStack.EMPTY }, hashSetOf(te.pos dim te.world.dimId), System.currentTimeMillis())
+		ChestChannelData(player.uniqueID, player.gameProfile.name, channelName ?: "New channel", Array(Constants.LINKED_CHEST_INVENTORY_SIZE) { ItemStack.EMPTY }, hashSetOf(te.pos dim te.world.dimId), System.currentTimeMillis())
 }

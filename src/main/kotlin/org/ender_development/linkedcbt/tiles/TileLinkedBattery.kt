@@ -23,7 +23,7 @@ class TileLinkedBattery : BaseLinkedTile<TileLinkedBattery, BatteryChannelData, 
 	}
 
 	override fun readClientChannelData(tag: NBTTagCompound, name: String, ownerUsername: String, ownerUUID: UUID, creationTime: Long) =
-		BatteryChannelData(false, ownerUUID, ownerUsername, name, tag.getInteger("EnergyAmount"), Constants.NO_LINKED_POSITIONS, creationTime).apply {
+		BatteryChannelData(ownerUUID, ownerUsername, name, tag.getInteger("EnergyAmount"), Constants.NO_LINKED_POSITIONS, creationTime).apply {
 			energyCapacityOverride = tag.getInteger("EnergyCapacity")
 		}
 

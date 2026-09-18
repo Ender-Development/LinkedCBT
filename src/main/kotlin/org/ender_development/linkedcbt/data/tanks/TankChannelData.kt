@@ -8,7 +8,6 @@ import net.minecraftforge.fluids.Fluid
 import java.util.*
 
 data class TankChannelData(
-	override var deleted: Boolean,
 	override var ownerUUID: UUID,
 	override var ownerUsername: String,
 	override var name: String,

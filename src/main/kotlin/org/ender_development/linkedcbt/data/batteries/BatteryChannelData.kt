@@ -7,7 +7,6 @@ import org.ender_development.linkedcbt.data.batteries.client.ClientBatteryChanne
 import java.util.*
 
 data class BatteryChannelData(
-	override var deleted: Boolean,
 	override var ownerUUID: UUID,
 	override var ownerUsername: String,
 	override var name: String,

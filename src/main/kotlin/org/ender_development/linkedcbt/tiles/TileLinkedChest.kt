@@ -23,7 +23,6 @@ class TileLinkedChest : BaseLinkedTile<TileLinkedChest, ChestChannelData, IItemH
 
 	override fun readClientChannelData(tag: NBTTagCompound, name: String, ownerUsername: String, ownerUUID: UUID, creationTime: Long) =
         ChestChannelData(
-            false,
             ownerUUID,
             ownerUsername,
             name,

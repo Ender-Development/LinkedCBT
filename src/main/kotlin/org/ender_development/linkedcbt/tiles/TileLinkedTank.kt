@@ -36,7 +36,7 @@ class TileLinkedTank : BaseLinkedTile<TileLinkedTank, TankChannelData, IFluidHan
 	override fun readClientChannelData(tag: NBTTagCompound, name: String, ownerUsername: String, ownerUUID: UUID, creationTime: Long): TankChannelData {
 		val fluid = FluidRegistry.getFluid(tag.getString("FluidName"))
 		val fluidAmount = tag.getInteger("FluidAmount")
-		return TankChannelData(false, ownerUUID, ownerUsername, name, fluid, fluidAmount, Constants.NO_LINKED_POSITIONS, creationTime).apply {
+		return TankChannelData(ownerUUID, ownerUsername, name, fluid, fluidAmount, Constants.NO_LINKED_POSITIONS, creationTime).apply {
 			fluidCapacityOverride = tag.getInteger("FluidCapacity")
 		}
 	}
