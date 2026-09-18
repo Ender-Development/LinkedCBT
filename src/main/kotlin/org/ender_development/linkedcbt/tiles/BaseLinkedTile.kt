@@ -50,7 +50,7 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 	override var needsRedstonePower = false
 
 	var channelId = Constants.NO_CHANNEL
-	var channelData: CH_DATA? = persistentData.data.get(channelId)
+	var channelData: CH_DATA? = persistentData.data[channelId]
 		set(value) {
 			field = value
 			linkedHandler.channelData = value
@@ -92,13 +92,13 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 		if(channelId == Constants.NO_CHANNEL)
 			return
 
-		persistentData.data.get(channelId)?.linkedPositions?.remove(pos dim world.dimId)
+		persistentData.data[channelId]?.linkedPositions?.remove(pos dim world.dimId)
 
 		channelId = Constants.NO_CHANNEL
 		channelData = null
 	}
 
-	fun link(newChannelId: Int, player: EntityPlayer) {
+	fun link(newChannelId: UUID, player: EntityPlayer) {
 		if(channelId == newChannelId)
 			return
 
@@ -129,11 +129,11 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 		markDirtyGUI()
 	}
 
-	fun link(newChannelId: Int) {
+	fun link(newChannelId: UUID) {
 		if(channelId == newChannelId)
 			return
 
-		val newChannelData = persistentData.data.get(newChannelId)
+		val newChannelData = persistentData.data[newChannelId]
 		if(newChannelData == null || newChannelData.deleted) // sanity check + never allow connecting to deleted channels
 			return
 
@@ -147,6 +147,7 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 
 		if(world != null) // in early readFromNBT, world is still null
 			newChannelData.linkedPositions.add(pos dim world.dimId)
+
 		channelId = newChannelId
 		channelData = newChannelData
 
@@ -212,8 +213,8 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 
 	// server-side
 	override fun readFromNBT(compound: NBTTagCompound) {
-		if(compound.hasKey("ChannelId"))
-			link(compound.getInteger("ChannelId"))
+		if(compound.hasKey("ChannelIdMost"))
+			link(compound.getUniqueId("ChannelId")!!)
 
 		sideConfiguration.readFromNBT(compound.getCompoundTag("SideConfiguration"))
 		super.readFromNBT(compound)
@@ -229,7 +230,7 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 		compound.removeTag("output")
 
 		if(channelId != Constants.NO_CHANNEL)
-			compound.setInteger("ChannelId", channelId)
+			compound.setUniqueId("ChannelId", channelId)
 
 		compound.setTag("SideConfiguration", sideConfiguration.writeToNBT(false))
 
@@ -242,15 +243,15 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 	// server-side, sent to client-side [handleUpdateTag]
 	override fun getUpdateTag(): NBTTagCompound {
 		return NBTTagCompound().apply {
-			// TODO: Let roz check why we can't just use the public version?
-			writeToNBT(this) // write stuff like x,y,z + Forge stuff, since we don't call writeToNBT
+			super.writeToNBT(this) // write stuff like x,y,z + Forge stuff, since we don't call writeToNBT ourselves
 			setTag("SideConfiguration", sideConfiguration.writeToNBT(true))
-			setInteger("ChannelId", channelId)
+			setUniqueId("ChannelId", channelId)
 
 			channelData?.let { channelData ->
 				setString("Name", channelData.name)
 				setString("OwnerUsername", channelData.ownerUsername)
 				setUniqueId("OwnerUUID", channelData.ownerUUID)
+				setLong("CreationTime", channelData.creationTime)
 
 				writeClientChannelData(channelData, this)
 			}
@@ -268,7 +269,7 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 		super.readFromNBT(tag)
 
 		sideConfiguration.readFromNBT(tag.getCompoundTag("SideConfiguration"))
-		channelId = tag.getInteger("ChannelId")
+		channelId = tag.getUniqueId("ChannelId")!!
 
 		if(!tag.hasKey("OwnerUsername")) {
 			channelData = null
@@ -278,10 +279,11 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 		val name = tag.getString("Name")
 		val ownerUsername = tag.getString("OwnerUsername")
 		val ownerUUID = tag.getUniqueId("OwnerUUID")!!
-		channelData = readClientChannelData(tag, name, ownerUsername, ownerUUID)
+		val creationTime = tag.getLong("CreationTime")
+		channelData = readClientChannelData(tag, name, ownerUsername, ownerUUID, creationTime)
 	}
 
-	abstract fun readClientChannelData(tag: NBTTagCompound, name: String, ownerUsername: String, ownerUUID: UUID): CH_DATA
+	abstract fun readClientChannelData(tag: NBTTagCompound, name: String, ownerUsername: String, ownerUUID: UUID, creationTime: Long): CH_DATA
 
 	override fun hasCapability(capability: Capability<*>, facing: EnumFacing?) =
 		capability == capType && sideConfiguration.hasCapability(facing)
@@ -316,7 +318,7 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 
 	// ICopyPasteExtraTile
 	override fun copyData(tag: NBTTagCompound) {
-		tag.setInteger("ChannelId", channelId)
+		tag.setUniqueId("ChannelId", channelId)
 		tag.setTag("SideConfiguration", sideConfiguration.writeToNBT(true))
 	}
 
@@ -324,8 +326,8 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 		if(channelData?.canBeEditedBy(player.uniqueID) == false)
 			return
 
-		if(tag.hasKey("ChannelId")) {
-			val channelId = tag.getInteger("ChannelId")
+		if(tag.hasKey("ChannelIdMost")) {
+			val channelId = tag.getUniqueId("ChannelId")!!
 			if(channelId != Constants.CREATE_NEW_CHANNEL) // sanity check
 				link(channelId, player)
 		}

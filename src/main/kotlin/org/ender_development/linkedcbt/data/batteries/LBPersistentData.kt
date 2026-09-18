@@ -20,8 +20,9 @@ object LBPersistentData : BasePersistentData<BatteryChannelData, TileLinkedBatte
 			DimBlockPos.fromString(tag.getString("LinkedPosition$$it"))
 		}
 		val energyAmount = tag.getInteger("EnergyAmount")
+		val creationTime = tag.getLong("CreationTime")
 
-		return BatteryChannelData(deleted, ownerUUID, ownerUsername, name, energyAmount, linkedPositions)
+		return BatteryChannelData(deleted, ownerUUID, ownerUsername, name, energyAmount, linkedPositions, creationTime)
 	}
 
 	override fun writeChannel(channelData: BatteryChannelData) =
@@ -35,8 +36,9 @@ object LBPersistentData : BasePersistentData<BatteryChannelData, TileLinkedBatte
 				setString("LinkedPosition$$idx", pos.toString())
 			}
 			setInteger("EnergyAmount", channelData.energyAmount)
+			setLong("CreationTime", channelData.creationTime)
 		}
 
 	override fun createEmptyChannel(player: EntityPlayer, te: TileLinkedBattery, channelName: String?) =
-		BatteryChannelData(false, player.uniqueID, player.gameProfile.name, channelName ?: "New channel $nextChannelId", 0, hashSetOf(te.pos dim te.world.dimId))
+		BatteryChannelData(false, player.uniqueID, player.gameProfile.name, channelName ?: "New channel", 0, hashSetOf(te.pos dim te.world.dimId), System.currentTimeMillis())
 }

@@ -57,7 +57,7 @@ abstract class BaseSideConfiguration<HANDLER> {
 	fun readFromNBT(tag: NBTTagCompound) {
 		sides.forEach { (facing) ->
 			if(tag.hasKey(facing.name))
-				sides.put(facing, SideConfiguration.valueOf(tag.getString(facing.name)))
+				sides[facing] = SideConfiguration.valueOf(tag.getString(facing.name))
 		}
 	}
 }

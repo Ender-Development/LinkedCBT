@@ -6,17 +6,20 @@ import org.ender_development.linkedcbt.data.tanks.client.ClientTankChannelData
 import io.netty.buffer.ByteBuf
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap
 import org.ender_development.catalyx.api.v1.common.extensions.readString
+import org.ender_development.catalyx.api.v1.common.extensions.readUUID
 import org.ender_development.catalyx.api.v1.common.extensions.writeString
+import org.ender_development.catalyx.api.v1.common.extensions.writeUUID
 import kotlin.random.Random
 
 class TankChannelListPacket : BaseChannelListPacket<TankChannelData, ClientTankChannelData> {
 	override fun writeChannel(buf: ByteBuf, channel: ClientTankChannelData) {
-		buf.writeInt(channel.id)
+		buf.writeUUID(channel.id)
 		buf.writeString(channel.name)
+		buf.writeLong(channel.creationTime)
 	}
 
 	override fun readChannel(buf: ByteBuf) =
-		ClientTankChannelData(buf.readInt(), buf.readString())
+		ClientTankChannelData(buf.readUUID(), buf.readString(), buf.readLong())
 
 	constructor(id: Int) {
 		this.id = id

@@ -21,14 +21,15 @@ class TileLinkedChest : BaseLinkedTile<TileLinkedChest, ChestChannelData, IItemH
 		}
 	}
 
-	override fun readClientChannelData(tag: NBTTagCompound, name: String, ownerUsername: String, ownerUUID: UUID) =
+	override fun readClientChannelData(tag: NBTTagCompound, name: String, ownerUsername: String, ownerUUID: UUID, creationTime: Long) =
         ChestChannelData(
             false,
             ownerUUID,
             ownerUsername,
             name,
             Array(Constants.LINKED_CHEST_INVENTORY_SIZE) { ItemStack(tag.getCompoundTag("Item$$it")) },
-            Constants.NO_LINKED_POSITIONS
+            Constants.NO_LINKED_POSITIONS,
+			creationTime
         )
 
 	override val inventorySlotCount = Constants.LINKED_CHEST_INVENTORY_SIZE

@@ -20,7 +20,7 @@ object LTTOPIntegration : IProbeInfoProvider {
 
 		info.text(when(tile.channelId) {
 			Constants.NO_CHANNEL -> "Unlinked"
-			else -> "Channel ${tile.channelData?.displayName(tile.channelId)}"
+			else -> "Channel ${tile.channelData?.displayName()}"
 		})
 	}
 }

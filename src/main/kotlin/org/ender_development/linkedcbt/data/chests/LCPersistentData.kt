@@ -27,8 +27,9 @@ object LCPersistentData : BasePersistentData<ChestChannelData, TileLinkedChest>(
 			else
 				ItemStack(tag.getCompoundTag("Item$$idx"))
 		}
+		val creationTime = tag.getLong("CreationTime")
 
-		return ChestChannelData(deleted, ownerUUID, ownerUsername, name, items, linkedPositions)
+		return ChestChannelData(deleted, ownerUUID, ownerUsername, name, items, linkedPositions, creationTime)
 	}
 
 	override fun writeChannel(channelData: ChestChannelData) =
@@ -45,8 +46,9 @@ object LCPersistentData : BasePersistentData<ChestChannelData, TileLinkedChest>(
 				if(!stack.isEmpty)
 					setTag("Item$$idx", stack.writeToNBT(NBTTagCompound()))
 			}
+			setLong("CreationTime", channelData.creationTime)
 		}
 
 	override fun createEmptyChannel(player: EntityPlayer, te: TileLinkedChest, channelName: String?) =
-		ChestChannelData(false, player.uniqueID, player.gameProfile.name, channelName ?: "New channel $nextChannelId", Array(Constants.LINKED_CHEST_INVENTORY_SIZE) { ItemStack.EMPTY }, hashSetOf(te.pos dim te.world.dimId))
+		ChestChannelData(false, player.uniqueID, player.gameProfile.name, channelName ?: "New channel", Array(Constants.LINKED_CHEST_INVENTORY_SIZE) { ItemStack.EMPTY }, hashSetOf(te.pos dim te.world.dimId), System.currentTimeMillis())
 }

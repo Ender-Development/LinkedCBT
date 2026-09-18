@@ -22,9 +22,9 @@ private typealias ChannelDataProviderDeletedWarn = (ICommandSender, String, Bool
 internal object SharedSubcommands {
 	fun <CH_DATA : BaseChannelData<CH_DATA, *>> list(server: MinecraftServer, sender: ICommandSender, args: Array<String>, persistentData: BasePersistentData<CH_DATA, *>, extraData: (CH_DATA) -> ITextComponent?) {
 		sender.reply("Channels:")
-		persistentData.data.toList().sortedBy { it.first }.forEach { (id, data) ->
+		persistentData.data.values.sortedByDescending { it.creationTime }.forEach { data ->
 			val colour = if(data.deleted) TextFormatting.GRAY else TextFormatting.WHITE
-			sender.reply("- ${data.displayName(id)}${if(data.deleted) " (deleted)" else ""}", colour)
+			sender.reply("- ${data.displayName()}${if(data.deleted) " (deleted)" else ""}", colour)
 			sender.reply("owner: ${data.ownerUsername}; ${data.linkedPositions.size} endpoint${if(data.linkedPositions.size == 1) "" else "s"}", colour)
 			extraData(data)?.let { sender.reply(it, colour) }
 			sender.reply("")
@@ -150,7 +150,7 @@ internal object SharedSubcommands {
 				return
 			}
 
-			persistentData.data.remove(channelId)
+			TODO()//persistentData.data.remove(channelId)
 
 			sender.reply("Channel $channelId and all of its associated data has been purged, and its channel id is free to be reused")
 		}

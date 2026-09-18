@@ -6,13 +6,21 @@ import org.ender_development.linkedcbt.data.chests.client.ClientChestChannelData
 import net.minecraft.item.ItemStack
 import java.util.*
 
-data class ChestChannelData(override var deleted: Boolean, override var ownerUUID: UUID, override var ownerUsername: String, override var name: String, val items: Array<ItemStack>, override val linkedPositions: HashSet<DimBlockPos>) : BaseChannelData<ChestChannelData, ClientChestChannelData>() {
+data class ChestChannelData(
+	override var deleted: Boolean,
+	override var ownerUUID: UUID,
+	override var ownerUsername: String,
+	override var name: String,
+	val items: Array<ItemStack>,
+	override val linkedPositions: HashSet<DimBlockPos>,
+	override val creationTime: Long
+) : BaseChannelData<ChestChannelData, ClientChestChannelData>() {
 	override fun equals(other: Any?) =
-		this === other || (other is ChestChannelData && deleted == other.deleted && ownerUUID == other.ownerUUID && name == other.name && items.contentEquals(other.items) && linkedPositions == other.linkedPositions)
+		this === other || (other is ChestChannelData && deleted == other.deleted && ownerUUID == other.ownerUUID && name == other.name && items.contentEquals(other.items) && linkedPositions == other.linkedPositions && creationTime == other.creationTime)
 
 	override fun hashCode() =
 		Objects.hash(deleted, ownerUUID, name, items.contentHashCode(), linkedPositions)
 
-	override fun toClientChannelData(id: Int) =
-		ClientChestChannelData(id, name)
+	override fun toClientChannelData(id: UUID) =
+		ClientChestChannelData(id, name, creationTime)
 }

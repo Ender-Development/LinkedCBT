@@ -136,7 +136,7 @@ internal object TanksSubcommand : CommandTreeBase() {
 		}
 
 	private fun getChannelData(sender: ICommandSender, arg: String, deletedWarn: Boolean = true): Pair<Int, TankChannelData>? {
-		val channelId = getChannelId(sender, arg) ?: return null
+		TODO()/*val channelId = getChannelId(sender, arg) ?: return null
 		val channel = LTPersistentData.data.get(channelId) ?: run {
 			sender.replyFail("There is no channel with id $channelId")
 			return null
@@ -145,7 +145,7 @@ internal object TanksSubcommand : CommandTreeBase() {
 		if(channel.deleted && deletedWarn)
 			sender.replyWarn("Channel is deleted")
 
-		return channelId to channel
+		return channelId to channel*/
 	}
 
 	private const val BASE_COMMAND = "/linkedcbt tanks"

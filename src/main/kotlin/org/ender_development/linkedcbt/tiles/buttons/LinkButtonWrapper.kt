@@ -6,7 +6,9 @@ import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext
 import org.ender_development.catalyx.api.v1.common.extensions.readString
+import org.ender_development.catalyx.api.v1.common.extensions.readUUID
 import org.ender_development.catalyx.api.v1.common.extensions.writeString
+import org.ender_development.catalyx.api.v1.common.extensions.writeUUID
 import org.ender_development.catalyx.core.client.button.AbstractButtonWrapper
 import org.ender_development.linkedcbt.client.gui.BaseLinkedGui
 import org.ender_development.linkedcbt.data.Constants
@@ -46,9 +48,8 @@ class LinkButtonWrapper : AbstractButtonWrapper {
 				this.y + BaseLinkedGui.LINK_BTN_TEXT_OFF_Y,
 				BaseLinkedGui.TEXT_COLOUR
 			)
-			@Suppress("KotlinConstantConditions")
 			if(Constants.DEBUG)
-				BaseLinkedGui.FONT_RENDERER.drawString(channel.toString(), this.x - 300, this.y + BaseLinkedGui.LINK_BTN_TEXT_OFF_Y, if(hovered) BaseLinkedGui.RED_TEXT_COLOUR else BaseLinkedGui.TEXT_COLOUR)
+				BaseLinkedGui.FONT_RENDERER.drawString(channel.toString(), this.x - 300, this.y + BaseLinkedGui.LINK_BTN_TEXT_OFF_Y - 100, if(hovered) BaseLinkedGui.RED_TEXT_COLOUR else BaseLinkedGui.TEXT_COLOUR)
 		}
 	} }
 
@@ -57,13 +58,13 @@ class LinkButtonWrapper : AbstractButtonWrapper {
 	lateinit var ctx: MessageContext
 
 	override fun readExtraData(buf: ByteBuf, ctx: MessageContext) {
-		channelId = buf.readInt()
+		channelId = buf.readUUID()
 		newChannelNameOverride = buf.readString()
 		this.ctx = ctx
 	}
 
 	override fun writeExtraData(buf: ByteBuf) {
-		buf.writeInt(channelId)
+		buf.writeUUID(channelId)
 		buf.writeString(newChannelNameOverride)
 	}
 }

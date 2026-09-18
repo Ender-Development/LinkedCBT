@@ -11,8 +11,8 @@ abstract class BaseClientChannelListManager<CH_DATA : BaseChannelData<CH_DATA, C
 
 	val channels: List<CLIENT_CH_DATA>
 		get() {
-			// only check every 1s
-			if(System.currentTimeMillis() - lastQueried >= 1000L) {
+			// only query at max every 1.5s
+			if(System.currentTimeMillis() - lastQueried >= 1500L) {
 				lastQueried = System.currentTimeMillis()
 				fetchNewData()
 			}
@@ -21,9 +21,9 @@ abstract class BaseClientChannelListManager<CH_DATA : BaseChannelData<CH_DATA, C
 		}
 
 	private fun fetchNewData() {
-		PacketHandler.channel.sendToServer(packet.newInstance().also {
-			handlers.put(it.id) {
-				it.channelData.sortBy { it.id }
+		PacketHandler.channel.sendToServer(packet.newInstance().also { pkt ->
+			handlers.put(pkt.id) {
+				it.channelData.sortByDescending { it.id }
 				it.channelData.add(createNewChannel)
 				cachedData = it.channelData
 			}

@@ -6,8 +6,15 @@ import org.ender_development.linkedcbt.data.base.BaseChannelData
 import org.ender_development.linkedcbt.data.batteries.client.ClientBatteryChannelData
 import java.util.*
 
-/** **Do NOT** use [ownerUsername] nor [name] for any checking */
-data class BatteryChannelData(override var deleted: Boolean, override var ownerUUID: UUID, override var ownerUsername: String, override var name: String, var energyAmount: Int, override val linkedPositions: HashSet<DimBlockPos>) : BaseChannelData<BatteryChannelData, ClientBatteryChannelData>() {
+data class BatteryChannelData(
+	override var deleted: Boolean,
+	override var ownerUUID: UUID,
+	override var ownerUsername: String,
+	override var name: String,
+	var energyAmount: Int,
+	override val linkedPositions: HashSet<DimBlockPos>,
+	override val creationTime: Long
+) : BaseChannelData<BatteryChannelData, ClientBatteryChannelData>() {
 	/**
 	 * Used client-side to make stuff display properly
 	 */
@@ -19,6 +26,6 @@ data class BatteryChannelData(override var deleted: Boolean, override var ownerU
 		else
 			LCBTConfig.batteries.capacity * if(LCBTConfig.batteries.capacityChangesWithBatteryCount) linkedPositions.size else 1
 
-	override fun toClientChannelData(id: Int) =
-		ClientBatteryChannelData(id, name)
+	override fun toClientChannelData(id: UUID) =
+		ClientBatteryChannelData(id, name, creationTime)
 }

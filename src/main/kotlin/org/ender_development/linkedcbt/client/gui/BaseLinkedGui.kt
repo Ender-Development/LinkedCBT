@@ -196,7 +196,7 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 		when(currentDisplay) {
 			CurrentDisplay.NONE -> {} // shouldn't happen, but don't crash if it does
 			CurrentDisplay.MAIN_OVERVIEW -> {
-				val nameText = tile.channelData?.displayName(tile.channelId) ?: "???"
+				val nameText = tile.channelData?.displayName() ?: "???"
 				var nameColour = TEXT_COLOUR
 				if(canEditChannelData && isHovered(guiLeft + NAME_TEXT_X, guiTop + NAME_TEXT_Y, FONT_RENDERER.getStringWidth(nameText), FONT_HEIGHT, mouseX, mouseY)) {
 					nameColour = HIGHLIGHTED_TEXT_COLOUR
@@ -277,7 +277,7 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 			if(currentDisplay == CurrentDisplay.CHANNEL_LINK) {
 				val text = channelListSearchBar.text.trim()
 				// this will be processed properly on server-side anyways
-				if(!text.isEmpty())
+				if(text.isNotEmpty())
 					it.newChannelNameOverride = text
 			}
 		}
@@ -301,7 +301,7 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 	override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
 		mouseClick = MouseClickData(mouseX, mouseY, mouseButton)
 		super.mouseClicked(mouseX, mouseY, mouseButton)
-		// copied and edited from from super.super.mouseClicked(mouseX, mouseY, mouseButton) but changed `mouseButton == 1`
+		// copied and edited from super.super.mouseClicked(mouseX, mouseY, mouseButton) but changed `mouseButton == 1`
 		if(mouseButton == 1)
 			for(btn in sideConfigurationButtons) {
 				val btn = btn.button!!

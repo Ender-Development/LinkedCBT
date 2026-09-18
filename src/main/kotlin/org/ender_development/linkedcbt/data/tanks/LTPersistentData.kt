@@ -22,8 +22,9 @@ object LTPersistentData : BasePersistentData<TankChannelData, TileLinkedTank>("t
 		}
 		val fluid = FluidRegistry.getFluid(tag.getString("FluidName"))
 		val fluidAmount = tag.getInteger("FluidAmount")
+		val creationTime = tag.getLong("CreationTime")
 
-		return TankChannelData(deleted, ownerUUID, ownerUsername, name, fluid, fluidAmount, linkedPositions)
+		return TankChannelData(deleted, ownerUUID, ownerUsername, name, fluid, fluidAmount, linkedPositions, creationTime)
 	}
 
 	override fun writeChannel(channelData: TankChannelData) =
@@ -39,8 +40,9 @@ object LTPersistentData : BasePersistentData<TankChannelData, TileLinkedTank>("t
 			if(channelData.fluid != null)
 				setString("FluidName", FluidRegistry.getFluidName(channelData.fluid))
 			setInteger("FluidAmount", channelData.fluidAmount)
+			setLong("CreationTime", channelData.creationTime)
 		}
 
 	override fun createEmptyChannel(player: EntityPlayer, te: TileLinkedTank, channelName: String?) =
-		TankChannelData(false, player.uniqueID, player.gameProfile.name, channelName ?: "New channel $nextChannelId", null, 0, hashSetOf(te.pos dim te.world.dimId))
+		TankChannelData(false, player.uniqueID, player.gameProfile.name, channelName ?: "New channel", null, 0, hashSetOf(te.pos dim te.world.dimId), System.currentTimeMillis())
 }

@@ -1,7 +1,5 @@
 package org.ender_development.linkedcbt.data.base
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
@@ -9,12 +7,12 @@ import org.ender_development.catalyx.core.common.persistence.WorldPersistentData
 import org.ender_development.linkedcbt.LinkedCBT
 import org.ender_development.linkedcbt.Reference
 import org.ender_development.linkedcbt.tiles.BaseLinkedTile
+import java.util.*
 
 abstract class BasePersistentData<CH_DATA : BaseChannelData<CH_DATA, *>, TE : BaseLinkedTile<TE, CH_DATA, *, *>>(type: String) {
 	protected val dataNBT = WorldPersistentData(ResourceLocation(Reference.MODID, type), true, ::read, ::unload)
 	private var wasRead = false
-	protected var nextChannelId = 1
-	val data: Int2ObjectMap<CH_DATA> = Int2ObjectOpenHashMap()
+	val data = hashMapOf<UUID, CH_DATA>()
 
 	fun read() {
 		if(wasRead)
@@ -24,16 +22,10 @@ abstract class BasePersistentData<CH_DATA : BaseChannelData<CH_DATA, *>, TE : Ba
 
 		data.clear()
 
-		var nextUnbrokenId = 1
-		dataNBT.data.keySet.sortedBy(String::toInt).forEach {
-			if(it.toInt() == nextUnbrokenId)
-				++nextUnbrokenId
-
-			val tag = dataNBT.data.getCompoundTag(it)
-			data.put(it.toInt(), readChannel(tag))
+		dataNBT.data.keySet.forEach { key ->
+			val tag = dataNBT.data.getCompoundTag(key)
+			data[UUID.fromString(key)] = readChannel(tag)
 		}
-
-		nextChannelId = nextUnbrokenId
 	}
 
 	protected abstract fun readChannel(tag: NBTTagCompound): CH_DATA
@@ -60,25 +52,14 @@ abstract class BasePersistentData<CH_DATA : BaseChannelData<CH_DATA, *>, TE : Ba
 		data.clear()
 	}
 
-	fun createNewChannel(player: EntityPlayer, te: TE, channelName: String? = null): Int {
+	fun createNewChannel(player: EntityPlayer, te: TE, channelName: String? = null): UUID {
 		val channelData = createEmptyChannel(player, te, channelName)
-		data.put(nextChannelId, channelData)
-		return nextChannelId.also {
-			nextChannelId = findNextFreeChannelId()
-		}
+		val channelId = UUID.randomUUID()
+		data[channelId] = channelData
+		return channelId
 	}
 
 	protected abstract fun createEmptyChannel(player: EntityPlayer, te: TE, channelName: String?): CH_DATA
-
-	private fun findNextFreeChannelId(): Int {
-		var id = 1
-		for(it in data.keys.sorted())
-			if(it == id)
-				++id
-			else
-				break
-		return id
-	}
 
 	init {
 		// try to load the data
