@@ -18,7 +18,7 @@ enum class SideConfiguration(val named: String, val colour: TextFormatting) {
 	 */
 	INPUT("input", TextFormatting.BLUE),
 	/**
-	 * Will try to pull from the adjacened tile
+	 * Will try to pull from the adjacent tile
 	 */
 	PULL("pull", TextFormatting.AQUA),
 	/**
@@ -26,7 +26,7 @@ enum class SideConfiguration(val named: String, val colour: TextFormatting) {
 	 */
 	OUTPUT("output", TextFormatting.YELLOW),
 	/**
-	 * Will try to push to the adjacened tile
+	 * Will try to push to the adjacent tile
 	 */
 	PUSH("push", TextFormatting.GOLD);
 
@@ -59,8 +59,8 @@ enum class SideConfiguration(val named: String, val colour: TextFormatting) {
 
 	val v: Int
 		get() = when(this) {
-			DEFAULT, NONE, INPUT -> 52
-			PULL, OUTPUT, PUSH -> 62
+			DEFAULT, NONE, INPUT -> 50
+			PULL, OUTPUT, PUSH -> 60
 		}
 
 	fun describe(facing: EnumFacing, relativeTo: EnumFacing) =
