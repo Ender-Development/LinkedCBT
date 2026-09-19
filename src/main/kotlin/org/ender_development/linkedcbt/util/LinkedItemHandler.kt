@@ -12,7 +12,7 @@ class LinkedItemHandler(override var channelData: ChestChannelData?) : BaseLinke
 		Constants.LINKED_CHEST_INVENTORY_SIZE
 
 	override fun getStackInSlot(slot: Int): ItemStack =
-		channelData?.items?.get(slot) ?: ItemStack.EMPTY
+		channelData?.items?.getOrNull(slot) ?: ItemStack.EMPTY // getOrNull to avoid a client crash when linking a channel and the items array is prefilled with emptyArray()
 
 	override fun getSlotLimit(slot: Int) =
 		channelData?.items?.get(slot)?.maxStackSize ?: 0

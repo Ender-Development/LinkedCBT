@@ -1,13 +1,12 @@
 package org.ender_development.linkedcbt.client.gui
 
 import org.ender_development.linkedcbt.client.container.ContainerLinkedChest
-import org.ender_development.linkedcbt.data.Constants
 import org.ender_development.linkedcbt.data.chests.ChestChannelData
 import org.ender_development.linkedcbt.data.chests.client.ClientChestChannelData
 import org.ender_development.linkedcbt.data.chests.client.ClientChestChannelListManager
 import org.ender_development.linkedcbt.tiles.TileLinkedChest
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.IInventory
+import org.ender_development.linkedcbt.client.container.SlotItemHandlerDisableable
 
 class GuiLinkedChest(playerInv: IInventory, tile: TileLinkedChest) : BaseLinkedGui<ChestChannelData, ClientChestChannelData, TileLinkedChest>(ContainerLinkedChest(playerInv, tile), tile, ClientChestChannelListManager) {
 	override val displayWrapper = null
@@ -19,6 +18,10 @@ class GuiLinkedChest(playerInv: IInventory, tile: TileLinkedChest) : BaseLinkedG
 
 	override fun drawGuiContainerBackgroundLayer(partialTicks: Float, mouseX: Int, mouseY: Int) {
 		super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY)
+		inventorySlots.inventorySlots.forEach {
+			if(it is SlotItemHandlerDisableable)
+				it.enabled = currentDisplay == CurrentDisplay.MAIN_OVERVIEW && tile.channelData != null
+		}
 		if(currentDisplay != CurrentDisplay.MAIN_OVERVIEW)
 			return
 

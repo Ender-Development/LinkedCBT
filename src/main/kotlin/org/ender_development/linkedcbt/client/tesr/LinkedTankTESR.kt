@@ -19,9 +19,7 @@ internal object LinkedTankTESR : AbstractTESRenderer() {
 		if(tileEntity !is TileLinkedTank)
 			return
 
-		val fluid = tileEntity.fluidHandler.contents
-		if(fluid == null)
-			return
+		val fluid = tileEntity.fluidHandler.contents ?: return
 
 		val icon = RenderUtils.getStillTexture(fluid) ?: return
 		val minU = icon.minU.toDouble() * icon.iconWidth
