@@ -69,7 +69,7 @@ abstract class BaseLinkedTile<TE : BaseLinkedTile<TE, CH_DATA, CAP_TYPE, LINKED_
 		markDirtyGUIEvery(5)
 		if(++channelUpdateTicks == 3) {
 			channelUpdateTicks = 0
-			if(channelId != Constants.NO_CHANNEL && channelData == null)
+			if(channelId != Constants.NO_CHANNEL && (channelData == null || !persistentData.data.containsKey(channelId)))
 				unlink()
 
 			// this shouldn't happen but might as well
