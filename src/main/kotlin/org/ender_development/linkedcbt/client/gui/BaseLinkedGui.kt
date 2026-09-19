@@ -290,7 +290,7 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 			if(it.channelId == Constants.NO_CHANNEL)
 				switchDisplay(CurrentDisplay.CHANNEL_LINK)
 			else {
-				// update client-side tile to hopefully display the correct data faster (also needed for unlinkButton visiblity)
+				// update client-side tile to hopefully display the correct data faster (also needed for unlinkButton visibility)
 				tile.channelId = it.channelId
 				tile.channelData = channelListManager.channels.find { ch -> ch.id == it.channelId }?.toFakeChannelData()
 				switchDisplay(CurrentDisplay.MAIN_OVERVIEW)
@@ -463,20 +463,18 @@ abstract class BaseLinkedGui<CH_DATA : BaseChannelData<CH_DATA, CLIENT_CH_DATA>,
 		const val BAR_BACKGROUND_U = 175
 		const val BAR_BACKGROUND_V = 0
 
-		const val DELETE_BTN_X = 133
-		const val DELETE_BTN_Y = 79
-		const val DELETE_BTN_W = 36
-		const val DELETE_BTN_H = 13
+		const val DELETE_BTN_X = 155
+		const val DELETE_BTN_Y = 81
+		const val DELETE_BTN_W = 14
+		const val DELETE_BTN_H = 11
 		const val DELETE_BTN_U = 193
 		const val DELETE_BTN_V = 24
 		const val DELETE_BTN_V_HOVERED = DELETE_BTN_V + DELETE_BTN_H
-		const val DELETE_BTN_TEXT_OFF_X = 3
-		const val DELETE_BTN_TEXT_OFF_Y = 3
-		const val DELETE_BTN_CONFIRMATION_TEXT_X = DELETE_BTN_X + DELETE_BTN_TEXT_OFF_X + (DELETE_BTN_W shr 1)
-		val DELETE_BTN_CONFIRMATION_TEXT_Y = DELETE_BTN_Y + DELETE_BTN_TEXT_OFF_Y - FONT_HEIGHT - 4
+		const val DELETE_BTN_CONFIRMATION_TEXT_X = DELETE_BTN_X - DELETE_BTN_W
+		val DELETE_BTN_CONFIRMATION_TEXT_Y = DELETE_BTN_Y - FONT_HEIGHT - 4
 
-		const val UNLINK_BTN_X = 109
-		const val UNLINK_BTN_Y = DELETE_BTN_Y + 1
+		const val UNLINK_BTN_X = 131
+		const val UNLINK_BTN_Y = DELETE_BTN_Y - 1
 		const val UNLINK_BTN_W = 22
 		const val UNLINK_BTN_H = 12
 		const val UNLINK_BTN_U = 193

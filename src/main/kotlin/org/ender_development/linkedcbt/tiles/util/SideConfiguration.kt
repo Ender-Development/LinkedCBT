@@ -59,8 +59,8 @@ enum class SideConfiguration(val named: String, val colour: TextFormatting) {
 
 	val v: Int
 		get() = when(this) {
-			DEFAULT, NONE, INPUT -> 50
-			PULL, OUTPUT, PUSH -> 60
+			DEFAULT, NONE, INPUT -> 46
+			PULL, OUTPUT, PUSH -> 56
 		}
 
 	fun describe(facing: EnumFacing, relativeTo: EnumFacing) =

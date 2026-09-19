@@ -9,8 +9,6 @@ info.linkedcbt:no_permission=You don't have sufficient permissions to edit this 
 gui.linkedcbt:cbt.owner=Owner: %s
 gui.linkedcbt:cbt.confirmation=Are you sure?
 gui.linkedcbt:cbt.channels=Channels:
-gui.linkedcbt:cbt.unlink_btn=Unlink
-gui.linkedcbt:cbt.delete_btn=Delete
 gui.linkedcbt:cbt.create_new=Create new
 
 itemGroup.linkedcbt=Linked CBT
